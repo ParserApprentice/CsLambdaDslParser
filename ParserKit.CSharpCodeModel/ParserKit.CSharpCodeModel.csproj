@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F2795CA4-5692-462B-9D42-395CDFCF2E66}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ParserKit.CSharpCodeModel</RootNamespace>
+    <AssemblyName>ParserKit.CSharpCodeModel</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="1_CodeDom\CodeAttributes.cs" />
+    <Compile Include="1_CodeDom\CodeComments.cs" />
+    <Compile Include="1_CodeDom\CodeDefineStatement.cs" />
+    <Compile Include="1_CodeDom\CodeDefineTypeDeclaration.cs" />
+    <Compile Include="1_CodeDom\CodeDefineTypeReference.cs" />
+    <Compile Include="1_CodeDom\CodeDirective.cs" />
+    <Compile Include="1_CodeDom\CodeExpression.cs" />
+    <Compile Include="1_CodeDom\CodeExpressions.cs" />
+    <Compile Include="1_CodeDom\CodeExpressions_Internal.cs" />
+    <Compile Include="1_CodeDom\CodeExpressions_PrimaryOpExpression.cs" />
+    <Compile Include="1_CodeDom\CodeJsonObjectExpression.cs" />
+    <Compile Include="1_CodeDom\CodeNamespace.cs" />
+    <Compile Include="1_CodeDom\CodeObjectCollection.cs" />
+    <Compile Include="1_CodeDom\CodeObjectRoles.cs" />
+    <Compile Include="1_CodeDom\CodeObjects.cs" />
+    <Compile Include="1_CodeDom\CodeQueryExpressions.cs" />
+    <Compile Include="1_CodeDom\CodeStatements.cs" />
+    <Compile Include="1_CodeDom\CodeStatements_IfElse_Switch.cs" />
+    <Compile Include="1_CodeDom\CodeStatements_Loop.cs" />
+    <Compile Include="1_CodeDom\CodeStatements_TryCatchFinally.cs" />
+    <Compile Include="1_CodeDom\CodeStatements_Yield.cs" />
+    <Compile Include="1_CodeDom\CodeTypeDeclarations.cs" />
+    <Compile Include="1_CodeDom\CodeTypeMembers.cs" />
+    <Compile Include="1_CodeDom\CodeTypeReferences.cs" />
+    <Compile Include="1_CodeDom\CodeXmlObjects.cs" />
+    <Compile Include="1_CodeDom\CompilationUnit.cs" />
+    <Compile Include="1_CodeDom\CompilationUnit_CodeElements_Parsing_Phase.cs" />
+    <Compile Include="1_CodeDom\LocationCodeArea.cs" />
+    <Compile Include="1_CodeDom\TypeParameter.cs" />
+    <Compile Include="2_Utils\0_BuildMessage.cs" />
+    <Compile Include="2_Utils\0_BuildMessages.cs" />
+    <Compile Include="2_Utils\3_CodeDomToSourceCodeConverter.cs" />
+    <Compile Include="2_Utils\AsmIndentTextWriter.cs" />
+    <Compile Include="2_Utils\CodeDomLocationFinder.cs" />
+    <Compile Include="2_Utils\CodeDomVisitor.cs" />
+    <Compile Include="2_Utils\CodeDomWalker_Statement_Expression.cs" />
+    <Compile Include="2_Utils\CodeDomWalker_TypeDecl_TypeMembers_Parser.cs" />
+    <Compile Include="CodeDom\Ast.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
