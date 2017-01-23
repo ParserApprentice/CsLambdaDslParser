@@ -125,7 +125,7 @@ namespace Parser.ParserKit.LR
 
         //[System.Diagnostics.DebuggerStepperBoundary]
 
-        internal ParseResult Parse(ParserSwitchContext swContext)
+        public ParseResult Parse(ParserSwitchContext swContext)
         {
             if (this.UseFastParseMode)
             {
@@ -138,7 +138,7 @@ namespace Parser.ParserKit.LR
 
         }
 
-          [System.Diagnostics.DebuggerStepperBoundary]
+        [System.Diagnostics.DebuggerStepperBoundary]
         ParseResult ParseDev(ParserSwitchContext swContext)
         {
             //convert to token  
@@ -167,15 +167,15 @@ namespace Parser.ParserKit.LR
 
             ParseNode finalNode = null;
             // bool switchBack = false;
-            bool breakOnReduce = this.EnableBreakOnReduce;
-            bool breakOnShift = this.EnableBreakOnShift;
+            bool breakOnReduce = false;// this.EnableBreakOnReduce;
+            bool breakOnShift = false;// this.EnableBreakOnShift;
             ParseNodeHolder holder = this.ParseNodeHolder = swContext.Holder;
-            
+
             holder.Reporter = reporter;
             int lineNumber = 0, columnNumber = 0;
             holder.ParseNodeStack = symbolParseNodes;
 
-            for (;;)
+            for (; ; )
             {
 
 #if DEBUG
@@ -200,7 +200,7 @@ namespace Parser.ParserKit.LR
                 if (todo.IsEmpty())
                 {
                     //check if switch row  
-                    //if token info is contextual ketword
+                    //if token info is contextual keyword
                     //then check current context that 
                     //should it be a keyword or an identifier 
                     todo = myLRParsingTable.GetTodo(current_state, TokenDefinition._switchToken);
@@ -250,22 +250,29 @@ namespace Parser.ParserKit.LR
 
                     if (todo.IsEmpty())
                     {
-
+                        //nothing todo then ask the manager
                         swContext.SwitchBackParseResult = new ParseResult();
                         swHandler(swContext);
                         ParseNode switchBackNode = swContext.SwitchBackParseNode;
                         if (switchBackNode != null)
                         {
                             symbolParseNodes.Push(switchBackNode);
+                            tk = reader.ReadNext();
+                            continue;
                         }
                         else
                         {
-                            symbolParseNodes.Push(new NTn1(new EmptyParseNode()));
+                            //skip or reduce?
+                            todo = myLRParsingTable.GetTodo(current_state, TokenDefinition._eof);
+                            tk = new Token(TokenDefinition._eof);
+                           // symbolParseNodes.Push(new NTn1(new EmptyParseNode()));
+                            continue;
                         }
-                        symbolParseNodes.Push(swContext.SwitchBackParseNode);
-                        tk = reader.ReadNext();
-                        continue;
+                       // symbolParseNodes.Push(swContext.SwitchBackParseNode);
+                      
+                       
                     }
+
                     //--------------------- 
                     if (todo.IsEmpty())
                     {
@@ -293,7 +300,7 @@ namespace Parser.ParserKit.LR
                                         int enter_index2 = reader.CurrentReadIndex;
                                         int lookupNCount = 10;
                                         int lookupTimes = 0;
-                                        for (;;)
+                                        for (; ; )
                                         {
 
                                             foundIndex = CanTokenApprearInSeq(seq, tk.TkInfo);
@@ -378,7 +385,7 @@ namespace Parser.ParserKit.LR
                                         int enter_index2 = reader.CurrentReadIndex;
                                         int lookupNCount = 10;
                                         int lookupTimes = 0;
-                                        for (;;)
+                                        for (; ; )
                                         {
 
                                             foundIndex = CanTokenApprearInSeq(seq, tk.TkInfo);
@@ -543,6 +550,8 @@ namespace Parser.ParserKit.LR
 
                             swContext.SwitchDetail = table.GetSwitchDetail(todo.SwitchRecordNumber);
                             swContext.SwitchBackParseResult = new ParseResult();//result 
+                           
+
                             swHandler(swContext);
 
                             symbolParseNodes.Push(swContext.SwitchBackParseNode);
@@ -637,10 +646,16 @@ namespace Parser.ParserKit.LR
                         break;
                     case LRItemTodoKind.Accept:
                         {
-                            if (symbolParseNodes.Count != 1)
+                            if(swContext.WaitingParserCount ==0 &&
+                                symbolParseNodes.Count != 1)                                 
                             {
                                 throw new NotSupportedException();
                             }
+
+                            //if (symbolParseNodes.Count != 1)
+                            //{
+                            //    throw new NotSupportedException();
+                            //}
 
                             finalNode = symbolParseNodes.Pop();
                             this.FinalNode = finalNode;
@@ -882,8 +897,8 @@ namespace Parser.ParserKit.LR
 
                 }
             }
-            //---------------
-            EXIT:
+        //---------------
+        EXIT:
             return new ParseResult(finalNode, ParseResultKind.OK, swContext.Reader.CurrentReadIndex);
         }
 
@@ -920,7 +935,7 @@ namespace Parser.ParserKit.LR
 
             ParseNode finalNode = null;
 
-            for (;;)
+            for (; ; )
             {
 
                 if (tk == null)
@@ -1040,7 +1055,7 @@ namespace Parser.ParserKit.LR
                                         int enter_index2 = reader.CurrentReadIndex;
                                         int lookupNCount = 10;
                                         int lookupTimes = 0;
-                                        for (;;)
+                                        for (; ; )
                                         {
 
                                             foundIndex = CanTokenApprearInSeq(seq, tk.TkInfo);
@@ -1125,7 +1140,7 @@ namespace Parser.ParserKit.LR
                                         int enter_index2 = reader.CurrentReadIndex;
                                         int lookupNCount = 10;
                                         int lookupTimes = 0;
-                                        for (;;)
+                                        for (; ; )
                                         {
 
                                             foundIndex = CanTokenApprearInSeq(seq, tk.TkInfo);
@@ -1565,8 +1580,8 @@ namespace Parser.ParserKit.LR
 
                 }
             }
-            //---------------
-            EXIT:
+        //---------------
+        EXIT:
             return new ParseResult(finalNode, ParseResultKind.OK, swContext.Reader.CurrentReadIndex);
         }
 

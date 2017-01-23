@@ -2227,7 +2227,7 @@ namespace Parser.ParserKit.LR
                     {
 
                         bool used = false;
-                        for (int i = ntB.SeqCount - 1; i >= 0; --i)
+                        for (int i = 0; i < j; ++i)
                         {
                             SymbolSequence subsq = ntB.GetSequence(i);
 
@@ -2684,10 +2684,6 @@ namespace Parser.ParserKit.LR
         }
         public void Push(ParseNode d)
         {
-            if (d == null)
-            {
-
-            }
             data[++index] = d;
         }
         public ParseNode Pop()

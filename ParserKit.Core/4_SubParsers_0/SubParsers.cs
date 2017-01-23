@@ -8,9 +8,6 @@ using Parser.ParserKit.SubParsers;
 
 namespace Parser.ParserKit
 {
-
-
-
     public abstract class SubParser
     {
         protected class RootHolder
@@ -58,19 +55,17 @@ namespace Parser.ParserKit
         {
             _autoNumber = 0;
             _tkInfoCollection = tkInfoCollection;
-
-
             //---------------------------------------
             InternalSetup(tkInfoCollection);
-            //---------------------------------------
-
+            //--------------------------------------- 
             if (!TryUseTableDataCache)
             {
                 _parsingTable.MakeParsingTable();
             }
             else
             {
-                ParserDataBinaryCache binaryCache = LRTableReaderWriter.LoadTableDataFromBinaryFile(this.RootNtName + ".tablecache");
+                ParserDataBinaryCache binaryCache = LRTableReaderWriter.LoadTableDataFromBinaryFile(
+                    this.RootNtName + ".tablecache");
                 if (binaryCache != null &&
                     binaryCache.SuccessLoaded &&
                     binaryCache.CompareWithTable(_parsingTable))
@@ -83,8 +78,7 @@ namespace Parser.ParserKit
                 else
                 {
                     _parsingTable.MakeParsingTable();
-                    //autosave if use cache
-
+                    //autosave if use cache 
                     SubParserCache.SaveAsBinaryFile(this, this.RootNtName + ".tablecache");
                 }
             }
@@ -98,8 +92,9 @@ namespace Parser.ParserKit
                 throw new NotSupportedException();
             }
 #endif
-
         }
+
+
         internal LRParsingTable InternalParsingTable { get { return _parsingTable; } }
         internal int GetNewAutoNumber()
         {
@@ -314,7 +309,6 @@ namespace Parser.ParserKit
                 }
             }
         }
-
         protected void sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
@@ -342,7 +336,6 @@ namespace Parser.ParserKit
             };
             _syncSeqs.Add(new SyncSequence(syncCmds));
         }
-
         internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
         {
             //ignor this pair
@@ -466,7 +459,7 @@ namespace Parser.ParserKit
             set { getWalkerDel = value; }
         }
 
-       
+
         protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1 });
@@ -620,7 +613,7 @@ namespace Parser.ParserKit
             }
             return new NtDefAssignSet<T>(getWalkerDel, choices);
         }
-        
+
 
         protected NtDefAssignSet<T> _oneof(
          UserExpectedSymbolDef<T> c1,

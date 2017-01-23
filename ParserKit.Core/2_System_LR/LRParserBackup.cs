@@ -1,4 +1,4 @@
-﻿////MIT 2015-2017, ParserApprentice  
+﻿//MIT 2015-2017, ParserApprentice  
 //using System;
 //using System.Text;
 //using System.Collections.Generic;

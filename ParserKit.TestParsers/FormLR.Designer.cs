@@ -154,7 +154,6 @@
             this.button26.TabIndex = 50;
             this.button26.Text = "Simple 2.1";
             this.button26.UseVisualStyleBackColor = true;
-            this.button26.Visible = false;
             this.button26.Click += new System.EventHandler(this.button26_Click);
             // 
             // button27

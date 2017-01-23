@@ -84,10 +84,6 @@
       <Project>{34E2BA19-5043-465C-AF6F-5F2E396C3889}</Project>
       <Name>ParserKit.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ParserKit.CSharpCodeModel\ParserKit.CSharpCodeModel.csproj">
-      <Project>{F2795CA4-5692-462B-9D42-395CDFCF2E66}</Project>
-      <Name>ParserKit.CSharpCodeModel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ParserKit.Lang.CSharp\ParserKit.Lang.CSharp.csproj">
       <Project>{28CA452A-FFAB-46E0-B6D2-9CADB2C2A269}</Project>
       <Name>ParserKit.Lang.CSharp</Name>

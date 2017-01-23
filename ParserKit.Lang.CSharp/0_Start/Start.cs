@@ -40,7 +40,7 @@ namespace Parser.MyCs
             parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             parserMan.Setup(new ArrayTypeParser());
             parserMan.Setup(new ArgumentListParser());
             parserMan.Setup(new ObjectOrCollectionInitializerParser());

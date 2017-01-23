@@ -60,6 +60,7 @@ namespace Parser.ParserKit
             get;
             set;
         }
+       
         internal int WaitingParserCount { get; private set; }
 
         public void BeginSwitch()

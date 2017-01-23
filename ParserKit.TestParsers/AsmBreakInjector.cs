@@ -236,16 +236,14 @@ namespace ParserKit.TestParsers
             return false;
         }
         static void ModifyTypeDef(TypeDefinition typedef)
-        {
-
+        { 
             //we insert special code
             if (typedef.IsAbstract)
             {
                 return;
             }
             if (IsInheritFromSubParser(typedef) || IsNestedLambdaDisplayType(typedef))
-            {
-
+            { 
                 MethodDefinition defineMethod = null;
                 foreach (MethodDefinition met in typedef.Methods)
                 {
@@ -256,14 +254,12 @@ namespace ParserKit.TestParsers
                     if (met.Name == "Define")
                     {
                         defineMethod = met;
-                    }
-
+                    } 
                     if (met.Name.Contains("<") && met.HasBody)
                     {
                         //this is lambda method 
                         MethodBody body = met.Body;
-                        //only method with 
-
+                        //only method with  
                         var pars = met.Parameters;
                         //only 1 pa
                         if (pars.Count != 1)
@@ -275,25 +271,20 @@ namespace ParserKit.TestParsers
                         if (!IsBreakMethodParameterType(pars[0].ParameterType))
                         {
                             continue;
-                        }
-
+                        } 
                         var bodyInst = body.Instructions;
                         Instruction firstInst = bodyInst[0];
-                        Instruction lastInst = bodyInst[bodyInst.Count - 1];
-
+                        Instruction lastInst = bodyInst[bodyInst.Count - 1]; 
                         List<Instruction> insts = new List<Instruction>();
                         //--------------------------------------------------------                         
                         insts.Add(met.IsStatic ?
                             Instruction.Create(OpCodes.Ldarg_0) ://static method 
-                            Instruction.Create(OpCodes.Ldarg_1));//instance method
-
+                            Instruction.Create(OpCodes.Ldarg_1));//instance method 
                         insts.Add(Instruction.Create(OpCodes.Ldstr, pars[0].Name));
                         insts.Add(Instruction.Create(OpCodes.Call, _BreakOnLambda));
                         insts.Add(Instruction.Create(OpCodes.Brfalse, firstInst));
-                        insts.Add(Instruction.Create(OpCodes.Break));
-
-                        //--------------------------------------------------------
-
+                        insts.Add(Instruction.Create(OpCodes.Break)); 
+                        //-------------------------------------------------------- 
                         for (int i = insts.Count - 1; i >= 0; --i)
                         {
                             bodyInst.Insert(0, insts[i]);

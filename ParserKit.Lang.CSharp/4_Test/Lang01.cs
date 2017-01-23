@@ -295,9 +295,10 @@ namespace Parser.ParserKit.LR
             parser.Parse(LexLR2(test01));
 
         }
-        public void TestLR0_3_5()
-        {
+        class SimpleParseNodeHolder : ParseNodeHolder { }
 
+        public void TestLR0_3_5_1()
+        {
             //define lex
             define_term("id");
             define_term("a", "b", "c", "d", "x", "y", "z",
@@ -311,8 +312,8 @@ namespace Parser.ParserKit.LR
             var simple_E = nt("E");
             {
                 I("id");
-                I("(", "X", ")");
-                I("(", "X", "]");
+                I("(", "M", ")");
+                I("(", "M", "]");
             }
 
             var simple_M = nt("M");
@@ -322,23 +323,26 @@ namespace Parser.ParserKit.LR
                 I("M", "%", "M");
             }
 
-            NTDefinition[] augmentedNTs = PrepareUserGrammarForAnyLR(new[] { simple_E, simple_M });
+            NTDefinition[] augmentedNTs =
+                PrepareUserGrammarForAnyLR(new[] { simple_E, simple_M });
 
             //--------------------------------------------------------------------------------- 
             LRParsingTable parsingTable1 = CreateLR1Table(augmentedNTs[0]);
             parsingTable1.MakeParsingTable();
 
-
             LRParsingTable parsingTable2 = CreateLR1Table(augmentedNTs[1]);
             parsingTable2.MakeParsingTable();
 
-
+            SimpleParseNodeHolder parseNodeHolder = new SimpleParseNodeHolder();
             LRParser parser1 = LRParsing.CreateRunner(parsingTable1);
+            parser1.ParseNodeHolder = parseNodeHolder;
+
 #if DEBUG
             parser1.dbugWriteParseLog = true;
 #endif
 
             LRParser parser2 = LRParsing.CreateRunner(parsingTable2);
+            parser2.ParseNodeHolder = parseNodeHolder;
 #if DEBUG
             parser2.dbugWriteParseLog = true;
 #endif
@@ -370,12 +374,216 @@ namespace Parser.ParserKit.LR
             parser1.Parse(new TokenStreamReader(tokenStream1));
 
         }
+
+        public void TestLR0_3_5x()
+        {
+            //define lex 
+            define_term("id",
+                "+", "*", "(", ")",
+                "[", "]",
+                "/", "%");
+            set_precedence("+", 10);
+            set_precedence("*", 20);
+
+            BeginSG();
+            var E = nt("E");
+            {
+                I("(", "M", ")");
+                I("(", "M", "]");
+            }
+            var M = nt("M");
+            {
+                I("id");
+                I("M", "/", "M");
+                I("M", "%", "M");
+            }
+            NTDefinition _E = EndSG(E);
+            LRParsingTable parsingTable1 = CreateLR1Table(_E);
+            parsingTable1.MakeParsingTable();
+
+
+            var parseNodeHolder = new SimpleParseNodeHolder();
+            LRParser parser1 = LRParsing.CreateRunner(parsingTable1);
+            parser1.ParseNodeHolder = parseNodeHolder;
+
+#if DEBUG
+            parser1.dbugWriteParseLog = true;
+#endif
+            parser1.SetSwitchHandler(swctx =>
+            {
+
+            });
+            //---------------------------------------------------------------------------------              
+            //string[] test01 = new string[] { "id", "+", "id", "*", "id" };
+            //string[] test01 = new string[] { "(", "id", ")", "id", "%", "id" };
+            string[] test01 = new string[] { "(", "id", "/", "id", ")" };
+            // string[] test01 = new string[] { "(", "id", "+", "id", "]" };
+            //--------------------------------------------------------------------------------- 
+            Token[] tokens = LexLR(test01);
+            TokenStream tokenStream1 = new TokenStream();
+            tokenStream1.AddTokens(tokens);
+            tokenStream1.SetCurrentPosition(-1);
+
+            TokenStreamReader reader = new TokenStreamReader(tokenStream1);
+            reader.ReadNext();
+            parser1.Parse(reader);
+            ParseNode finalNode = parser1.FinalNode;
+
+
+        }
+        public void TestLR0_3_5()
+        {
+            //define lex
+            define_term("id",
+                "+", "*", "(", ")",
+                "[", "]",
+                "/", "%");
+            set_precedence("+", 10);
+            set_precedence("*", 20);
+            //----------------------------------------------
+            BeginSG();
+            var E = nt("E");
+            {
+                I("(", "M", ")");
+                I("(", "M", "]");
+            }
+            NTDefinition _E = EndSG(E);
+            LRParsingTable parsingTable1 = CreateLR1Table(_E);
+            parsingTable1.MakeParsingTable();
+            //----------------------------------------------
+            BeginSG();
+            var M = nt("M");
+            {
+                I("id");
+                I("M", "/", "M");
+                I("M", "%", "M");
+            }
+            NTDefinition _M = EndSG(M);
+            LRParsingTable parsingTable2 = CreateLR1Table(_M);
+            parsingTable2.MakeParsingTable();
+            //----------------------------------------------
+
+            SimpleParseNodeHolder parseNodeHolder = new SimpleParseNodeHolder();
+            LRParser parser1 = LRParsing.CreateRunner(parsingTable1);
+            parser1.ParseNodeHolder = parseNodeHolder;
+#if DEBUG
+            parser1.dbugWriteParseLog = true;
+#endif
+
+            LRParser parser2 = LRParsing.CreateRunner(parsingTable2);
+            parser2.ParseNodeHolder = parseNodeHolder;
+#if DEBUG
+            parser2.dbugWriteParseLog = true;
+#endif
+            parser1.SetSwitchHandler(swctx =>
+            {
+                Token current_token = swctx.CurrentToken;
+                //goto another parser
+                var switchDetail = swctx.SwitchDetail;
+                swctx.BeginSwitch();
+                {
+                    swctx.SwitchBackParseResult = parser2.Parse(swctx);
+                    var switchPair = switchDetail.GetSwPair(0);
+                    swctx.SwitchBackState = switchPair.switchBackState;
+                }
+                swctx.EndSwitch();
+            });
+
+            parser2.SetSwitchHandler(swctx =>
+            {
+
+            });
+
+            //---------------------------------------------------------------------------------              
+            //string[] test01 = new string[] { "id", "+", "id", "*", "id" };
+            //string[] test01 = new string[] { "(", "id", ")", "id", "%", "id" };
+            string[] test01 = new string[] { "(", "id", "/", "id", ")" };
+            // string[] test01 = new string[] { "(", "id", "+", "id", "]" };
+            //--------------------------------------------------------------------------------- 
+            Token[] tokens = LexLR(test01);
+            TokenStream tokenStream1 = new TokenStream();
+            tokenStream1.AddTokens(tokens);
+            tokenStream1.SetCurrentPosition(-1);
+
+            TokenStreamReader reader = new TokenStreamReader(tokenStream1);
+
+            parser1.Parse(reader);
+            ParseNode finalNode = parser1.FinalNode;
+
+        }
+
+        public void TestLR0_3_5x1()
+        {
+            //define lex
+            define_term("id",
+                "+", "*", "(", ")",
+                "[", "]",
+                "/", "%");
+            set_precedence("+", 10);
+            set_precedence("*", 20);
+            //----------------------------------------------
+            BeginSG();
+            var E = nt("E");
+            {
+                I("(", "M", ")");
+                I("(", "M", "]");
+            }
+            NTDefinition _E = EndSG(E);
+            LRParsingTable parsingTable1 = CreateLR1Table(_E);
+            parsingTable1.MakeParsingTable();
+            //----------------------------------------------
+            BeginSG();
+            var M = nt("M");
+            {
+                I("id");
+                I("M", "/", "M");
+                I("M", "%", "M");
+            }
+            NTDefinition _M = EndSG(M);
+            LRParsingTable parsingTable2 = CreateLR1Table(_M);
+            parsingTable2.MakeParsingTable();
+            //----------------------------------------------
+
+            var parseNodeHolder = new SimpleParseNodeHolder();
+            LRParser parser1 = LRParsing.CreateRunner(parsingTable1);
+            parser1.ParseNodeHolder = parseNodeHolder;
+#if DEBUG
+            parser1.dbugWriteParseLog = true;
+#endif
+            LRParser parser2 = LRParsing.CreateRunner(parsingTable2);
+            parser2.ParseNodeHolder = parseNodeHolder;
+#if DEBUG
+            parser2.dbugWriteParseLog = true;
+#endif
+            parser1.SetSwitchHandler(swctx =>
+            {
+                Token current_token = swctx.CurrentToken;
+                var switchDetail = swctx.SwitchDetail;
+                swctx.BeginSwitch();
+                {
+                    swctx.SwitchBackParseResult = parser2.Parse(swctx);
+                    var switchPair = switchDetail.GetSwPair(0);
+                    swctx.SwitchBackState = switchPair.switchBackState;
+                }
+                swctx.EndSwitch();
+            });
+            parser2.SetSwitchHandler(swctx => { });
+
+            string[] input = new string[] { "(", "id", "/", "id", ")" };
+            Token[] tokens = LexLR(input);
+            var reader = new TokenStreamReader(new TokenStream(tokens));
+
+            parser1.Parse(reader);
+
+            ParseNode finalNode = parser1.FinalNode;
+        }
+
+
         public void TestLR0_3_5_2()
         {
-
             //define lex
             define_term("id");
-            define_term("a", "b", "c", "d", "x", "y", "z",
+            define_term("id", "b", "c", "d", "x", "y", "z",
                 "+", "*", "(", ")",
                 "[", "]",
                 "/", "%");
@@ -393,7 +601,8 @@ namespace Parser.ParserKit.LR
                 I("+", "-"); //base 
             }
 
-            NTDefinition[] augmentedNTs = PrepareUserGrammarForAnyLR(new[] { simple_E, simple_M });
+            NTDefinition[] augmentedNTs =
+                PrepareUserGrammarForAnyLR(new[] { simple_E, simple_M });
 
             //---------------------------------------------------------------------------------
             LRParsingTable parsingTable1 = CreateLR1Table(augmentedNTs[0]);
@@ -866,7 +1075,7 @@ namespace Parser.ParserKit.LR
             TypeParser typeParser = parserMan.Setup(new TypeParser());
             StatementParser statementParser = parserMan.Setup(new StatementParser());
             ClassDeclParser classDeclParser = parserMan.Setup(new ClassDeclParser());
-            AttributeParser attrParser = parserMan.Setup(new AttributeParser());
+            AttributesParser attrParser = parserMan.Setup(new AttributesParser());
             NamespaceParser nsParser = parserMan.Setup(new NamespaceParser());
 
             //string teststr = "id<id>";
@@ -906,7 +1115,7 @@ namespace Parser.ParserKit.LR
             TypeParser typeParser = parserMan.Setup(new TypeParser());
             StatementParser statementParser = parserMan.Setup(new StatementParser());
             ClassDeclParser classDeclParser = parserMan.Setup(new ClassDeclParser());
-            AttributeParser attrParser = parserMan.Setup(new AttributeParser());
+            AttributesParser attrParser = parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
 
             //string teststr = "id<id>";
@@ -944,7 +1153,7 @@ namespace Parser.ParserKit.LR
             StatementParser statementParser = parserMan.Setup(new StatementParser());
             StructDeclParser structDeclParser = parserMan.Setup(new StructDeclParser());
             ClassDeclParser classDeclParser = parserMan.Setup(new ClassDeclParser());
-            AttributeParser attrParser = parserMan.Setup(new AttributeParser());
+            AttributesParser attrParser = parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
 
@@ -985,7 +1194,7 @@ namespace Parser.ParserKit.LR
             StatementParser statementParser = parserMan.Setup(new StatementParser());
             StructDeclParser structDeclParser = parserMan.Setup(new StructDeclParser());
             ClassDeclParser classDeclParser = parserMan.Setup(new ClassDeclParser());
-            AttributeParser attrParser = parserMan.Setup(new AttributeParser());
+            AttributesParser attrParser = parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
 
@@ -1031,7 +1240,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new ClassDeclParser());
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
 
@@ -1079,7 +1288,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
 
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
             //-------------------------------------- 
@@ -1128,7 +1337,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
             //-------------------------------------- 
@@ -1178,7 +1387,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             //-------------------------------------- 
             parserMan.PrepareSwitchLink();
             //-------------------------------------- 
@@ -1230,7 +1439,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
 
             parserMan.Setup(new ArrayTypeParser());
             //-------------------------------------- 
@@ -1292,7 +1501,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             parserMan.Setup(new ArrayTypeParser());
             parserMan.Setup(new ArgumentListParser());
             parserMan.Setup(new ObjectOrCollectionInitializerParser());
@@ -1413,7 +1622,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             parserMan.Setup(new ArrayTypeParser());
             parserMan.Setup(new ArgumentListParser());
             parserMan.Setup(new ObjectOrCollectionInitializerParser());
@@ -1446,8 +1655,8 @@ namespace Parser.ParserKit.LR
             //string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01_300.cs");
 
 
-            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_02_200.cs");
-
+            //string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_02_200.cs");
+            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
             // string teststr = "class id{}";
             //string teststr = "var id=1;";//pass 
             //string teststr = "while(true){}";//pass 
@@ -1544,7 +1753,8 @@ namespace Parser.ParserKit.LR
         //======================
         static bool ShouldStopOnLambda(AstWalker walker, string argName)
         {
-            return false;
+            return true;
+            //return false;
             //return true;
             ////return false;
             //if (argName == "x")
@@ -1592,7 +1802,7 @@ namespace Parser.ParserKit.LR
             parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
-            parserMan.Setup(new AttributeParser());
+            parserMan.Setup(new AttributesParser());
             parserMan.Setup(new ArrayTypeParser());
             parserMan.Setup(new ArgumentListParser());
             parserMan.Setup(new ObjectOrCollectionInitializerParser());
@@ -1606,7 +1816,7 @@ namespace Parser.ParserKit.LR
             //-------------------------------------- 
             GC.Collect();
 
-            string teststr = " class id{ void id(){}}";//pass
+            //string teststr = " class id{ void id(){}}";//pass
             //string teststr = "class id{ public id id{get;set;}}"; //pass          
 
 
@@ -1630,7 +1840,7 @@ namespace Parser.ParserKit.LR
             //string teststr = "1 + 1 + (1 * 2)";//pass
             //string teststr = "id()";//pass
             //string teststr = "id(id,id:1)";//pass
-            //string teststr = "id(out id,ref id,id:1)";//pass
+            string teststr = "id(out id,ref id,id:1)";//pass
 
             //string teststr = "id.id";//pass
             //string teststr = "id[id]";//pass
@@ -2273,180 +2483,3 @@ namespace Parser.ParserKit.LR
 
     }
 }
-
-//private void button1_Click(object sender, EventArgs e)
-//     {
-
-//         var a = new DefOf<Expr>();
-//         var b = new DefOf<SampleToken>();
-//         var c = new DefOf<Expr>();
-
-
-//         var f = new SampleBinopExpression();
-//         //_x_(f,
-//         //    n => n.left1,
-//         //    n => n.op1,
-//         //    n => f.right1,
-//         //    BuildBinOpExpression);
-//         _x_(
-//             () => f.left1,
-//             () => f.op1,
-//             () => f.right1);
-
-//         _y_(f,
-//             n => n.left1,
-//             n => n.op1,
-//             n => n.right1);
-
-//         _z_(f,
-//             n => n.left1,
-//             n => n.op1,
-//             n => n.right1,
-//             BuildBinOpExpression);
-
-//         _d_(A<SampleBinopExpression>(),
-//            n => n.left,
-//            n => n.op,
-//            n => n.right,
-//            BuildBinOpExpression1);
-
-
-//         _e_(A<SampleBinopExpression>(),
-//           n => n.left,
-//           n => n.op,
-//           n => n.right,
-
-//           n => n.BuildBinOpExpression1); //handle when complete
-
-
-//     }
-//     T A<T>()
-//     {
-//         return default(T);
-//     }
-//     protected virtual void BuildBinOpExpression(SampleExpression x, SampleToken y, SampleExpression z)
-//     {
-//         //build binary operator expression 
-
-//     }
-//     protected virtual Holder1<SampleBinopExpression> BuildBinOpExpression1(SampleExpression x, SampleToken y, SampleExpression z)
-//     {
-//         //build binary operator expression 
-//         return new Holder1<SampleBinopExpression>();
-//     }
-
-
-
-
-//     public class Holder1<T>
-//     {
-
-//     }
-//     class A3
-//     {
-//         public object t1;
-//         public object t2;
-//         public object t3;
-//     }
-//     public class DefOf<T>
-//     {
-
-//     }
-//     public class DefOf<N, T>
-//     {
-
-//     }
-//     public class SampleExpression
-//     {
-//     }
-
-//     public class SampleBinopExpression : SampleExpression
-//     {
-//         public SampleExpression left;
-//         public SampleToken op;
-//         public SampleExpression right;
-//         public DefOf<SampleExpression> left1;
-//         public DefOf<SampleToken> op1;
-//         public DefOf<SampleExpression> right1;
-
-//         public virtual Holder1<SampleBinopExpression> BuildBinOpExpression1(SampleExpression x, SampleToken y, SampleExpression z)
-//         {
-//             //build binary operator expression 
-//             return new Holder1<SampleBinopExpression>();
-//         }
-//     }
-//     void _x_<N, T1, T2, T3, T4>(N n, Func<N, DefOf<T1>> t, Func<N, DefOf<T2>> t2, Func<N, DefOf<T3>> t3, Func<T1, T2, T3, T4> a)
-//     {
-
-//     }
-
-//     void _x_<T1, T2, T3>(Func<DefOf<T1>> t, Func<DefOf<T2>> t2, Func<DefOf<T3>> t3)
-//     {
-
-//     }
-//     void _y_<N, T1, T2, T3>(N n, Func<N, DefOf<T1>> t, Func<N, DefOf<T2>> t2, Func<N, DefOf<T3>> t3)
-//     {
-
-//     }
-//     void _z_<N, T1, T2, T3>(N n, Func<N, DefOf<T1>> t, Func<N, DefOf<T2>> t2, Func<N, DefOf<T3>> t3, Action<T1, T2, T3> action)
-//     {
-
-//     }
-//     void _d_<N, T1, T2, T3>(N n, Func<N, T1> t, Func<N, T2> t2, Func<N, T3> t3, Func<T1, T2, T3, Holder1<N>> action)
-//     {
-
-//     }
-//     void _e_<N, T1, T2, T3>(N n, Func<N, T1> t, Func<N, T2> t2, Func<N, T3> t3, Func<N, Func<T1, T2, T3, Holder1<N>>> action)
-//     {
-
-//     }
-//     public static class TestMe1
-//     {
-//         public static void A()
-//         {
-
-//             var a = new SimpleReflector<AnonymousMethodExpr.I>();
-
-//             a.Write(i => i.IsAsync);
-//             a.Write(i => i.Parameters);
-//             a.Write(i => i.Body);
-
-//             a.Read(i => i.Body);
-
-//             var b = new SimpleBridge<AnonymousMethodExpr.I, AnonymousMethodExpression>();
-//             b.Write(x => x.Parameters, y => y.Parameters);
-//         }
-
-//     }
-
-//     class SimpleReflector<T>
-//     {
-//         public MemberInfo Write<U>(Expression<Func<T, U>> expression)
-//         {
-//             var member = expression.Body as MemberExpression;
-//             if (member != null)
-//                 return member.Member;
-//             throw new ArgumentException("Expression is not a member access", "expression");
-//         }
-//         public MemberInfo Read<U>(Expression<Func<T, U>> expression)
-//         {
-
-//             return null;
-//         }
-//     }
-
-//     class SimpleBridge<A, B>
-//     {
-//         public MemberInfo Write<U, V>(Expression<Func<A, U>> expression1, Expression<Func<B, V>> expression2)
-//         {
-//             var member = expression1.Body as MemberExpression;
-//             if (member != null)
-//                 return member.Member;
-//             throw new ArgumentException("Expression is not a member access", "expression");
-//         }
-//         public MemberInfo Read<U>(Expression<Func<A, U>> expression)
-//         {
-
-//             return null;
-//         } 
-//     }

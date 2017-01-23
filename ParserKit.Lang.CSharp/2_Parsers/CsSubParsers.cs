@@ -546,7 +546,7 @@ namespace Parser.MyCs
 
             //--------------------------------------------------  
             _array_initializer += _oneof(
-                /*1*/_(     /**/ r => r.NewArrayInitilizer,
+                /*1*/_(
                    o => _token_openBrc,
                    o => opt(list_c(_variable_initalizer)),
                    o => _token_closeBrc),
@@ -694,7 +694,7 @@ namespace Parser.MyCs
 
             _anonymous_function_body += _(o => _expression);
 
-        }
+        } 
 
         //----------------------------------------------------------
         public class Walker : AstWalker
@@ -710,7 +710,6 @@ namespace Parser.MyCs
             public virtual void AddObjectMemberInitializer() { }
             public virtual void NewAnonymousObject() { }
             public virtual void NewObjectInitializer() { }
-            public virtual void NewArrayInitilizer() { }
             public virtual void AddMemberDeclarators() { }
             public virtual void NewMemberDeclarators() { }
             public virtual void NewMemberDeclaratorIdAssing() { }
@@ -718,12 +717,6 @@ namespace Parser.MyCs
             public virtual void MemberDeclAddValue() { }
         }
 
-        public class T3
-        {
-            public object t1;
-            public object t2;
-            public object t3;
-        }
     }
 
 
@@ -1238,7 +1231,7 @@ namespace Parser.MyCs
     }
 
 
-    public class AttributeParser : CsSubParser<AttributeParser.Walker>
+    public class AttributesParser : CsSubParser<AttributesParser.Walker>
     {
 
         TopUserNtDefinition _attributes;

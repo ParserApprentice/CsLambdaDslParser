@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Parser.ParserKit
-{   
+{
     public abstract class UserLangGrammarSheet
     {
 
@@ -696,6 +696,10 @@ namespace Parser.ParserKit
             }
 
         }
+        public NTDefinition EndSG(UserNTDefinition rootUnt)
+        {
+            return PrepareUserGrammarForAnyLR(rootUnt); 
+        }
         public NTDefinition PrepareUserGrammarForAnyLR(UserNTDefinition userRootNt)
         {
 
@@ -846,6 +850,13 @@ namespace Parser.ParserKit
             //    }
 
             //}
+
+        }
+        public void BeginSG()
+        {
+            this.dicCoreNTs = new Dictionary<string, NTDefinition>();
+            this.allUserNTs = new UserNTCollection();
+            this.symResolutionInfo = new SymbolResolutionInfo();
 
         }
         public NTDefinition[] PrepareUserGrammarForAnyLR(UserNTDefinition[] multipleRootNts)

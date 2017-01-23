@@ -526,7 +526,6 @@ namespace Parser.ParserKit
         public override LocationCodeArea GetLocation(ParseNodeLocator locator)
         {
             return new LocationCodeArea();
-
             //LocationCodeArea loca1 = new LocationCodeArea();
             //if (n1.ntNode is NonTerminalParseNode)
             //{

@@ -31,7 +31,6 @@ namespace Parser.CodeDom
             get { throw new NotImplementedException(); }
         }
     }
-
     public class CodeUnCheckedExpression : CodeExpression
     {
         CodeExpression innerExpression;
