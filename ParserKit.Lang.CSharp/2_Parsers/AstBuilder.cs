@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 //#define RETURN_NOW
 
 using System;
