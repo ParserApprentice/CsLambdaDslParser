@@ -35,30 +35,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Microsoft.Cci.Pdb\BitAccess.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\BitSet.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\CvInfo.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\DataStream.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\DbiDbgHdr.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\DbiHeader.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\DbiModuleInfo.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\DbiSecCon.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\Interfaces.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\IntHashTable.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\MsfDirectory.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbConstant.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbDebugException.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbException.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbFile.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbFileHeader.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbFunction.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbLine.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbLines.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbReader.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbScope.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbSlot.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\PdbSource.cs" />
-    <Compile Include="Microsoft.Cci.Pdb\SourceLocationProvider.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\BitAccess.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\BitSet.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\CvInfo.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\DataStream.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\DbiDbgHdr.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\DbiHeader.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\DbiModuleInfo.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\DbiSecCon.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\Interfaces.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\IntHashTable.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\MsfDirectory.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbConstant.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbDebugException.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbException.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbFile.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbFileHeader.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbFunction.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbLine.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbLines.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbReader.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbScope.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbSlot.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\PdbSource.cs" />
+    <Compile Include="Microsoft.Cci.Pdb_\SourceLocationProvider.cs" />
     <Compile Include="Mono.Cecil.Cil\Code.cs" />
     <Compile Include="Mono.Cecil.Cil\CodeReader.cs" />
     <Compile Include="Mono.Cecil.Cil\CodeWriter.cs" />
@@ -86,15 +86,15 @@
     <Compile Include="Mono.Cecil.Metadata\TokenType.cs" />
     <Compile Include="Mono.Cecil.Metadata\UserStringHeap.cs" />
     <Compile Include="Mono.Cecil.Metadata\Utilities.cs" />
-    <Compile Include="Mono.Cecil.Pdb\AssemblyInfo.cs" />
-    <Compile Include="Mono.Cecil.Pdb\ISymUnmanagedDocumentWriter.cs" />
-    <Compile Include="Mono.Cecil.Pdb\ISymUnmanagedWriter2.cs" />
-    <Compile Include="Mono.Cecil.Pdb\ModuleMetadata.cs" />
-    <Compile Include="Mono.Cecil.Pdb\PdbHelper.cs" />
-    <Compile Include="Mono.Cecil.Pdb\PdbReader.cs" />
-    <Compile Include="Mono.Cecil.Pdb\PdbWriter.cs" />
-    <Compile Include="Mono.Cecil.Pdb\SymDocumentWriter.cs" />
-    <Compile Include="Mono.Cecil.Pdb\SymWriter.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\AssemblyInfo.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\ISymUnmanagedDocumentWriter.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\ISymUnmanagedWriter2.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\ModuleMetadata.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\PdbHelper.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\PdbReader.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\PdbWriter.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\SymDocumentWriter.cs" />
+    <Compile Include="Mono.Cecil.Pdb_\SymWriter.cs" />
     <Compile Include="Mono.Cecil.PE\BinaryStreamReader.cs" />
     <Compile Include="Mono.Cecil.PE\BinaryStreamWriter.cs" />
     <Compile Include="Mono.Cecil.PE\ByteBuffer.cs" />
@@ -198,6 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.Cci.Pdb_\LICENSE" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
