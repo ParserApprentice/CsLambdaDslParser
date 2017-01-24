@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,9 +43,9 @@ namespace ParserKit.TestParsers
 
 
 
-        void TestA(object a, object b)
-        {
-        }
+
+
+
 
 
 
@@ -148,8 +148,14 @@ namespace ParserKit.TestParsers
 
         private void button26_Click(object sender, EventArgs e)
         {
-            Lang01 lang1 = new Lang01();
-            lang1.TestLR0_3_5();
+            {
+                Lang01 lang1 = new Lang01();
+                lang1.TestLR0_3_5();
+            }
+            {
+                Lang01 lang1 = new Lang01();
+                lang1.TestLR0_3_5x();
+            }
         }
 
 

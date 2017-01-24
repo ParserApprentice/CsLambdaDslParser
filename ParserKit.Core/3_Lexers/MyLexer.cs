@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -134,7 +134,9 @@ namespace Parser.ParserKit.Lexers
             for (int i = 0; i < 255; i++)
             {
                 table.AddColumn((char)i);
-            } 
+            }
+
+
 
             table.FinishColumnsDefinition();
             //--------------------------------------
@@ -164,7 +166,9 @@ namespace Parser.ParserKit.Lexers
             table.SetCell(0, '.', LexToDo.CreateReadNext(lexStateNumberDecimalPart.LexStateId));
             table.SetCell(0, '\0', LexToDo.CreateAccept(LexToDoState.Finished));
             table.SetCell(0, '\"', LexToDo.CreateReadNext(lexStateLiteralString.LexStateId));
-            table.SetCell(0, '\'', LexToDo.CreateReadNext(lexStateLiteralCharacter.LexStateId)); 
+            table.SetCell(0, '\'', LexToDo.CreateReadNext(lexStateLiteralCharacter.LexStateId));
+
+
         }
         void WriteToTable(int rowId, LexState lexState)
         {
@@ -218,7 +222,7 @@ namespace Parser.ParserKit.Lexers
 
 
         LexEventArgs lexEventArgs = new LexEventArgs();
-
+       
 
         public void Lex(char[] buffer, TokenStream tokenStream, int startPos, out int currentPos)
         {
@@ -227,7 +231,7 @@ namespace Parser.ParserKit.Lexers
             if (_lexCompactData == null)
             {
                 CompactTable();
-            }
+            } 
 
             long[] lexCompactData = _lexCompactData;
             int compactColCount = _colCount;
@@ -255,7 +259,7 @@ namespace Parser.ParserKit.Lexers
             {
                 if (c == '\n')
                 {
-                    lineNumber++;
+                    lineNumber++;                      
                     tokenStream.AddNewLinePos(i);
                     //record new line
                 }
@@ -355,13 +359,13 @@ namespace Parser.ParserKit.Lexers
                                 //lexEventArgs.start = start;
                                 //lexEventArgs.fromLexState = lexTodo.todo; 
                                 //EmitLexEvent(lexEventArgs);
-
+                                 
                                 tokenStream.AddToken(//latestToken =
                                    new Token(TokenDefinition._identifier,
-                                    //new string(buffer, start, appendLength),
+                                   //new string(buffer, start, appendLength),
                                    start,
                                    (ushort)appendLength));
-
+                                 
 
                                 if (tokenStream.IsEndPage)
                                 {
@@ -568,7 +572,7 @@ namespace Parser.ParserKit.Lexers
 
         }
 
-
+    
         protected virtual void BeginLex()
         {
 
@@ -869,8 +873,12 @@ namespace Parser.ParserKit.Lexers
                 }
             }
 
-            //at all state  if found terminal then terminate 
+            //at all state  if found terminal then terminate
+
+
         }
+
+
     }
 
 

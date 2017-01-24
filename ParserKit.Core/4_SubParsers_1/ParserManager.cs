@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -78,68 +78,7 @@ namespace Parser.ParserKit
                         selectedSubParser = swPair.resolvedSubParser;
                     }
                     break;
-            }
-
-            //SwitchChoicesForRow dic = sw.LookFor.choices;
-            //
-            //if (sw.LookFor.fromResolvedSwitch && sw.LookFor.KnownParserNameIndex != 0)
-            //{
-            //    SwitchChoice selectedChoice = dic.GetChoiceByParserNameIndex(sw.LookFor.KnownParserNameIndex);
-            //    if (selectedChoice == null || selectedChoice.resolvedSubParser == null)
-            //    {
-            //        throw new NotSupportedException();
-            //        //no switch avaliable here 
-            //        //return;
-            //    }
-            //    selectedSubParser = selectedChoice.resolvedSubParser;
-            //}
-            //else
-            //{
-            //    switch (dic.Count)
-            //    {
-            //        case 0:
-            //            new NotSupportedException();
-            //            break;
-            //        case 1:
-            //            {
-
-            //                //only 1
-            //                SwitchChoice selectedChoice = dic.GetChoiceByIndex(0);
-            //                if (selectedChoice != null)
-            //                {
-            //                    selectedSubParser = selectedChoice.resolvedSubParser;
-            //                    if (!selectedSubParser.StartWith(sw.Reader.CurrentToken))
-            //                    {
-            //                        return;
-            //                    }
-            //                }
-
-            //            } break;
-            //        default:
-            //            {
-            //                selectedSubParser = GetSubParser(dic.GetSwitchTable(), sw.Reader);
-            //            } break;
-            //    }
-            //}
-            ////-------------------------------------------
-
-            //int beforeEnterIndex = sw.Reader.InputIndex;
-            //if (selectedSubParser == null)
-            //{
-            //    //no other parser 
-            //    throw new NotSupportedException();
-            //}
-            ////-------------------------------------------  
-            //selectedSubParser.Parse(sw);
-            //if (sw.SwitchBackParseResult.resultKind != ParseResultKind.Error)
-            //{
-
-            //}
-            //else
-            //{
-            //    //switch back from error 
-            //    throw new NotSupportedException();
-            //}
+            } 
 #if DEBUG
             if (selectedSubParser == null)
             {

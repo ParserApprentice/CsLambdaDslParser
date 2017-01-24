@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 //#define RETURN_NOW
 
 using System;
@@ -23,380 +23,380 @@ namespace Parser.MyCs
         }
     }
 
-    static class ParseNodeWalker
-    {
-        static void RecursiveInvoke(SeqReduction seqRd, CsParseNodeHolder csParseNodeHolder)
-        {
-            if (seqRd._prevNode != null)
-            {
-                RecursiveInvoke(seqRd._prevNode, csParseNodeHolder);
-                seqRd._symbolSeq.NotifyReductionEvent(csParseNodeHolder);
-            }
-            else
-            {
+//    static class ParseNodeWalker
+//    {
+//        static void RecursiveInvoke(SeqReduction seqRd, CsParseNodeHolder csParseNodeHolder)
+//        {
+//            if (seqRd._prevNode != null)
+//            {
+//                RecursiveInvoke(seqRd._prevNode, csParseNodeHolder);
+//                seqRd._symbolSeq.NotifyReductionEvent(csParseNodeHolder);
+//            }
+//            else
+//            {
 
-#if DEBUG
-                csParseNodeHolder.CurrentContextSequence = seqRd._symbolSeq;
-#endif
-                SymbolSequence sq = seqRd._symbolSeq;
-                sq.NotifyReductionEvent(csParseNodeHolder);
+//#if DEBUG
+//                csParseNodeHolder.CurrentContextSequence = seqRd._symbolSeq;
+//#endif
+//                SymbolSequence sq = seqRd._symbolSeq;
+//                sq.NotifyReductionEvent(csParseNodeHolder);
 
-                //if (sq.HasSomeUserExpectedSymbolMonitor)
-                //{
+//                //if (sq.HasSomeUserExpectedSymbolMonitor)
+//                //{
 
-                //    ReductionMonitor[] rdMonitors = sq.GetAllUserExpectedSymbolReductionMonitors();
-                //    int i = 0;
-                //    NonTerminalParseNode nt = (NonTerminalParseNode)csParseNodeHolder.ContextOwner;
-                //    ParseNode c = nt.FirstChild;
-                //    int childCount = csParseNodeHolder.ContextChildCount;
-                //    int currentAstIndex = csParseNodeHolder.CurrentAstIndex - childCount;
+//                //    ReductionMonitor[] rdMonitors = sq.GetAllUserExpectedSymbolReductionMonitors();
+//                //    int i = 0;
+//                //    NonTerminalParseNode nt = (NonTerminalParseNode)csParseNodeHolder.ContextOwner;
+//                //    ParseNode c = nt.FirstChild;
+//                //    int childCount = csParseNodeHolder.ContextChildCount;
+//                //    int currentAstIndex = csParseNodeHolder.CurrentAstIndex - childCount;
 
-                //    switch (childCount)
-                //    {
+//                //    switch (childCount)
+//                //    {
 
-                //        case 0: break;
-                //        case 1:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 2:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 3:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[2];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 4:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[2];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[3];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 5:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[2];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[3];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[4];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 6:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[2];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[3];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[4];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[5];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 5;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        case 7:
-                //            {
-                //                ReductionMonitor m = rdMonitors[0];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[1];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[2];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[3];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[4];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[5];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 5;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            {
-                //                c = c.NextSibling;
-                //                ReductionMonitor m = rdMonitors[6];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 6;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //            }
-                //            break;
-                //        default:
-                //            while (c != null)
-                //            {
-                //                ReductionMonitor m = rdMonitors[i];
-                //                if (m != null)
-                //                {
-                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
-                //                    m.NotifyReduction(csParseNodeHolder, c);
-                //                }
-                //                //fill component 
-                //                c = c.NextSibling;
-                //                i++;
-                //                currentAstIndex++;
-                //            }
-                //            break;
-                //    }
+//                //        case 0: break;
+//                //        case 1:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 2:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 3:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[2];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 4:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[2];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[3];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 5:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[2];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[3];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[4];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 6:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[2];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[3];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[4];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[5];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 5;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        case 7:
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[0];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[1];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 1;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[2];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 2;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[3];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 3;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[4];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 4;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[5];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 5;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            {
+//                //                c = c.NextSibling;
+//                //                ReductionMonitor m = rdMonitors[6];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex + 6;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //            }
+//                //            break;
+//                //        default:
+//                //            while (c != null)
+//                //            {
+//                //                ReductionMonitor m = rdMonitors[i];
+//                //                if (m != null)
+//                //                {
+//                //                    csParseNodeHolder.CurrentChildAstIndex = currentAstIndex;
+//                //                    m.NotifyReduction(csParseNodeHolder, c);
+//                //                }
+//                //                //fill component 
+//                //                c = c.NextSibling;
+//                //                i++;
+//                //                currentAstIndex++;
+//                //            }
+//                //            break;
+//                //    }
 
-                //}
-            }
-        }
+//                //}
+//            }
+//        }
 
 
-        //public static void WalkNodes(ParseNode node, CsParseNodeHolder csParseNodeHolder)
-        //{
+//        //public static void WalkNodes(ParseNode node, CsParseNodeHolder csParseNodeHolder)
+//        //{
 
-        //    if (node.IsTerminalNode)
-        //    {
-        //        Token tk = (Token)node;
-        //        SeqReduction seqRd = node.LatestReduction;
-        //        if (seqRd != null)
-        //        {
-        //            csParseNodeHolder.ContextOwner = tk;
-        //            RecursiveInvoke(seqRd, csParseNodeHolder);
-        //        }
-        //        else
-        //        {
+//        //    if (node.IsTerminalNode)
+//        //    {
+//        //        Token tk = (Token)node;
+//        //        SeqReduction seqRd = node.LatestReduction;
+//        //        if (seqRd != null)
+//        //        {
+//        //            csParseNodeHolder.ContextOwner = tk;
+//        //            RecursiveInvoke(seqRd, csParseNodeHolder);
+//        //        }
+//        //        else
+//        //        {
 
-        //        }
+//        //        }
 
-        //    }
-        //    else
-        //    {
+//        //    }
+//        //    else
+//        //    {
 
-        //        NonTerminalParseNode nt = (NonTerminalParseNode)node;
-        //        SeqReduction seqRd = nt.LatestReduction;
-        //        ParseNode c = nt.FirstChild;
+//        //        NonTerminalParseNode nt = (NonTerminalParseNode)node;
+//        //        SeqReduction seqRd = nt.LatestReduction;
+//        //        ParseNode c = nt.FirstChild;
 
-        //        object currentContextAst = csParseNodeHolder.ContextAst;
-        //        int currentContextIndex = csParseNodeHolder.CurrentAstIndex;
+//        //        object currentContextAst = csParseNodeHolder.ContextAst;
+//        //        int currentContextIndex = csParseNodeHolder.CurrentAstIndex;
 
-        //        int count = 0;
-        //        while (c != null)
-        //        {
-        //            csParseNodeHolder.ContextAst = null;
-        //            WalkNodes(c, csParseNodeHolder);
-        //            csParseNodeHolder.AddContextAst(csParseNodeHolder.ContextAst);
-        //            //fill component 
-        //           // c = c.NextSibling;
-        //            count++;
-        //        }
+//        //        int count = 0;
+//        //        while (c != null)
+//        //        {
+//        //            csParseNodeHolder.ContextAst = null;
+//        //            WalkNodes(c, csParseNodeHolder);
+//        //            csParseNodeHolder.AddContextAst(csParseNodeHolder.ContextAst);
+//        //            //fill component 
+//        //           // c = c.NextSibling;
+//        //            count++;
+//        //        }
 
-        //        //restore back
-        //        csParseNodeHolder.ContextAst = currentContextAst;
-        //        csParseNodeHolder.ContextChildCount = count;
-        //        //if (currentContextAst == null)
-        //        //{
-        //        //    if (nt is NonTerminalParseNodeList)
-        //        //    {
+//        //        //restore back
+//        //        csParseNodeHolder.ContextAst = currentContextAst;
+//        //        csParseNodeHolder.ContextChildCount = count;
+//        //        //if (currentContextAst == null)
+//        //        //{
+//        //        //    if (nt is NonTerminalParseNodeList)
+//        //        //    {
 
-        //        //    }
-        //        //}
-        //        if (seqRd != null)
-        //        {
-        //            csParseNodeHolder.CurrentChildAstIndex = currentContextIndex;
-        //            csParseNodeHolder.ContextOwner = nt;
-        //            //walk with context ast ***
-        //            RecursiveInvoke(seqRd, csParseNodeHolder);
-        //        }
+//        //        //    }
+//        //        //}
+//        //        if (seqRd != null)
+//        //        {
+//        //            csParseNodeHolder.CurrentChildAstIndex = currentContextIndex;
+//        //            csParseNodeHolder.ContextOwner = nt;
+//        //            //walk with context ast ***
+//        //            RecursiveInvoke(seqRd, csParseNodeHolder);
+//        //        }
 
-        //        csParseNodeHolder.Pop(count);
-        //    }
-        //}
-    }
+//        //        csParseNodeHolder.Pop(count);
+//        //    }
+//        //}
+//    }
 
 
     public class ArrayTypeBuilder : ArrayTypeParser.Walker

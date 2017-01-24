@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -31,7 +31,6 @@ namespace Parser.CodeDom
             get { throw new NotImplementedException(); }
         }
     }
-
     public class CodeUnCheckedExpression : CodeExpression
     {
         CodeExpression innerExpression;

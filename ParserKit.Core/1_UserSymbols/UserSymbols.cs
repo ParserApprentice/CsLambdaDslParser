@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -634,6 +634,11 @@ namespace Parser.ParserKit
             }
         }
     }
+
+
+   
+
+
 
     public delegate object UserExpectedSymbolDef<T>(T r);
     public abstract class NtDefAssignSet

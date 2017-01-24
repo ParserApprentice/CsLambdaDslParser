@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice  
+﻿//MIT, 2015-2017, ParserApprentice 
 
 using System;
 using System.Text;
@@ -60,6 +60,7 @@ namespace Parser.ParserKit
             get;
             set;
         }
+       
         internal int WaitingParserCount { get; private set; }
 
         public void BeginSwitch()

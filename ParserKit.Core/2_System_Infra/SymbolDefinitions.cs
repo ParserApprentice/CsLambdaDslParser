@@ -1,4 +1,4 @@
-﻿//MIT 2015-2017, ParserApprentice 
+﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Text;
 using System.Collections.Generic;
@@ -47,6 +47,12 @@ namespace Parser.ParserKit
         {
             AllocSpace();
         }
+        public TokenStream(Token[] tokens)
+            : this()
+        {
+            AddTokens(tokens);
+            SetCurrentPosition(-1);
+        }
         public TokenStream(CodeText codeText)
             : this()
         {
@@ -60,13 +66,7 @@ namespace Parser.ParserKit
         {
             get { return currentPosInPage >= BUFF_LEN; }
         }
-        public void Reset()
-        {
-            //use the same current page            
-            currentPosInPage = 0;
-            length = 0;
 
-        }
         void AllocSpace()
         {
             tokens = new Token[BUFF_LEN];
@@ -118,7 +118,7 @@ namespace Parser.ParserKit
         {
             if (codeText != null)
             {
-                codeText.LinePosList.Add(pos);                 
+                codeText.LinePosList.Add(pos);
             }
         }
         public List<int> LinePosList
