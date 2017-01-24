@@ -120,7 +120,7 @@ namespace Parser.ParserKit.LR
 
 #if DEBUG
         static int dbugCounting = 0;
-        string dbugLogFileName = "c:\\WImageTest\\parseLog.txt";
+        string dbugLogFileName = "parseLog.txt";
 #endif
 
         //[System.Diagnostics.DebuggerStepperBoundary]
