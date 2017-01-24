@@ -55,8 +55,8 @@ namespace ParserKit.TestParsers
             ScanTypesAndMethods(asmDef);
             SetBreakMethodParameterTypes(
                 new[]{
-                //typeof(Parser.ParserKit.ParserReporter), 
-                //typeof(Parser.ParserKit.ParseNodeHolder),
+                typeof(Parser.ParserKit.ParserReporter), 
+                typeof(Parser.ParserKit.ParseNodeHolder),
                 typeof(Parser.ParserKit.AstWalker)});
             InjectDebugCode(asmDef);
 

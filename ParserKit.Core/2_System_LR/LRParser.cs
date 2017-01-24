@@ -167,8 +167,8 @@ namespace Parser.ParserKit.LR
 
             ParseNode finalNode = null;
             // bool switchBack = false;
-            bool breakOnReduce = false;// this.EnableBreakOnReduce;
-            bool breakOnShift = false;// this.EnableBreakOnShift;
+            bool breakOnReduce = this.EnableBreakOnReduce;
+            bool breakOnShift  = this.EnableBreakOnShift;
             ParseNodeHolder holder = this.ParseNodeHolder = swContext.Holder;
 
             holder.Reporter = reporter;
