@@ -258,7 +258,7 @@ namespace Parser.MyCs
 
     }
 
-    public abstract class CsSubParser2<T> : ReflectionSubParser<T>
+    public abstract class CsSubParser2<T> : ReflectionSubParserV2<T>
       where T : AstWalker, new()
     {
         //has built-in CS token info 
@@ -399,10 +399,7 @@ namespace Parser.MyCs
         {
             return new UserTokenDefinition(grammarString);
         }
-        protected override void Define()
-        {
-             
-        }
+
         public sealed override string GetTokenPresentationName(string fieldname)
         {
 
@@ -499,11 +496,11 @@ namespace Parser.MyCs
                     }
             }
         }
-        protected ParserKit.SubParsers.ListSymbol list_c(UserNTDefinition nt)
+        protected static ParserKit.SubParsers.ListSymbol list_c(UserNTDefinition nt)
         {
             return list(nt, _token_comma);
         }
-        protected ParserKit.SubParsers.ListSymbol list_c(TokenDefinition tk)
+        protected static ParserKit.SubParsers.ListSymbol list_c(TokenDefinition tk)
         {
             return list(tk, _token_comma);
         }

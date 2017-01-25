@@ -665,6 +665,8 @@ namespace Parser.ParserKit
         //------------------------------
         NtDefAssignSet<T>[] subAssignSets;
 
+
+
         public NtDefAssignSet(
             GetWalkerDel<T> getBuilder,
             ParserKit.SubParsers.UserExpectedSymbolShift symbolShiftDel,
@@ -818,6 +820,20 @@ namespace Parser.ParserKit
                 return (object)builderDel(cachedBuilder);
             }
         }
+
+
+
+        /// <summary>
+        /// set precedence
+        /// </summary>
+        /// <returns></returns>
+        public NtDefAssignSet<T> set_prec(int value)
+        {
+            //TODO: review here again
+            this.Precedence = value;
+            return this;
+        }
+        public int Precedence { get; private set; }
     }
 
 

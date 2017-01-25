@@ -10,79 +10,41 @@ namespace Parser.MyCs
 {
 
 
-    public class TypeParser_V2 : CsSubParser2<TypeParser_V2.Walker>
+    public class TypeParser : CsSubParser2<TypeParser.Walker>
     {
 
 
         static UserNTDefinition
+            //
             //top ***
             _type = s_oneof(
             /*1*/
-                s_(
-                    o => _token_id,
-                    o => s_opt(_type_argument_list)),
-            /*2*/
-                s_(o => _array_type)),
-            //-------------------------------------------
-           _type_argument_list,
-            //-------------------------------------------
-          _array_type = s_(
-            o => _non_array_type,
-            o => s_list(_rank_specifier)),
-            //----------------------------------------
-          _non_array_type = s_(o => _type),
-            //----------------------------------------
-          _rank_specifier = s_(
-                    o => _token_openBkt,
-                    o => s_opt(s_list(_token_comma)),
-                    o => _token_closeBkt
-           );
-
-
-        public class Walker : AstWalker
-        {
-            public virtual void NewRankSpecifier() { }
-            public virtual void NewArrayType() { }
-        }
-    }
-
-
-    public class TypeParser : CsSubParser<TypeParser.Walker>
-    {
-        TopUserNtDefinition _type;
-        UserNTDefinition _type_argument_list,
-             _array_type,
-             _non_array_type,
-             _rank_specifier;
-
-        protected override void Define()
-        {
-
-            _type += _oneof(
-                /*1*/
                 _(
                     o => _token_id,
                     o => opt(_type_argument_list)),
-
-                /*2*/
-                _(
-                    o => _array_type)
-                );
-
-
-            _array_type += _(r => r.NewArrayType,
-                    o => _non_array_type,
-                    o => list(_rank_specifier)
-                );
-
-            _non_array_type += _(o => _type);
-
-            _rank_specifier += _(r => r.NewRankSpecifier,
+            /*2*/
+                _(o => _array_type)),
+            //-------------------------------------------
+            //
+           _type_argument_list,
+            //-------------------------------------------
+            //
+          _array_type = _(
+            o => _non_array_type,
+            o => list(_rank_specifier)),
+            //----------------------------------------
+            //
+          _non_array_type = _(o => _type),
+            //----------------------------------------
+            //
+          _rank_specifier = _(
                     o => _token_openBkt,
                     o => opt(list(_token_comma)),
                     o => _token_closeBkt
-                );
-        }
+           ),
+            //----------------------------------------
+          _end;
+
 
         public class Walker : AstWalker
         {
@@ -92,29 +54,22 @@ namespace Parser.MyCs
     }
 
 
-    public class ArrayTypeParser : CsSubParser<ArrayTypeParser.Walker>
+
+
+    public class ArrayTypeParser : CsSubParser2<ArrayTypeParser.Walker>
     {
-        TopUserNtDefinition _array_type;
-        UserNTDefinition _non_array_type,
-             _type,
-            _rank_specifier;
-
-
-        protected override void Define()
-        {
-            _array_type += _(                /**/ r => r.NewArrayType,
+        static UserNTDefinition
+            //
+        _array_type = _(                /**/ r => r.NewArrayType,
                 o => _non_array_type,
                 o => list(_rank_specifier)
-                );
-
-            _non_array_type += _(o => _type);
-
-            _rank_specifier += _(           /**/ r => r.NewRankSpecifier,
-               o => _token_openBkt,
-               o => opt(list(_token_comma)),
-               o => _token_closeBkt);
-        }
-
+                ),
+            //-------------------------------
+        _non_array_type,
+        _type,
+        _rank_specifier,
+            //----------------------------------------
+         _end;
         public class Walker : AstWalker
         {
             public virtual void NewArrayType() { }
@@ -122,184 +77,80 @@ namespace Parser.MyCs
         }
     }
 
-    public class TypeParameterConstraintsClausesParser : CsSubParser<TypeParameterConstraintsClausesParser.Walker>
+    public class TypeParameterConstraintsClausesParser : CsSubParser2<TypeParameterConstraintsClausesParser.Walker>
     {
-        TopUserNtDefinition _type_parameter_constraints_clauses;
-        UserNTDefinition
-            _type_parameter_constraints_clause,
-            _type_parameter,
-            _type_parameter_constraints,
-            _common_constraint,
-            _type;
-        //_primary_constraint,
-        //_secondary_constraints,
-        //_constructor_constraint,
-        //_type;
+        static UserNTDefinition
+            //
 
-
-        protected override void Define()
-        {
-
-            _type_parameter_constraints_clauses += _(
-
-               o => list(_type_parameter_constraints_clause));
-
-
-            _type_parameter_constraints_clause += _(r => r.NewTypeParameterConstraints,
+           _type_parameter_constraints_clauses = _(
+               o => list(_type_parameter_constraints_clause)),
+            //----------------------------------------------
+            _type_parameter_constraints_clause = _(r => r.NewTypeParameterConstraints,
                o => _token_where,
                o => _type_parameter,
                o => _token_colon,
                o => list_c(_common_constraint)
-                );
-
-            _common_constraint += _oneof(
+                ),
+            _type_parameter = _(o => _token_id),
+            _type_parameter_constraints,
+            _common_constraint = _oneof(
                  _(o => _type),
                  _(o => _token_class),
                  _(o => _token_struct),
                  _(o => _token_new, o => _token_openPar, o => _token_closePar)
-                 );
-
-
-            //------------------------------------------
-            _type_parameter += _(o => _token_id);
-            //_primary_constraint._(_type);
-            //_primary_constraint._(_token_class);
-            //_primary_constraint._(_token_struct); 
-        }
-
-
+                 ),
+            _type;
+        //_primary_constraint,
+        //_secondary_constraints,
+        //_constructor_constraint,
+        //_type; 
         public class Walker : AstWalker
         {
             public virtual void NewTypeParameterConstraints() { }
         }
     }
 
-    public class TypeArgumentListParser : CsSubParser<TypeArgumentListParser.Walker>
+    public class TypeArgumentListParser : CsSubParser2<TypeArgumentListParser.Walker>
     {
-
-        TopUserNtDefinition _type_argument_list;
-        UserNTDefinition _type;
-        protected override void Define()
-        {
-            _type_argument_list += _(
+        static UserNTDefinition
+          _type_argument_list = _(
                o => _token_gen_oAng,
                o => list_c(_type),
-               o => _token_gen_cAng);
+               o => _token_gen_cAng),
+            //----------------------------------------------
+          _type;
 
-            //---------------------------
-            sync_start(_token_openAng);
-        }
         public class Walker : AstWalker { }
     }
 
 
 
-    public class ExpressionParser : CsSubParser<ExpressionParser.Walker>
+    public class ExpressionParser : CsSubParser2<ExpressionParser.Walker>
     {
-        TopUserNtDefinition _expression;
-        UserNTDefinition
-            _literal,
-            _simple_name_expression,
-            _additive_expression,
-            _multiplicative_expression,
-            _shift_expression,
 
-            _and_expression,
-            _xor_expression,
-            _or_expression,
-            _conditional_and_expression,
-            _conditional_or_expression,
-            _null_coalescing_expression,
-            _conditional_expression, //terinary expression
-            _relational_and_type_testing,
-            _equality_expression,
-            _assignment,
+        //operator precedence
+        //     //low
+        //Unknown,
+        //Lambda,
+        //Assignment,
+        //Conditional,
+        //NullCoalescing,
+        //ConditionOR,
+        //ConditionAND,
+        //LogicalOR,
+        //LogicalXOR,
+        //LogicalAND,
+        //Equality,
+        //RelationalAndTypeTesting,
+        //Shift,
+        //Additive,
+        //Multiplicative,
+        //Unary,
+        //Primary
 
-            _unary_expression,
-            _type_argument_list,
-
-            _parenthesized_expression,
-            _invocation_expression,
-            _member_access,
-            _element_access,
-            _this_access,
-            _base_access,
-            _post_increment_decrement_expression,
-            _object_creation_expression,
-            _expression_list,
-
-
-            //_anonymous_method_expression,
-            _lambda_expression,//external
-            _anonymous_function_signature,
-            _explicit_anonymous_function_signature,
-            _explicit_anonymous_function_parameter,
-            _implicit_anonymous_function_parameter,
-            _implicit_anonymous_function_signature,
-            _anonymous_function_body,
-
-
-            _array_creation_expression,
-            _rank_specifiers,
-            _rank_specifier,
-            _array_initializer,
-            _variable_initalizer,
-
-            _anonymous_object_creation_expression,
-            _anonymous_object_initializer,
-            _member_declarators,
-            _member_declarator,
-
-            _argument_list,//other parser 
-            _object_or_collection_initializer, //other parser
-
-            _unbound_type_name,
-            _generic_dimension_specifier,
-
-            _typeof_expression,
-            _checked_expression,
-            _unchecked_expression,
-            _default_value_expression,
-
-            _preop_unary_expression,
-            _pre_increment_decrement_expression,
-            _cast_expression,
-            _type;
-
-
-        public ExpressionParser() { }
-        void set_prec(prec prec)
-        {
-            set_prec((int)prec);
-        }
-
-
-        protected override void Define()
-        {
-
-
-            //operator precedence
-            //     //low
-            //Unknown,
-            //Lambda,
-            //Assignment,
-            //Conditional,
-            //NullCoalescing,
-            //ConditionOR,
-            //ConditionAND,
-            //LogicalOR,
-            //LogicalXOR,
-            //LogicalAND,
-            //Equality,
-            //RelationalAndTypeTesting,
-            //Shift,
-            //Additive,
-            //Multiplicative,
-            //Unary,
-            //Primary
-
-            //primary expression
-            _expression += _oneof(
+        //primary expression
+        static UserNTDefinition
+            _expression = _oneof(
                  o => _simple_name_expression,
                  o => _literal,
                  o => _parenthesized_expression,
@@ -321,7 +172,7 @@ namespace Parser.MyCs
                 o => _cast_expression,
                 o => _pre_increment_decrement_expression,
                 o => _preop_unary_expression,
-                //-----------------------------------
+            //-----------------------------------
                 o => _multiplicative_expression,
                 o => _additive_expression,
                 o => _shift_expression,
@@ -337,54 +188,135 @@ namespace Parser.MyCs
                 o => _conditional_expression,
                 o => _assignment,
                 o => _lambda_expression
-                );
-            //------------------------------------------------------
-            _simple_name_expression += _(
+                ),
+            //--------------------------------
+            _literal = _oneof(
+                  _(                                /**/r => r.NewLiteralTrue,
+                      o => _token_true),
+                  _(                                /**/r => r.NewLiteralFalse,
+                      o => _token_false),
+                  _(                                /**/r => r.NewLiteralInteger,
+                      o => _token_literal_integer),
+                  _(                                /**/r => r.NewLiteralString,
+                      o => _token_literal_string)
+                ),
+            //--------------------------------
+            _simple_name_expression = _(
                 o => _token_id,
                 o => opt(_type_argument_list)
-                );
+                ),
+            //--------------------------------
+            _additive_expression = _(r => r.NewBinOpExpression_Add_Sub,
+                 o => _expression,
+                 o => oneof(_token_plus, _token_minus),
+                 o => _expression
+                ).set_prec((int)prec.Additive),
+            //--------------------------------
+            _multiplicative_expression = _(
+                o => _expression,
+                o => oneof(_token_mul, _token_div, _token_mod),
+                o => _expression).set_prec((int)prec.Multiplicative),
+            //--------------------------------
+            _shift_expression = _(
+               o => _expression,
+               o => oneof(_token_shift_left, _token_shift_right),
+               o => _expression).set_prec((int)prec.Shift),
+            //--------------------------------
+            _and_expression = _(
+                 o => _expression,
+                 o => _token_and,
+                 o => _expression).set_prec((int)prec.LogicalAND),
+            //--------------------------------
+            _xor_expression = _(
+                 o => _expression,
+                 o => _token_cap,
+                 o => _expression
+                ).set_prec((int)prec.LogicalXOR),
+            //--------------------------------
+            _or_expression = _(
+                o => _expression,
+                o => _token_or,
+                o => _expression
+                ).set_prec((int)prec.LogicalOR),
+            //--------------------------------
+            _conditional_and_expression = _(
+                o => _expression,
+                o => _token_conditional_and,
+                o => _expression).set_prec((int)prec.LogicalAND),
+            //--------------------------------
+            _conditional_or_expression = _(
+                o => _expression,
+                o => _token_conditional_or,
+                o => _expression).set_prec((int)prec.LogicalOR),
+            //--------------------------------
+            _null_coalescing_expression = _(
+                o => _expression,
+                o => _token_null_coalescing,
+                o => _expression).set_prec((int)prec.NullCoalescing),
+            //--------------------------------
+            _conditional_expression = _(
+                o => _expression,
+                o => _token_quest,
+                o => _expression,
+                o => _token_colon,
+                o => _expression).set_prec((int)prec.Conditional), //terinary expression
+            //--------------------------------
+            _relational_and_type_testing = _(
+                o => _expression,
+                o => oneof(_token_openAng, _token_closeAng, _token_closeAng, _token_less_orEq,
+                      _token_greater_orEq, _token_as, _token_is),
+                o => _expression).set_prec((int)prec.RelationalAndTypeTesting),
+            //--------------------------------
+            _equality_expression = _(
+                 o => _expression,
+                 o => oneof(_token_eq, _token_neq),
+                 o => _expression).set_prec((int)prec.Equality),
+            //--------------------------------
+            _assignment = _(
+                o => _expression,
+            /*assignment op*/
+                o => oneof(_token_assign, _token_add_assign, _token_minus_assign,
+                _token_mul_assign, _token_div_assign, _token_and_assign, _token_or_assign,
+                _token_cap_assign, _token_leftshift_assign, _token_rightshift_assign),
 
-            //--------------------------------------------------------
+                o => _expression).set_prec((int)prec.Assignment),
+
+            _unary_expression,
+            //-------------------------------
             //doc 479
-            _type_argument_list += _(
+            _type_argument_list = _(
                 o => _token_gen_oAng,
                 o => list_c(_type),
-                o => _token_gen_cAng);
-            //------------------------------------------------------------
-
-            _parenthesized_expression += _(
+                o => _token_gen_cAng),
+            //-------------------------------
+            _parenthesized_expression = _(
                 o => _token_openPar,
                 o => _expression,
-                o => _token_closePar);
-            //------------------------------------------------------------
-            _invocation_expression += _(
+                o => _token_closePar),
+            //-------------------------------
+            _invocation_expression = _(
                 o => _expression,
                 o => _token_openPar,
                 o => opt(_argument_list),
                 o => _token_closePar
-             );
-
-            //------------------------------------------------------------
-            //doc(480)
-            _member_access += _(
+             ),
+            //-------------------------------
+            //doc 480
+            _member_access = _(
                  o => _expression,
                  o => _token_dot,
                  o => _token_id,
-                 o => opt(_type_argument_list));
-
-            //------------------------------------------------------------
-            _element_access += _(
+                 o => opt(_type_argument_list)),
+            //-------------------------------
+            _element_access = _(
                 o => _expression,
                 o => _token_openBkt,
                 o => _argument_list,
-                o => _token_closeBkt);
-
-            //480
-
-            _this_access += _(o => _token_this);
-            //------------------------------------------------------------
-
-            _base_access += _oneof(
+                o => _token_closeBkt),
+            //-------------------------------
+            _this_access = _(o => _token_this),
+            //-------------------------------
+            _base_access = _oneof(
                     _(o => _token_base,
                       o => _token_dot,
                       o => _token_id),
@@ -392,149 +324,17 @@ namespace Parser.MyCs
                       o => _token_openBkt,
                       o => _argument_list,
                       o => _token_closeBkt)
-                );
-            //------------------------------------------------------------
-
-            _literal += _oneof(
-                  _(r => r.NewLiteralTrue,
-                      o => _token_true),
-                  _(r => r.NewLiteralFalse,
-                      o => _token_false),
-                  _(r => r.NewLiteralInteger,
-                      o => _token_literal_integer),
-                  _(r => r.NewLiteralString,
-                      o => _token_literal_string)
-                );
-
-            //----------------------------------------------------------------------------------- 
-            _cast_expression += _(
-                 o => _token_openPar,
-                 o => _type,
-                 o => _token_closePar,
-                 o => _expression /*unary expression*/
-                );
-            set_prec(prec.Unary);
-            //----------------------------------------------------------------------------------- 
-
-            _preop_unary_expression += _(
-               o => oneof(_token_plus, _token_minus, _token_bang, _token_complement),
-               o => _expression);
-            set_prec(prec.Unary);
-            //----------------------------------------------------------------------------------- 
-
-            _pre_increment_decrement_expression += _(
-               o => oneof(_token_plus_plus, _token_minus),
-               o => _expression);
-            set_prec(prec.Unary);
-            //-----------------------------------------------------------------------------------  
-
-            _multiplicative_expression += _(
-                o => _expression,
-                o => oneof(_token_mul, _token_div, _token_mod),
-                o => _expression);
-            set_prec(prec.Multiplicative);
-
-            //------------------------------------------------------------
-            _additive_expression += _(r => r.NewBinOpExpression_Add_Sub,
-                 o => _expression,
-                 o => oneof(_token_plus, _token_minus),
-                 o => _expression
-                );
-            set_prec(prec.Additive);
-            //------------------------------------------------------------
-
-            _shift_expression += _(
-               o => _expression,
-               o => oneof(_token_shift_left, _token_shift_right),
-               o => _expression);
-
-            set_prec(prec.Shift);
-            //------------------------------------------------------------
-
-            _relational_and_type_testing += _(
-                o => _expression,
-                o => oneof(_token_openAng, _token_closeAng, _token_closeAng, _token_less_orEq,
-                      _token_greater_orEq, _token_as, _token_is),
-                o => _expression);
-            set_prec(prec.RelationalAndTypeTesting);
-            //----------------------------------------------------------------------------------- 
-
-            _equality_expression += _(
-                 o => _expression,
-                 o => oneof(_token_eq, _token_neq),
-                 o => _expression);
-
-            set_prec(prec.Equality);
-            //-----------------------------------------------------------------------------------  
-            _and_expression += _(
-                 o => _expression,
-                 o => _token_and,
-                 o => _expression);
-            set_prec(prec.LogicalAND);
-
-            //------------------------------------------------------
-            _xor_expression += _(
-                 o => _expression,
-                 o => _token_cap,
-                 o => _expression
-                );
-            set_prec(prec.LogicalXOR);
-            //------------------------------------------------------
-            _or_expression += _(
-                o => _expression,
-                o => _token_or,
-                o => _expression
-                );
-            set_prec(prec.LogicalOR);
-            //------------------------------------------------------
-            _conditional_and_expression += _(
-                o => _expression,
-                o => _token_conditional_and,
-                o => _expression);
-            set_prec(prec.ConditionAND);
-            //------------------------------------------------------
-            _conditional_or_expression += _(
-                o => _expression,
-                o => _token_conditional_or,
-                o => _expression);
-            set_prec(prec.ConditionOR);
-            //------------------------------------------------------
-            _null_coalescing_expression += _(
-                o => _expression,
-                o => _token_null_coalescing,
-                o => _expression);
-            set_prec(prec.NullCoalescing);
-            //------------------------------------------------------
-            _conditional_expression += _(
-                o => _expression,
-                o => _token_quest,
-                o => _expression,
-                o => _token_colon,
-                o => _expression);
-
-            set_prec(prec.Conditional);
-            //------------------------------------------------------
-
-            _assignment += _(
-                o => _expression,
-                /*assignment op*/
-                o => oneof(_token_assign, _token_add_assign, _token_minus_assign,
-                _token_mul_assign, _token_div_assign, _token_and_assign, _token_or_assign,
-                _token_cap_assign, _token_leftshift_assign, _token_rightshift_assign),
-
-                o => _expression);
-            set_prec(prec.Assignment);
-            //------------------------------------------------------ 
-            _post_increment_decrement_expression += _oneof(
+                ),
+            //-------------------------------
+            _post_increment_decrement_expression = _oneof(
                 _(
                    o => _expression,
                    o => _token_plus_plus),
                 _(
                    o => _expression,
-                   o => _token_minus_minus));
-
-            //------------------------------------------------------ 
-            _object_creation_expression += _oneof(
+                   o => _token_minus_minus)),
+            //-------------------------------
+            _object_creation_expression = _oneof(
                 _(
                    o => _token_new,             /**/
                    o => _type,
@@ -547,12 +347,45 @@ namespace Parser.MyCs
                    o => _token_new,
                    o => _type,
                    o => _object_or_collection_initializer)
-               );
-            //------------------------------------------------------------
+               ),
+            //-------------------------------
+            _expression_list = _(o => list_c(_expression)),
 
-            _expression_list += _(o => list_c(_expression));
-            //------------------------------------------------------------
-            _array_creation_expression += _oneof(
+            //-------------------------------
+            //_anonymous_method_expression,
+            _lambda_expression = _(
+                 o => _anonymous_function_signature,
+                 o => _token_lambda,
+                 o => _anonymous_function_body).set_prec((int)prec.Lambda),//external
+            //-------------------------------
+            _anonymous_function_signature = _oneof(
+                o => _explicit_anonymous_function_signature,
+                o => _implicit_anonymous_function_signature),
+            //-------------------------------
+            _explicit_anonymous_function_signature = _(
+                o => _token_openPar,
+                o => opt(list_c(_explicit_anonymous_function_parameter)),
+                o => _token_closePar),
+            //-------------------------------
+            _explicit_anonymous_function_parameter = _(
+                o => opt(oneof(_token_ref, _token_out)),
+                o => _type,
+                o => _token_id),
+            //-------------------------------
+            _implicit_anonymous_function_parameter = _(o => _token_id),
+            //-------------------------------
+            _implicit_anonymous_function_signature = _oneof(
+               _(
+                 o => _token_openPar,
+                 o => opt(list_c(_implicit_anonymous_function_signature)),
+                 o => _token_closePar),
+
+               _(o => _implicit_anonymous_function_parameter)
+               ),
+            //-------------------------------
+            _anonymous_function_body = _(o => _expression),
+            //-------------------------------
+            _array_creation_expression = _oneof(
                 _(
                     o => _token_new,
                     o => _type,
@@ -568,43 +401,37 @@ namespace Parser.MyCs
                 _(
                     o => _token_new,
                     o => _rank_specifier,
-                    o => _array_initializer));
-
-            //------------------------------------------------- 
-            _rank_specifiers += _(
-                o => list(_rank_specifier));
-
-            //------------------------------------------------- 
-            _rank_specifier += _(
+                    o => _array_initializer)),
+            //-------------------------------
+            _rank_specifiers = _(
+                o => list(_rank_specifier)),
+            //-------------------------------
+            _rank_specifier = _(
                 o => _token_openBkt,
                 o => list(_token_comma),
-                o => _token_closeBkt);
-
-            //--------------------------------------------------  
-            _array_initializer += _oneof(
-                /*1*/_(
+                o => _token_closeBkt),
+            //-------------------------------
+            _array_initializer = _oneof(
+            /*1*/_(
                    o => _token_openBrc,
                    o => opt(list_c(_variable_initalizer)),
                    o => _token_closeBrc),
-                /*2*/_(
+            /*2*/_(
                    o => _token_openBrc,
                    o => list_c(_variable_initalizer),
                    o => _token_comma,
-                   o => _token_closeBrc));
-            //--------------------------------------------------  
-            _variable_initalizer += _oneof(
+                   o => _token_closeBrc)),
+            //-------------------------------
+            _variable_initalizer = _oneof(
                    o => _expression,
-                   o => _array_initializer);
-            //--------------------------------------------------  
-
-
-            //------------------------------------------------------------
-            _anonymous_object_creation_expression += _(r => r.NewAnonymousObject,
+                   o => _array_initializer),
+            //-------------------------------
+            _anonymous_object_creation_expression = _(
+            /**/r => r.NewAnonymousObject,
                    o => _token_new,
-                   o => _anonymous_object_initializer);
-
-            //------------------------------------------------------------
-            _anonymous_object_initializer += _oneof(
+                   o => _anonymous_object_initializer),
+            //-------------------------------
+            _anonymous_object_initializer = _oneof(
                     _(                                /**/ r => r.NewObjectInitializer,
                         o => _token_openBrc,
                         o => opt(_member_declarators),
@@ -615,13 +442,13 @@ namespace Parser.MyCs
                         o => _member_declarators,
                         o => _token_comma,
                         o => _token_closeBrc)
-                );
-
-            _member_declarators += _(r => r.NewMemberDeclarators,
+                ),
+            //-------------------------------
+            _member_declarators = _(                /**/r => r.NewMemberDeclarators,
                     o => list_c(_member_declarator)
-                );
-
-            _member_declarator += _oneof(
+                ),
+            //-------------------------------
+            _member_declarator = _oneof(
                  _(
                     o => _simple_name_expression),
 
@@ -632,30 +459,13 @@ namespace Parser.MyCs
                     o => _token_id,
                     o => _token_assign,
                     o => _expression)
-                );
+                ),
+            //-------------------------------
+            _argument_list,//other parser 
+            _object_or_collection_initializer, //other parser
 
-
-            //------------------------------------------------------------ 
-            //doc482
-            _typeof_expression += _oneof(
-                  _(
-                    o => _token_typeof,
-                    o => _token_openPar,
-                    o => _type,
-                    o => _token_closePar),
-                  _(
-                    o => _token_typeof,
-                    o => _token_openPar,
-                    o => _unbound_type_name,
-                    o => _token_closePar),
-                 _(
-                    o => _token_typeof,
-                    o => _token_openPar,
-                    o => _token_void,
-                    o => _token_closePar)
-                );
-            //------------------------------------------------------------
-            _unbound_type_name += _oneof(
+            //----------------------------------
+            _unbound_type_name = _oneof(
                _(o => _token_id,
                   o => opt(_generic_dimension_specifier)),
 
@@ -671,66 +481,71 @@ namespace Parser.MyCs
                 o => _token_dot,
                 o => _token_id,
                 o => opt(_generic_dimension_specifier)
-                ));
-            _generic_dimension_specifier += _(
+                )),
+            //-------------------------------
+            _generic_dimension_specifier = _(
               o => _token_openAng,
               o => opt(list(_token_comma)),
-              o => _token_closeAng);
-            //----------------------------------------------------------------------------------- 
-            _checked_expression += _(
+              o => _token_closeAng),
+
+            //---------------------------------
+            //doc 482
+            _typeof_expression = _oneof(
+                  _(
+                    o => _token_typeof,
+                    o => _token_openPar,
+                    o => _type,
+                    o => _token_closePar),
+                  _(
+                    o => _token_typeof,
+                    o => _token_openPar,
+                    o => _unbound_type_name,
+                    o => _token_closePar),
+                 _(
+                    o => _token_typeof,
+                    o => _token_openPar,
+                    o => _token_void,
+                    o => _token_closePar)
+                ),
+            //-----------------------------------
+            _checked_expression = _(
                 o => _token_checked,
                 o => _token_openPar,
                 o => _expression,
-                o => _token_closePar);
-            _unchecked_expression += _(
+                o => _token_closePar),
+            //------------------------------
+            _unchecked_expression = _(
                 o => _token_unchecked,
                 o => _token_openPar,
                 o => _expression,
-                o => _token_closePar);
-
-            _default_value_expression += _(
+                o => _token_closePar),
+            //--------------------------
+            _default_value_expression = _(
                 o => _token_default,
                 o => _token_openPar,
                 o => _type,
-                o => _token_closePar);
+                o => _token_closePar),
+            //------------------------------- 
+            _preop_unary_expression = _(
+               o => oneof(_token_plus, _token_minus, _token_bang, _token_complement),
+               o => _expression)
+               .set_prec((int)prec.Unary),
 
-            //------------------------------------------------------------
-            _lambda_expression += _(
-                 o => _anonymous_function_signature,
-                 o => _token_lambda,
-                 o => _anonymous_function_body);
-
-            set_prec(prec.Lambda);
-
-            _anonymous_function_signature += _oneof(
-                o => _explicit_anonymous_function_signature,
-                o => _implicit_anonymous_function_signature);
-
-
-            _explicit_anonymous_function_signature += _(
-                o => _token_openPar,
-                o => opt(list_c(_explicit_anonymous_function_parameter)),
-                o => _token_closePar);
-
-            _explicit_anonymous_function_parameter += _(
-                o => opt(oneof(_token_ref, _token_out)),
-                o => _type,
-                o => _token_id);
-
-            _implicit_anonymous_function_signature += _oneof(
-               _(
+            _pre_increment_decrement_expression = _(
+               o => oneof(_token_plus_plus, _token_minus),
+               o => _expression).set_prec((int)prec.Unary),
+            //-------------------------------             
+            _cast_expression = _(
                  o => _token_openPar,
-                 o => opt(list_c(_implicit_anonymous_function_signature)),
-                 o => _token_closePar),
+                 o => _type,
+                 o => _token_closePar,
+                 o => _expression /*unary expression*/
+                ).set_prec((int)prec.Unary),
+            //-------------------------------
+            _type;
 
-               _(o => _implicit_anonymous_function_parameter)
-               );
 
-            _implicit_anonymous_function_parameter += _(o => _token_id);
 
-            _anonymous_function_body += _(o => _expression);
-
-        }
 
         //----------------------------------------------------------
         public class Walker : AstWalker
@@ -757,58 +572,49 @@ namespace Parser.MyCs
 
 
 
-    public class ObjectOrCollectionInitializerParser : CsSubParser<ObjectOrCollectionInitializerParser.Walker>
+    public class ObjectOrCollectionInitializerParser : CsSubParser2<ObjectOrCollectionInitializerParser.Walker>
     {
-        TopUserNtDefinition _object_or_collection_initializer;
-        UserNTDefinition
-          _expression_list,
-          _expression,
+        static UserNTDefinition
+         _object_or_collection_initializer = _oneof(
+               _(  /*1*/                        r => r.NewObjectInitialization,
+                   o => _token_openBrc,
+                   o => opt(list_c(_member_initializer)),
+                   o => _token_closeBrc),
+               _(  /*2*/                        r => r.NewObjectInitialization,
+                   o => _token_openBrc,
+                   o => list_c(_member_initializer),
+                   o => _token_comma,
+                   o => _token_closeBrc)
+               ),
+            //---------------------------------------------
+         _expression_list = _(o => list_c(_expression)),
+         _expression,
 
-          _object_initializer,
-          _element_initializer,
-          _member_initializer,
-          _initialize_value,
-          _type;
-
-        protected override void Define()
-        {
-            _object_initializer += _oneof(
-                _(  /*1*/                        r => r.NewObjectInitialization,
+         _object_initializer,
+            //---------------------------------------------
+         _element_initializer = _oneof(
+                  _(o => _expression),
+                  _(
                     o => _token_openBrc,
-                    o => opt(list_c(_member_initializer)),
-                    o => _token_closeBrc),
-                _(  /*2*/                        r => r.NewObjectInitialization,
-                    o => _token_openBrc,
-                    o => list_c(_member_initializer),
-                    o => _token_comma,
-                    o => _token_closeBrc)
-                );
-            //------------------------------------------------------------
-            _member_initializer += _(
-                    o => _token_id,
-                    o => _token_assign,
-                    o => _initialize_value
-                );
-            //------------------------------------------------------------
-            _initialize_value += _oneof(
-                o => _expression,
-                o => _object_or_collection_initializer
-            );
-            //------------------------------------------------------------
-            _element_initializer += _oneof(
-                   _(o => _expression),
-                   _(
-                     o => _token_openBrc,
-                     o => _expression_list,
-                     o => _token_closeBrc
-                   )
-                );
-            //------------------------------------------------------------
-            _expression_list += _(o => list_c(_expression));
-            //------------------------------------------------------------
+                    o => _expression_list,
+                    o => _token_closeBrc
+                  )
+               ),
+            //---------------------------------------------
+         _member_initializer = _(
+                   o => _token_id,
+                   o => _token_assign,
+                   o => _initialize_value
+               ),
+            //---------------------------------------------
+         _initialize_value = _oneof(
+               o => _expression,
+               o => _object_or_collection_initializer
+           ),
+            //---------------------------------------------
+         _type;
+        //sync_start(_token_openBrc);
 
-            sync_start(_token_openBrc);
-        }
 
         //-----------------------------------------------------------
         public class Walker : AstWalker
@@ -818,35 +624,25 @@ namespace Parser.MyCs
     }
 
 
-
-    public class ArgumentListParser : CsSubParser<ArgumentListParser.Walker>
+    public class ArgumentListParser : CsSubParser2<ArgumentListParser.Walker>
     {
-        TopUserNtDefinition _argument_list;
-        UserNTDefinition
-           _argument,
-           _argument_value,
-           _argument_name,
-           _expression;
-
-        protected override void Define()
-        {
-
-            //-----------------------------------------
-            _argument_list += _(o => list_c(_argument));
-            //-----------------------------------------
-            _argument += _(
+        static UserNTDefinition
+           _argument_list = _(o => list_c(_argument)),
+            //--------------------------------------------
+           _argument = _(
                  o => opt(_argument_name),
-                 o => _argument_value);
-
-            _argument_name += _(
-                o => _token_id,
-                o => _token_colon);
-
-            _argument_value += _oneof(
+                 o => _argument_value),
+            //--------------------------------------------
+           _argument_value = _oneof(
                    _(o => _expression),
                    _(o => _token_ref, o => _expression),
-                   _(o => _token_out, o => _expression));
-        }
+                   _(o => _token_out, o => _expression)),
+            //--------------------------------------------
+           _argument_name = _(
+                o => _token_id,
+                o => _token_colon),
+            //--------------------------------------------
+           _expression;
 
         public class Walker : AstWalker
         {
@@ -854,68 +650,11 @@ namespace Parser.MyCs
 
     }
 
-    public class StatementParser : CsSubParser<StatementParser.Walker>
+    public class StatementParser : CsSubParser2<StatementParser.Walker>
     {
-        TopUserNtDefinition _statement;
-        UserNTDefinition
-
-            _empty_statement,
-            _expression_statement,
-
-            _if_else,
-            _switch_statement,
-            _switch_block,
-            _switch_section,
-            _switch_label,
-
-            _do_statement,
-            _while_statement,
-            _for_statement,
-            _for_initializer,
-            _foreach_statement,
-
-            _embeded_statement,
-
-            _block_statement,
-            _break_statement,
-            _continue_statement,
-            _goto_statement,
-            _return_statement,
-            _throw_statement,
-            _try_statement,
-            _catch_clauses,
-            _specific_catch_clause,
-            _generic_catch_clause,
-            _finally_clause,
-
-            _checked_statement,
-            _unchecked_statement,
-
-            _declaration_statement,
-            _local_variable_declaration,
-            _local_constant_declaration,
-            _constant_declarator,
-            _local_variable_declarator,
-            _local_variable_initializer,
-
-            _lock_statement,
-            _using_statement,
-            _yield_statement,
-            _label_statement,
-
-            _expression,
-
-            _array_initializer,
-            _variable_initializer,
-
-            _type;
-
-
-
-        protected override void Define()
-        {
-
-            _statement += _oneof(
+        static UserNTDefinition
+            //
+            _statement = _oneof(
                  o => _expression_statement,
                  o => _empty_statement,
                  o => _block_statement,
@@ -935,30 +674,21 @@ namespace Parser.MyCs
                  o => _return_statement,
                  o => _throw_statement,
                  o => _try_statement
-               );
+               ),
 
-            //----------------------------------
-            _expression_statement += _(
+               //---------------------
+            _empty_statement = _(
+                 o => _token_semicolon
+                ),
+            //---------------------
+            _expression_statement = _(
                  o => _expression,
                  o => _token_semicolon
-                );
-            //----------------------------------
-            _empty_statement += _(
-                 o => _token_semicolon
-                );
+                ),
+            //---------------------
 
-            _block_statement += _(                /**/   r => r.NewBlockStatement,
-                o => _token_openBrc,
-                o => opt(list(_statement)),      /**/ o => m.BlockStatement_Content,
-                o => _token_closeBrc
-                );
-            //----------------------------------
-            //if, switch
-            //while, do while
-            //for, for each
-
-            _if_else += _oneof(
-                /*1*/
+            _if_else = _oneof(
+            /*1*/
                  _(r => r.NewIfElseStatement,
                  o => _token_if,
                  o => _token_openPar,
@@ -966,8 +696,7 @@ namespace Parser.MyCs
                  o => _token_closePar,
                  o => _statement,       /**/ r => m.If_IfBodyStmt
                  ),
-
-                 /*2*/
+            /*2*/
                  _(r => r.NewIfElseStatement,
                  o => _token_if,
                  o => _token_openPar,
@@ -977,81 +706,53 @@ namespace Parser.MyCs
                  o => _token_else,
                  o => _statement,       /**/ r => m.If_ElseBodyStmt
                  )
-                );
-
-            _declaration_statement += _oneof(
-
-                    _( /*1*/
-                        o => _local_variable_declaration,
-                        o => _token_semicolon
-                     ),
-
-                    _( /*2*/
-                        o => _local_constant_declaration,
-                        o => _token_semicolon
-                     )
-                );
-
-            _local_variable_declaration += _(
-                o => oneof(_type, _token_var),
-                o => list_c(_local_variable_declarator)
-                );
-            _local_constant_declaration += _(
-                o => _token_const,
-                o => _type,
-                o => list_c(_constant_declarator)
-                );
-
-            // doc 487
-            _constant_declarator += _(
-                o => _token_id,
-                o => _token_assign,
-                o => _expression/*const expression*/
-                );
-
+                ),
+            //---------------------
             //doc 487
-
-
-            //486
-
-            _local_variable_declarator += _oneof(
-                     _(   /*1*/                            /**/r => r.NewLocalVarDecl,
-                        o => _token_id,                 /**/o => m.LocalVarName
-                      ),
-
-                     _( /*2*/                            /**/r => r.NewLocalVarDecl,
-                      o => _token_id,                   /**/o => m.LocalVarName,
-                      o => _token_assign,
-                      o => _local_variable_initializer, /**/o => m.LocalVarInitValue
-                      )
-                );
-
-            //doc 487
-            _local_variable_initializer += _oneof(
-                    _(o => _expression),
-                    _(o => _array_initializer)
-                );
-
-
-            //doc 489
-            _array_initializer += _oneof(
-                    _(
-                       o => _token_openBrc,
-                       o => opt(list_c(_variable_initializer)),
-                       o => _token_closeBrc),
-
-                    _(
-                       o => _token_openBrc,
-                       o => list_c(_variable_initializer),
-                       o => _token_comma,
-                       o => _token_closeBrc)
-                     );
-            _variable_initializer += _oneof(
-                _(o => _expression),
-                _(o => _array_initializer)
-                );
-
-            _for_statement += _(
+            _switch_statement = _(
+                o => _token_switch,
+                o => _token_openPar,
+                o => _expression,
+                o => _token_closePar,
+                o => _switch_block),
+            //---------------------
+            _switch_block = _(
+               o => _token_openBrc,
+               o => opt(list(_switch_section)),
+               o => _token_closeBrc),
+            //---------------------
+            _switch_section = _(
+               o => list(_switch_label),
+               o => list(_statement)),
+            //---------------------
+            _switch_label = _oneof(
+            /*1*/
+                _(o => _token_case,
+                    o => _expression,
+                    o => _token_colon),
+            /*2*/
+                _(o => _token_default,
+                  o => _token_colon)),
+            //------------------------------
+            _do_statement = _(
+                o => _token_do,
+                o => _statement/*embeded statement*/,
+                o => _token_while,
+                o => _token_openPar,
+                o => _expression,
+                o => _token_closePar,
+                o => _token_semicolon
+            ),
+            //------------------------------
+            _while_statement = _(
+               o => _token_while,
+               o => _token_openPar,
+               o => _expression,
+               o => _token_closePar,
+               o => _statement
+              ),
+            //------------------------------
+            _for_statement = _(
                 o => _token_for,
                 o => _token_openPar,
                 o => opt(_for_initializer),
@@ -1061,26 +762,11 @@ namespace Parser.MyCs
                 o => opt(list_c(_expression)),/*statement_expression_list*/
                 o => _token_closePar,
                 o => _statement /*embeded statement*/
-                );
-
-            _while_statement += _(
-               o => _token_while,
-               o => _token_openPar,
-               o => _expression,
-               o => _token_closePar,
-               o => _statement
-              );
-
-            _do_statement += _(
-                o => _token_do,
-                o => _statement/*embeded statement*/,
-                o => _token_while,
-                o => _token_openPar,
-                o => _expression,
-                o => _token_closePar,
-                o => _token_semicolon
-            );
-            _foreach_statement += _(
+                ),
+            //------------------------------
+            _for_initializer,
+            //------------------------------
+            _foreach_statement = _(
                 o => _token_foreach,
                 o => _token_openPar/*embeded statement*/,
                 o => oneof(_type, _token_var),
@@ -1089,17 +775,28 @@ namespace Parser.MyCs
                 o => _expression,
                 o => _token_closePar,
                 o => _statement
-                );
-            _break_statement += _(
+                ),
+            //------------------------------
+            _embeded_statement,
+
+            //--------------------
+            _block_statement = _(                /**/   r => r.NewBlockStatement,
+                o => _token_openBrc,
+                o => opt(list(_statement)),      /**/ o => m.BlockStatement_Content,
+                o => _token_closeBrc
+                ),
+            //--------------------
+            _break_statement = _(
                 o => _token_break,
                 o => _token_semicolon
-                );
-            _continue_statement += _(
+                ),
+            //--------------------
+            _continue_statement = _(
                     o => _token_continue,
                     o => _token_semicolon
-                );
-
-            _goto_statement += _oneof(
+                ),
+            //--------------------
+            _goto_statement = _oneof(
                   _(
                       o => _token_goto,
                       o => _token_id,
@@ -1112,19 +809,21 @@ namespace Parser.MyCs
                   _(
                       o => _token_goto,
                       o => _token_default)
-                );
-
-            _return_statement += _(        /**/ o => o.NewReturnStatement,
+                ),
+            //--------------------
+            _return_statement = _(        /**/ o => o.NewReturnStatement,
                 o => _token_return,
                 o => opt(_expression),     /**/ o => m.ReturnExpression,
                 o => _token_semicolon
-                );
-            _throw_statement += _(
+                ),
+            //--------------------
+            _throw_statement = _(
                 o => _token_throw,
                 o => opt(_expression),
                 o => _token_semicolon
-                );
-            _try_statement += _oneof(
+                ),
+            //--------------------
+            _try_statement = _oneof(
                 _(
                     o => _token_try,
                     o => _block_statement,
@@ -1140,99 +839,142 @@ namespace Parser.MyCs
                     o => _block_statement,
                     o => _catch_clauses,
                     o => _finally_clause)
-                );
-
-            _catch_clauses += _oneof(
+                ),
+            //--------------------
+            _catch_clauses = _oneof(
                 _(
                     o => list(_specific_catch_clause),
                     o => opt(_generic_catch_clause)),
                 _(
                     o => opt(list(_specific_catch_clause)),
                     o => _generic_catch_clause)
-                );
-
-            _specific_catch_clause += _(
+                ),
+            //--------------------
+            _specific_catch_clause = _(
                 o => _token_catch,
                 o => _token_openPar,
                 o => _type/*_class_type*/,
                 o => opt(_token_id),
                 o => _token_closePar,
                 o => _block_statement
-                );
-
-
-            _generic_catch_clause += _(
+                ),
+            //--------------------
+            _generic_catch_clause = _(
                  o => _token_catch,
                  o => _block_statement
-                );
-
-            _finally_clause += _(
+                ),
+            //--------------------
+            _finally_clause = _(
                  o => _token_finally,
                  o => _block_statement
-                );
-
-
-
-            _checked_statement += _(
+                ),
+            //--------------------
+            _checked_statement = _(
                 o => _token_checked,
-                o => _block_statement);
-
-
-            _unchecked_statement += _(
+                o => _block_statement),
+            //--------------------
+            _unchecked_statement = _(
                 o => _token_unchecked,
                 o => _block_statement
-                );
+                ),
 
+            //----------------------------
+            _declaration_statement = _oneof(
 
-            _lock_statement += _(
+                    _( /*1*/
+                        o => _local_variable_declaration,
+                        o => _token_semicolon
+                     ),
+
+                    _( /*2*/
+                        o => _local_constant_declaration,
+                        o => _token_semicolon
+                     )
+                ),
+            //----------------------------
+            _local_variable_declaration = _(
+                o => oneof(_type, _token_var),
+                o => list_c(_local_variable_declarator)
+                ),
+            //----------------------------
+            _local_constant_declaration = _(
+                o => _token_const,
+                o => _type,
+                o => list_c(_constant_declarator)
+                ),
+            //----------------------------
+            //doc 487
+            _constant_declarator = _(
+                o => _token_id,
+                o => _token_assign,
+                o => _expression/*const expression*/
+                ),
+            //----------------------------
+            //doc 486
+            _local_variable_declarator = _oneof(
+                     _(   /*1*/                            /**/r => r.NewLocalVarDecl,
+                        o => _token_id,                 /**/o => m.LocalVarName
+                      ),
+
+                     _( /*2*/                            /**/r => r.NewLocalVarDecl,
+                      o => _token_id,                   /**/o => m.LocalVarName,
+                      o => _token_assign,
+                      o => _local_variable_initializer, /**/o => m.LocalVarInitValue
+                      )
+                ),
+            //----------------------------
+            //doc 487
+            _local_variable_initializer = _oneof(
+                    _(o => _expression),
+                    _(o => _array_initializer)
+                ),
+            //----------------------------
+            _lock_statement = _(
                 o => _token_lock,
                 o => _token_openPar,
                 o => _expression,
                 o => _token_closePar,
-                o => _statement);
-            //-----------------------------------------------------------------
-
-
-            _using_statement += _(
+                o => _statement),
+            //----------------------------
+            _using_statement = _(
                o => _token_using,
                o => _token_openPar,
                o => oneof(_local_variable_declarator, _expression),
                o => _token_closePar,
-               o => _statement/*embeded statement*/);
-
-            //-----------------------------------------------------------------
-            _yield_statement += _oneof(
+               o => _statement/*embeded statement*/),
+            //----------------------------
+            _yield_statement = _oneof(
                 _(o => _token_yield, o => _token_return, o => _expression, o => _token_semicolon),
                 _(o => _token_yield, o => _token_break, o => _token_semicolon)
-                );
+                ),
+            //----------------------------
+            _label_statement,
+
+            _expression,
+
+            //----------------------------------------
+            //489
+            _array_initializer = _oneof(
+                    _(
+                       o => _token_openBrc,
+                       o => opt(list_c(_variable_initializer)),
+                       o => _token_closeBrc),
+
+                    _(
+                       o => _token_openBrc,
+                       o => list_c(_variable_initializer),
+                       o => _token_comma,
+                       o => _token_closeBrc)
+                     ),
+            //----------------------------------------
+            _variable_initializer = _oneof(
+                _(o => _expression),
+                _(o => _array_initializer)
+                ),
+            //----------------------------------------
+            _type;
 
 
-            //487
-            _switch_statement += _(
-                o => _token_switch,
-                o => _token_openPar,
-                o => _expression,
-                o => _token_closePar,
-                o => _switch_block);
-
-            _switch_block += _(
-               o => _token_openBrc,
-               o => opt(list(_switch_section)),
-               o => _token_closeBrc);
-
-            _switch_section += _(
-               o => list(_switch_label),
-               o => list(_statement));
-
-            _switch_label += _oneof(
-                _(o => _token_case,
-                    o => _expression,
-                    o => _token_colon),
-
-                _(o => _token_default,
-                    o => _token_colon));
-
-        }
         public enum m
         {
             BlockStatement_Content,
