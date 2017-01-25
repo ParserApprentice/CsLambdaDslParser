@@ -1139,39 +1139,21 @@ namespace Parser.MyCs
         }
     }
 
-    public class PropertyDeclParser : CsSubParser<PropertyDeclParser.Walker>
+    public class PropertyDeclParser : CsSubParser2<PropertyDeclParser.Walker>
     {
 
-        TopUserNtDefinition _property_declaration;
-        UserNTDefinition
-            _property_modifier, _return_type,
-            _attributes,
-            _member_name,
-            _accessors_declarations,
-            _formal_parameter_list,
-            _type,
-            _statement,
-            _get_accessor_declaration,
-            _set_accessor_declaration,
-            _accessor_modifier,
-            _accessor_body
-            ;
-
-
-        protected override void Define()
-        {
-
-            _property_declaration += _(
+        static UserNTDefinition
+            //--------------------------------
+            _property_declaration = _(
                 o => opt(_attributes),
                 o => opt(list(_property_modifier)),
                 o => _type,
                 o => _member_name,
                 o => _token_openBrc,
                 o => _accessors_declarations,
-                o => _token_closeBrc);
-            //-------------------------------------------------------------------
-
-            _property_modifier += _oneof(
+                o => _token_closeBrc),
+            //--------------------------------
+            _property_modifier = _oneof(
                o => _token_new,
                o => _token_public,
                o => _token_protected,
@@ -1181,79 +1163,78 @@ namespace Parser.MyCs
                o => _token_virtual,
                o => _token_abstract,
                o => _token_extern
-               );
-            //-------------------------------------------------------------------
-            _accessors_declarations += _oneof(
+               ),
+            //--------------------------------
+            _return_type,
+            _attributes,
+            _member_name = _(o => _token_id),
+            //--------------------------------
+            _accessors_declarations = _oneof(
                 _(
                   o => _get_accessor_declaration,
                   o => opt(_set_accessor_declaration)),
                 _(
                   o => opt(_set_accessor_declaration),
-                  o => _get_accessor_declaration));
-            //-------------------------------------------------------------------
-            _get_accessor_declaration += _(
+                  o => _get_accessor_declaration)),
+            //--------------------------------
+            _formal_parameter_list,
+            _type,
+            _statement,
+            //--------------------------------
+            _get_accessor_declaration = _(
                 o => opt(_attributes),
                 o => opt(_accessor_modifier),
                 o => _token_get,
-                o => _accessor_body);
-
-            _set_accessor_declaration += _(
+                o => _accessor_body),
+            //--------------------------------
+            _set_accessor_declaration = _(
                 o => opt(_attributes),
                 o => opt(_accessor_modifier),
                 o => _token_set,
-                o => _accessor_body);
-
-            _accessor_modifier += _oneof(
+                o => _accessor_body),
+            //--------------------------------
+            _accessor_modifier = _oneof(
                 _(o => _token_protected),
                 _(o => _token_internal),
                 _(o => _token_private),
                 _(o => _token_protected, o => _token_internal),
                 _(o => _token_internal, o => _token_protected)
-               );
-            //------------------------------------------------------
-            _member_name += _(o => _token_id);
-
-            _accessor_body += _oneof(
+               ),
+            //--------------------------------
+            _accessor_body = _oneof(
                 _(
                     o => _token_openBrc,
                     o => opt(list(_statement)),
                     o => _token_closeBrc),
 
-                _(o => _token_semicolon));
-            //------------------------------- 
-
-            //what is the 'safe-point' or 'sync-point' if  an error occurs ?
-
-            //-------------------------------
-            sync(_token_get);
-            sync(_token_set);
-
-        }
-
+                _(o => _token_semicolon))
+            ;
+        //TODO: review here
+        //what is the 'safe-point' or 'sync-point' if  an error occurs ? 
+        //-------------------------------
+        //sync(_token_get);
+        //sync(_token_set);  
         public class Walker : AstWalker
         {
         }
     }
 
 
-    public class FieldDeclParser : CsSubParser<FieldDeclParser.Walker>
+    public class FieldDeclParser : CsSubParser2<FieldDeclParser.Walker>
     {
         //492
-        TopUserNtDefinition _field_declaration;
-        UserNTDefinition _attributes, _field_modifiers,
-            _type, _variable_declarator, _expression;
-        protected override void Define()
-        {
-            _field_declaration += _(
+        static UserNTDefinition
+            _field_declaration = _(
                o => opt(_attributes),
                o => opt(_field_modifiers),
                o => _type,
                o => list_c(_variable_declarator), //variable_declarators
-               o => _token_semicolon);
+               o => _token_semicolon),
+            //-----------------------------------
 
-
-            //-------------------------------------------
-            _field_modifiers += _oneof(
+            _attributes,
+            //-----------------------------------
+            _field_modifiers = _oneof(
                  o => _token_new,
                  o => _token_public,
                  o => _token_protected,
@@ -1261,42 +1242,33 @@ namespace Parser.MyCs
                  o => _token_private,
                  o => _token_static,
                  o => _token_readonly
-                );
-            //-------------------------------------------
-            _variable_declarator += _oneof(
+                ),
+            //-----------------------------------
+            _type,
+            //-----------------------------------
+            _variable_declarator = _oneof(
                  _(o => _token_id),
+                 _(o => _token_id,
+                   o => _token_assign,
+                   o => _expression)
+                ),
+            //-----------------------------------
+            _expression;
+        //TODO: review here
+        //sync(_token_semicolon);
+        //   sync(_token_assign);
 
-                 _(o => _token_id, o => _token_assign, o => _expression)
-                );
-
-            //-------------------------------------------
-            sync(_token_semicolon);
-            sync(_token_assign);
-            //------------------------------------------- 
-        }
         public class Walker : AstWalker
         {
         }
     }
 
-    public class FormalParameterListParser : CsSubParser<FormalParameterListParser.Walker>
+    public class FormalParameterListParser : CsSubParser2<FormalParameterListParser.Walker>
     {
-        TopUserNtDefinition _formal_parameter_list;
+        static
         UserNTDefinition
-            _fixedParameters,
-            _fixedParameter,
-            _default_argument,
-            _parameter_modifier,
-            _parameter_array,
-            _attributes,
-            _type,
-            _array_type,
-            _expression
-            ;
-        protected override void Define()
-        {
-            _formal_parameter_list += _oneof(
-                /*1*/_(
+            _formal_parameter_list = _oneof(
+            /*1*/_(
                     o => _fixedParameters),
 
                 /*2*/_(
@@ -1305,63 +1277,52 @@ namespace Parser.MyCs
                     o => _parameter_array),
 
                 /*3*/_(
-                    o => _parameter_array));
-
-            _fixedParameters += _(o => list_c(_fixedParameter));
-
-            _fixedParameter += _(
+                    o => _parameter_array)),
+            //----------------------------------
+            _fixedParameters = _(o => list_c(_fixedParameter)),
+            //----------------------------------
+            _fixedParameter = _(
                 o => opt(_attributes),
                 o => opt(_parameter_modifier),
                 o => _type,
                 o => _token_id,
-                o => opt(_default_argument));
-            //----------------------------- 
-            _default_argument += _(
+                o => opt(_default_argument)),
+            //----------------------------------
+            _default_argument = _(
                 o => _token_assign,
-                o => _expression);
-            //-----------------------------
-            _parameter_modifier += _oneof(
+                o => _expression),
+            //----------------------------------
+            _parameter_modifier = _oneof(
                 o => _token_ref,
                 o => _token_out,
                 o => _token_this
-                );
-            //------------------------------- 
-            _parameter_array += _(
+                ),
+            //----------------------------------
+            _parameter_array = _(
                 o => opt(_attributes),
                 o => _token_params,
                 o => _array_type,
-                o => _token_id);
-            //-------------------------------  
-        }
-
+                o => _token_id),
+            //----------------------------------
+            _attributes,
+            _type,
+            _array_type,
+            _expression
+            ;
         public class Walker : AstWalker
         {
 
         }
     }
-    public class MethodDeclParser : CsSubParser<MethodDeclParser.Walker>
+    public class MethodDeclParser : CsSubParser2<MethodDeclParser.Walker>
     {
-        TopUserNtDefinition _method_declaration;
+        static
         UserNTDefinition
-            _method_header,
-            _method_body,
-            _method_modifier,
-            _return_type,
-            _attributes,
-            _member_name,
-            _type_parameter_list,
-            _formal_parameter_list,
-            _type,
-            _statement
-            ;
-
-        protected override void Define()
-        {
-            _method_declaration += _(
+            _method_declaration = _(
                 o => _method_header,
-                o => _method_body);
+                o => _method_body),
             //---------------------------------------------------
-            _method_header += _(
+            _method_header = _(
                 o => opt(_attributes),
                 o => opt(list(_method_modifier)),
                 o => opt(_token_partial),
@@ -1371,10 +1332,11 @@ namespace Parser.MyCs
                 o => _token_openPar,
                 o => opt(_formal_parameter_list),
                 o => _token_closePar
-                //opt<type_parameter_constraints_clauses
-                );
-            //-------------------------------
-            _method_modifier += _oneof(
+            //opt<type_parameter_constraints_clauses
+                ),
+            //---------------------------------------------------
+
+            _method_modifier = _oneof(
                 o => _token_new,
                 o => _token_public,
                 o => _token_protected,
@@ -1384,28 +1346,32 @@ namespace Parser.MyCs
                 o => _token_virtual,
                 o => _token_abstract,
                 o => _token_extern
-                );
-            _return_type += _(
-               o => _token_void);
+                ),
+            //---------------------------------------------------
 
-            _member_name += _(
-                o => _token_id
-                );
-
-            //-------------------------------
-            _method_body += _oneof(
+            _method_body = _oneof(
                     _(
                         o => _token_openBrc,
                         o => opt(list(_statement)),
                         o => _token_closeBrc),
                     _(
                         o => _token_semicolon)
-                );
+                ),
+            //---------------------------------------------------
+            //TODO: review method return type
+            _return_type = _(o => _token_void),
+            //---------------------------------------------------
+            _attributes,
+            //---------------------------------------------------
+            _member_name = _(o => _token_id),
 
+            _type_parameter_list,
+            _formal_parameter_list,
+            _type,
+            _statement
+            ;
+        //sync(_token_openPar);
 
-            //-------------------------------
-            sync(_token_openPar);
-        }
 
         public class Walker : AstWalker
         {
@@ -1413,29 +1379,11 @@ namespace Parser.MyCs
         }
     }
 
-    public class StructDeclParser : CsSubParser<StructDeclParser.Walker>
+    public class StructDeclParser : CsSubParser2<StructDeclParser.Walker>
     {
         //497 
-        TopUserNtDefinition _struct_decl;
-        UserNTDefinition
-           _attributes,
-           _struct_modifiers,
-           _type_parameter_list,
-           _struct_interfaces,
-           _type_parameter_constraints_clauses,
-           _struct_body,
-           _type_name,
-           _type_parameters,
-           _type_parameter,
-           _namespace_or_typename,
-           _type_argument_list,
-
-           _interface_type,
-           _interface_typelist;//external define  
-
-        protected override void Define()
-        {
-            _struct_decl += _(
+        static UserNTDefinition
+            _struct_decl = _(
                o => opt(_attributes),
                o => opt(_struct_modifiers),
                o => opt(_token_partial),
@@ -1445,10 +1393,11 @@ namespace Parser.MyCs
                o => opt(_struct_interfaces),
                o => opt(_type_parameter_constraints_clauses),
                o => _struct_body,
-               o => opt(_token_semicolon));
-
-            //-------------------------------------------------------
-            _struct_modifiers += _oneof(
+               o => opt(_token_semicolon)),
+            //----------------------------
+           _attributes,
+            //----------------------------
+           _struct_modifiers = _oneof(
                o => _token_public,
                o => _token_protected,
                o => _token_internal,
@@ -1457,43 +1406,42 @@ namespace Parser.MyCs
                o => _token_sealed,
                o => _token_new,
                o => _token_static
-               );
-            //---------------------------------------------------------
-
-
-            //[doc(491)]             
-            _type_parameter_list += _(
+               ),
+            //----------------------------
+            //doc 491
+           _type_parameter_list = _(
                  o => _token_openAng,
                  o => _type_parameters,
                  o => _token_closeAng
-                );
-
-            _type_parameters += _oneof(
+                ),
+            //----------------------------
+           _struct_interfaces = _(
+                o => _token_colon,
+                o => _interface_typelist),
+            //----------------------------
+           _type_parameter_constraints_clauses,
+            //----------------------------
+           _struct_body = _(
+                o => _token_openBrc,
+                o => _token_closeBrc),
+            //----------------------------
+           _type_name = _(o => _namespace_or_typename),
+            //----------------------------
+           _type_parameters = _oneof(
                _(
                  o => opt(_attributes),
                  o => _type_parameter),
-
                _(
                  o => _type_parameters,
                  o => _token_comma,
                  o => _attributes,
                  o => _type_parameter)
-                );
-
-            _type_parameter += _(o => _token_id);
-            //---------------------------------------------------------
-
-            _struct_interfaces += _(
-                o => _token_colon,
-                o => _interface_typelist);
-
-            _interface_typelist += _(o => list_c(_interface_type));
-            //---------------------------------------------------------
-            _interface_type += _(o => _type_name);
-            _type_name += _(o => _namespace_or_typename);
-
-            // [doc(477)]
-            _namespace_or_typename += _oneof(
+                ),
+            //----------------------------
+           _type_parameter = _(o => _token_id),
+            //----------------------------
+            //doc 477
+           _namespace_or_typename = _oneof(
                  _(
                     o => _token_id,
                     o => opt(_type_argument_list)),
@@ -1502,18 +1450,14 @@ namespace Parser.MyCs
                     o => _token_dot,
                     o => _token_id,
                     o => opt(_type_argument_list)
-                 ));
-            //qualified_alias_member
-            //-------------------------------------------------------
-            _struct_body += _(
-                o => _token_openBrc,
-                o => _token_closeBrc);
-            //---------------------------------------------------------
-            //not correct
-            //---------------------------------------------------------
-            sync(_token_struct);
-        }
+                 )),
+            //----------------------------
+           _type_argument_list = _(o => list_c(_interface_type)),
+            //----------------------------
+           _interface_type = _(o => _type_name),
+           _interface_typelist;//external define  
 
+        //reiew  sync(_token_struct); 
         public class Walker : AstWalker
         {
         }
@@ -1563,37 +1507,6 @@ namespace Parser.MyCs
                  o => _token_semicolon
              )
             ;
-        //------------------------------------------------------ 
-
-        //protected override void Define()
-        //{
-
-
-        //    //_namespace_member_decl += _oneof(
-        //    //    _o => _namespace_decl,
-        //    //    _o => _type_decl
-        //    //    );
-
-        //    //_namespace_decl += _(             /**/ r => r.NewNamespaceDeclaration,
-        //    //     o => _token_namespace,
-        //    //     o => _token_id,
-        //    //     o => _namespace_body,
-        //    //     o => opt(_token_semicolon)
-        //    //     );
-        //    //------------------------------------------------------ 
-        //    //_namespace_body += _(
-        //    //     o => _token_openBrc,
-        //    //     o => opt(_namespace_member_decls),
-        //    //     o => _token_closeBrc
-        //    //     );
-        //    //------------------------------------------------------              
-        //    //_type_decl += _oneof(
-        //    //        _(o => _class_decl),
-        //    //        _(o => _struct_decl)
-        //    //    );
-
-        //}
-
         //state for shift
         public enum m
         {
@@ -1611,12 +1524,6 @@ namespace Parser.MyCs
             public virtual void AddTypeDeclToNamespaceMember() { }
             public virtual void NewUsingDirective() { }
             public virtual void NewCompilationUnit() { }
-        }
-
-
-
-    }
-
-
-
+        } 
+    } 
 }
