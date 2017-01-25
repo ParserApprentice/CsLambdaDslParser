@@ -1009,30 +1009,36 @@ namespace Parser.MyCs
     }
 
 
-    public class AttributesParser : CsSubParser<AttributesParser.Walker>
+    public class AttributesParser : CsSubParser2<AttributesParser.Walker>
     {
 
-        TopUserNtDefinition _attributes;
-        UserNTDefinition
-            _attribute_section,
-            _attribute,
-            _attribute_name;
-        protected override void Define()
-        {
-            _attributes += _(o => list_c(_attribute_section));
-            _attribute_section += _(
+        static UserNTDefinition
+            _attributes = _(o => list_c(_attribute_section)),
+            _attribute_section = _(
                 o => _token_openBkt,
                 o => list_c(_attribute),
                 o => opt(_token_comma),
-                o => _token_closeBkt);
+                o => _token_closeBkt),
 
-            _attribute += _(o => _attribute_name);
-            _attribute_name += _(o => _token_id);
+            _attribute = _(o => _attribute_name),
+            _attribute_name = _(o => _token_id)
+            ;
+        //protected override void Define()
+        //{
+        //    //_attributes += _(o => list_c(_attribute_section));
+        //    _attribute_section += _(
+        //        o => _token_openBkt,
+        //        o => list_c(_attribute),
+        //        o => opt(_token_comma),
+        //        o => _token_closeBkt);
 
-            //----------------
-            sync_start(_token_openBkt);
-            //---------------- 
-        }
+        //    _attribute += _(o => _attribute_name);
+        //    _attribute_name += _(o => _token_id);
+
+        //    //----------------
+        //    sync_start(_token_openBkt);
+        //    //---------------- 
+        //}
         public class Walker : AstWalker
         {
         }
