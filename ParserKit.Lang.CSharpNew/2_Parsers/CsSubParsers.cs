@@ -1534,66 +1534,80 @@ namespace Parser.MyCs
         }
     }
 
-    public class NamespaceParser : CsSubParser<NamespaceParser.Walker>
+    public class NamespaceParser : CsSubParser2<NamespaceParser.Walker>
     {
-        TopUserNtDefinition _compilation_unit;
-        UserNTDefinition
-            _namespace_member_decls,
-            _namespace_member_decl,
-            _namespace_decl,
-            _type_decl,
-            _namespace_body,
-            _class_decl,
-            _struct_decl,
-            _using_directive
-            ;
-        //------------------------------------------------------ 
-
-        protected override void Define()
-        {
-
-
-            _compilation_unit += _(              /**/ r => r.NewCompilationUnit,
+        static UserNTDefinition
+            _compilation_unit = _(              /**/ r => r.NewCompilationUnit,
                  o => opt(list(_using_directive)),
                  o => opt(_namespace_member_decls)
-                 );
-            //------------------------------------------------------  
-
-            _using_directive += _(               /**/ r => r.NewUsingDirective,
-                 o => _token_using,
-                 o => _token_id,
-                 o => _token_semicolon
-             );
-
-            //------------------------------------------------------ 
-            _namespace_member_decls += _(
+                 ),
+            //-----------------------------------------
+            _namespace_member_decls = _(
                  o => list(_namespace_member_decl)
-                );
-
-            _namespace_member_decl += _oneof(
+                ),
+            //-----------------------------------------
+            _namespace_member_decl = _oneof(
                 _o => _namespace_decl,
                 _o => _type_decl
-                );
-
-            _namespace_decl += _(             /**/ r => r.NewNamespaceDeclaration,
+                ),
+            //-----------------------------------------
+            _namespace_decl = _(             /**/ r => r.NewNamespaceDeclaration,
                  o => _token_namespace,
                  o => _token_id,
                  o => _namespace_body,
                  o => opt(_token_semicolon)
-                 );
-            //------------------------------------------------------ 
-            _namespace_body += _(
+                 ),
+            //-----------------------------------------
+         
+            _namespace_body = _(
                  o => _token_openBrc,
                  o => opt(_namespace_member_decls),
                  o => _token_closeBrc
-                 );
-            //------------------------------------------------------              
-            _type_decl += _oneof(
+                 ),
+            //-----------------------------------------
+            _type_decl = _oneof(
                     _(o => _class_decl),
                     _(o => _struct_decl)
-                );
+                ),
+            //-----------------------------------------
+            _class_decl,
+            _struct_decl,
+            _using_directive = _(               /**/ r => r.NewUsingDirective,
+                 o => _token_using,
+                 o => _token_id,
+                 o => _token_semicolon
+             )
+            ;
+        //------------------------------------------------------ 
 
-        }
+        //protected override void Define()
+        //{
+              
+             
+        //    //_namespace_member_decl += _oneof(
+        //    //    _o => _namespace_decl,
+        //    //    _o => _type_decl
+        //    //    );
+
+        //    //_namespace_decl += _(             /**/ r => r.NewNamespaceDeclaration,
+        //    //     o => _token_namespace,
+        //    //     o => _token_id,
+        //    //     o => _namespace_body,
+        //    //     o => opt(_token_semicolon)
+        //    //     );
+        //    //------------------------------------------------------ 
+        //    //_namespace_body += _(
+        //    //     o => _token_openBrc,
+        //    //     o => opt(_namespace_member_decls),
+        //    //     o => _token_closeBrc
+        //    //     );
+        //    //------------------------------------------------------              
+        //    //_type_decl += _oneof(
+        //    //        _(o => _class_decl),
+        //    //        _(o => _struct_decl)
+        //    //    );
+
+        //}
 
         //state for shift
         public enum m
