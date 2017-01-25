@@ -10,10 +10,12 @@ namespace Parser.MyCs
 {
 
 
-    public class TypeParser_V2 : CsSubParser2<TypeParser.Walker>
+    public class TypeParser_V2 : CsSubParser2<TypeParser_V2.Walker>
     {
-        static UserNTDefinition
 
+
+        static UserNTDefinition
+            //top ***
             _type = s_oneof(
             /*1*/
                 s_(
@@ -36,6 +38,12 @@ namespace Parser.MyCs
                     o => _token_closeBkt
            );
 
+
+        public class Walker : AstWalker
+        {
+            public virtual void NewRankSpecifier() { }
+            public virtual void NewArrayType() { }
+        }
     }
 
 
