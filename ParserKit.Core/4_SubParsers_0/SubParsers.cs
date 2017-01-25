@@ -266,6 +266,19 @@ namespace Parser.ParserKit
         {
             return new OptSymbol(oneofSymbol);
         }
+        protected static OptSymbol s_opt(UserNTDefinition nt)
+        {
+            return new OptSymbol(nt);
+        }
+        protected static OptSymbol s_opt(ListSymbol listSymbol)
+        {
+            return new OptSymbol(listSymbol);
+        }
+        protected static OptSymbol s_opt(OneOfSymbol oneofSymbol)
+        {
+            return new OptSymbol(oneofSymbol);
+        }
+
         protected ListSymbol list(UserNTDefinition nt)
         {
             return new ListSymbol(nt);
@@ -282,6 +295,25 @@ namespace Parser.ParserKit
         {
             return new ListSymbol(tk, sep);
         }
+        //------------
+        protected static ListSymbol s_list(UserNTDefinition nt)
+        {
+            return new ListSymbol(nt);
+        }
+        protected static ListSymbol s_list(TokenDefinition tk)
+        {
+            return new ListSymbol(tk);
+        }
+        protected static ListSymbol s_list(UserNTDefinition nt, TokenDefinition sep)
+        {
+            return new ListSymbol(nt, sep);
+        }
+        protected static ListSymbol s_list(TokenDefinition tk, TokenDefinition sep)
+        {
+            return new ListSymbol(tk, sep);
+        }
+
+        //------
         protected OneOfSymbol oneof(params object[] symbols)
         {
             return new OneOfSymbol(symbols);
@@ -470,12 +502,26 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2 });
         }
+        protected static NtDefAssignSet<T> s_(BuilderDel3<T> reductionDel,
+            UserExpectedSymbolDef<T> s1,
+            UserExpectedSymbolDef<T> s2)
+        {
+
+            return new NtDefAssignSet<T>(null, null, reductionDel, new[] { s1, s2 });
+        }
         protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3 });
+        }
+        protected static NtDefAssignSet<T> s_(BuilderDel3<T> reductionDel,
+            UserExpectedSymbolDef<T> s1,
+            UserExpectedSymbolDef<T> s2,
+            UserExpectedSymbolDef<T> s3)
+        {
+            return new NtDefAssignSet<T>(null, null, reductionDel, new[] { s1, s2, s3 });
         }
         protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
@@ -598,6 +644,23 @@ namespace Parser.ParserKit
             }
 
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, total);
+        }
+
+        protected static UserNTDefinition s_oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
+        {
+            //at least 2 choices
+            int j = others.Length;
+            NtDefAssignSet<T>[] choices = new NtDefAssignSet<T>[j + 2];
+            choices[0] = c1;
+            choices[1] = c2;
+            for (int i = 0; i < j; ++i)
+            {
+                choices[2 + i] = others[i];
+            }
+            UserNTDefinition newnt = new UserNTDefinition();
+            var ntSefAssignSet = new NtDefAssignSet<T>(null, choices);
+            ntSefAssignSet.AssignDataToNt(newnt);
+            return newnt;
         }
 
         protected NtDefAssignSet<T> _oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
@@ -739,11 +802,21 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1 });
         }
+        protected static NtDefAssignSet<T> s_(UserExpectedSymbolDef<T> s1)
+        {
+            return new NtDefAssignSet<T>(null, null, null, new[] { s1 });
+        }
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2 });
+        }
+        protected static NtDefAssignSet<T> s_(
+            UserExpectedSymbolDef<T> s1,
+            UserExpectedSymbolDef<T> s2)
+        {
+            return new NtDefAssignSet<T>(null, null, null, new[] { s1, s2 });
         }
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
@@ -751,6 +824,13 @@ namespace Parser.ParserKit
             UserExpectedSymbolDef<T> s3)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3 });
+        }
+        protected static NtDefAssignSet<T> s_(
+          UserExpectedSymbolDef<T> s1,
+          UserExpectedSymbolDef<T> s2,
+          UserExpectedSymbolDef<T> s3)
+        {
+            return new NtDefAssignSet<T>(null, null, null, new[] { s1, s2, s3 });
         }
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,

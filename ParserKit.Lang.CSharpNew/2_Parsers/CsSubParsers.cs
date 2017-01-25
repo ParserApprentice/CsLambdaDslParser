@@ -10,6 +10,34 @@ namespace Parser.MyCs
 {
 
 
+    public class TypeParser_V2 : CsSubParser2<TypeParser.Walker>
+    {
+        static UserNTDefinition
+
+            _type = s_oneof(
+            /*1*/
+                s_(
+                    o => _token_id,
+                    o => s_opt(_type_argument_list)),
+            /*2*/
+                s_(o => _array_type)),
+            //-------------------------------------------
+           _type_argument_list,
+            //-------------------------------------------
+          _array_type = s_(
+            o => _non_array_type,
+            o => s_list(_rank_specifier)),
+            //----------------------------------------
+          _non_array_type = s_(o => _type),
+            //----------------------------------------
+          _rank_specifier = s_(
+                    o => _token_openBkt,
+                    o => s_opt(s_list(_token_comma)),
+                    o => _token_closeBkt
+           );
+
+    }
+
 
     public class TypeParser : CsSubParser<TypeParser.Walker>
     {
@@ -21,8 +49,8 @@ namespace Parser.MyCs
 
         protected override void Define()
         {
-            _type += _oneof(
 
+            _type += _oneof(
                 /*1*/
                 _(
                     o => _token_id,
@@ -694,7 +722,7 @@ namespace Parser.MyCs
 
             _anonymous_function_body += _(o => _expression);
 
-        } 
+        }
 
         //----------------------------------------------------------
         public class Walker : AstWalker

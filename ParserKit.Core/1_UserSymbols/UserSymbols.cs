@@ -230,6 +230,13 @@ namespace Parser.ParserKit
             return unt;
         }
 
+        public static implicit operator UserNTDefinition(NtDefAssignSet assignSet)
+        {
+            var newNt = new UserNTDefinition();
+            assignSet.AssignDataToNt(newNt);
+            return newNt;
+        }
+
         internal bool IsOneOf { get; set; }
         internal bool IsClosed { get; set; }
     }
@@ -422,6 +429,7 @@ namespace Parser.ParserKit
             assignSet.AssignDataToNt(unt);
             return unt;
         }
+
     }
 
 
@@ -636,7 +644,7 @@ namespace Parser.ParserKit
     }
 
 
-   
+
 
 
 
