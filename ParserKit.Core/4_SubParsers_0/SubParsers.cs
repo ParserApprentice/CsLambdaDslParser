@@ -502,7 +502,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2 });
         }
-         
+
         protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
@@ -510,7 +510,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3 });
         }
-        
+
         protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
@@ -634,7 +634,7 @@ namespace Parser.ParserKit
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, total);
         }
 
-      
+
 
         protected NtDefAssignSet<T> _oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
         {
@@ -775,14 +775,14 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1 });
         }
-       
+
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2 });
         }
-     
+
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
@@ -790,7 +790,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3 });
         }
-     
+
         protected NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
@@ -922,6 +922,8 @@ namespace Parser.ParserKit
     public abstract class ReflectionSubParserV2 : SubParser
     {
 
+        public static TokenInfoCollection s_tkInfoCollection;
+
         List<UserNTDefinition> _initUserNts;
         List<UserNTDefinition> _lateNts;
         public void AddLateCreatedUserNt(UserNTDefinition lateNt)
@@ -1035,71 +1037,68 @@ namespace Parser.ParserKit
 
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
-            _initUserNts = new List<UserNTDefinition>();
+            _initUserNts = new List<UserNTDefinition>(); 
 
+            //Type t = this.GetType();
+            //FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance); 
+            ////init field
+            //foreach (FieldInfo f in fields)
+            //{
 
-            Type t = this.GetType();
-            FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            //    if (f.FieldType == typeof(TopUserNtDefinition))
+            //    {
+            //        var unt = new TopUserNtDefinition(f.Name);
+            //        unt.OwnerSubParser = this;
+            //        _initUserNts.Add(unt);
+            //        f.SetValue(this, unt);
+            //        //---------------------
+            //        if (_rootNtDef != null)
+            //        {
+            //            //must has only1
+            //            throw new NotSupportedException();
+            //        }
+            //        this._rootNtDef = new RootHolder(unt);
+            //        //---------------------
+            //    }
+            //    else if (f.FieldType == typeof(UserNTDefinition))
+            //    {
+            //        //init this field
+            //        //user field name              
+            //        var unt = new UserNTDefinition(f.Name);
+            //        unt.OwnerSubParser = this;
+            //        _initUserNts.Add(unt);
+            //        f.SetValue(this, unt);
+            //    }
+            //    else if (f.FieldType == typeof(UserTokenDefinition))
+            //    {
+            //        var fieldValue = f.GetValue(this) as UserTokenDefinition;
+            //        if (fieldValue == null)
+            //        {
+            //            //no init value 
+            //            f.SetValue(this, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name))));
+            //        }
+            //        else
+            //        {
+            //            //use presentation string 
+            //            fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
+            //        }
 
+            //    }
+            //    else if (f.FieldType == typeof(TokenDefinition))
+            //    {
+            //        //get token from grammar sheet
+            //        //get existing value 
+            //        var fieldValue = f.GetValue(this) as TokenDefinition;
+            //        if (fieldValue == null)
+            //        {
+            //            f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
+            //        }
+            //    }
+            //    else
+            //    {
 
-            //init field
-            foreach (FieldInfo f in fields)
-            {
-
-                if (f.FieldType == typeof(TopUserNtDefinition))
-                {
-                    var unt = new TopUserNtDefinition(f.Name);
-                    unt.OwnerSubParser = this;
-                    _initUserNts.Add(unt);
-                    f.SetValue(this, unt);
-                    //---------------------
-                    if (_rootNtDef != null)
-                    {
-                        //must has only1
-                        throw new NotSupportedException();
-                    }
-                    this._rootNtDef = new RootHolder(unt);
-                    //---------------------
-                }
-                else if (f.FieldType == typeof(UserNTDefinition))
-                {
-                    //init this field
-                    //user field name              
-                    var unt = new UserNTDefinition(f.Name);
-                    unt.OwnerSubParser = this;
-                    _initUserNts.Add(unt);
-                    f.SetValue(this, unt);
-                }
-                else if (f.FieldType == typeof(UserTokenDefinition))
-                {
-                    var fieldValue = f.GetValue(this) as UserTokenDefinition;
-                    if (fieldValue == null)
-                    {
-                        //no init value 
-                        f.SetValue(this, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name))));
-                    }
-                    else
-                    {
-                        //use presentation string 
-                        fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
-                    }
-
-                }
-                else if (f.FieldType == typeof(TokenDefinition))
-                {
-                    //get token from grammar sheet
-                    //get existing value 
-                    var fieldValue = f.GetValue(this) as TokenDefinition;
-                    if (fieldValue == null)
-                    {
-                        f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
-                    }
-                }
-                else
-                {
-
-                }
-            }
+            //    }
+            //}
             //---------------------------------------
             Define();
             //--------------------------------------- 
@@ -1137,7 +1136,7 @@ namespace Parser.ParserKit
         }
         protected sealed override void Define()
         {
-            
+
         }
     }
 
@@ -1724,16 +1723,20 @@ namespace Parser.ParserKit
         internal static UserSymbolSequence CreateUserSymbolSeq(UserNTDefinition ntdef, params object[] expectedSymbols)
         {
             UserSymbolSequence ss = new UserSymbolSequence(ntdef);
-            ReflectionSubParser ownerSubParser = ntdef.OwnerSubParser as ReflectionSubParser;
-            SubParser.SetCurrentUserSymbolSeq(ownerSubParser, ss);
-            int j = expectedSymbols.Length;
-            //check if symbol or delegate
-            for (int i = 0; i < j; ++i)
+            ss.SetLateSetupDel((o) =>
             {
-                ss.AppendLast(CreateUserExpectedSymbol(ownerSubParser, expectedSymbols[i]));
-            }
-            ntdef.AddSymbolSequence(ss);
-            ss.ClearParserReductionNotifyDel();
+                ReflectionSubParser ownerSubParser = ntdef.OwnerSubParser as ReflectionSubParser;
+                SubParser.SetCurrentUserSymbolSeq(ownerSubParser, ss);
+                int j = expectedSymbols.Length;
+                //check if symbol or delegate
+                for (int i = 0; i < j; ++i)
+                {
+                    ss.AppendLast(CreateUserExpectedSymbol(ownerSubParser, expectedSymbols[i]));
+                }
+                ntdef.AddSymbolSequence(ss);
+                ss.ClearParserReductionNotifyDel();
+            });
+
             return ss;
         }
     }

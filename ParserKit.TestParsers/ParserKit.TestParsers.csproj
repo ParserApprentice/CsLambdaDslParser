@@ -84,9 +84,9 @@
       <Project>{34E2BA19-5043-465C-AF6F-5F2E396C3889}</Project>
       <Name>ParserKit.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ParserKit.Lang.CSharp\ParserKit.Lang.CSharp.csproj">
-      <Project>{28CA452A-FFAB-46E0-B6D2-9CADB2C2A269}</Project>
-      <Name>ParserKit.Lang.CSharp</Name>
+    <ProjectReference Include="..\ParserKit.Lang.CSharpNew\ParserKit.Lang.CSharpNew.csproj">
+      <Project>{9CB42ECC-F382-43A7-A742-68EAD377218E}</Project>
+      <Name>ParserKit.Lang.CSharpNew</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

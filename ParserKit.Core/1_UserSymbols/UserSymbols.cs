@@ -253,11 +253,13 @@ namespace Parser.ParserKit
 
         bool isRightAssoc;
         UserNTDefinition ownerNT;
+        bool isSetup;
+
 #if DEBUG
         static int dbugTotalId = 0;
         public int dbugId;
 #endif
-
+        Action<object> lateSetupDel;
         public UserSymbolSequence(UserNTDefinition ownerNT)
         {
             setupId();
@@ -270,6 +272,11 @@ namespace Parser.ParserKit
             this.ownerNT = ownerNT;
             this.rightside_expectedGmParts = new List<UserExpectedSymbol>() { s };
         }
+        public void SetLateSetupDel(Action<object> lateSetupDel)
+        {
+            this.lateSetupDel = lateSetupDel;
+        }
+
 
         [System.Diagnostics.Conditional("DEBUG")]
         void setupId()
@@ -683,13 +690,26 @@ namespace Parser.ParserKit
             for (int i = 0; i < j; ++i)
             {
                 UserExpectedSymbolDef<T> symDel = symbols[i];
-                object f_result = symbols[i](default(T));
+#if DEBUG
+                if (symDel == null)
+                {
+
+                }
+#endif
+                object f_result = symDel(default(T));
+#if DEBUG
+                if (f_result == null)
+                {
+                    //can't be null
+
+                }
+#endif
                 if (f_result is USymbol)
                 {
 
                     USymbol usymbol = (USymbol)f_result;
-                    SeqShiftDelMap seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
-                    SubParsers.SymbolWithStepInfo symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
+                    var seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
+                    var symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
                         new SubParsers.UserExpectedSymbolShift(seqShiftDelMap.Invoke));
                     firstLevelSymbols.Add(symbolWithStepInfo);
 

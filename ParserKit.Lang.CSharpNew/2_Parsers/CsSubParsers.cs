@@ -10,7 +10,7 @@ namespace Parser.MyCs
 {
 
 
-    public class TypeParser : CsSubParser2<TypeParser.Walker>
+    public class TypeParser : CsSubParser2<TypeParser.Walker, TypeParser>
     {
 
 
@@ -56,7 +56,7 @@ namespace Parser.MyCs
 
 
 
-    public class ArrayTypeParser : CsSubParser2<ArrayTypeParser.Walker>
+    public class ArrayTypeParser : CsSubParser2<ArrayTypeParser.Walker, ArrayTypeParser>
     {
         static UserNTDefinition
             //
@@ -77,7 +77,8 @@ namespace Parser.MyCs
         }
     }
 
-    public class TypeParameterConstraintsClausesParser : CsSubParser2<TypeParameterConstraintsClausesParser.Walker>
+    public class TypeParameterConstraintsClausesParser :
+        CsSubParser2<TypeParameterConstraintsClausesParser.Walker, TypeParameterConstraintsClausesParser>
     {
         static UserNTDefinition
             //
@@ -110,7 +111,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class TypeArgumentListParser : CsSubParser2<TypeArgumentListParser.Walker>
+    public class TypeArgumentListParser : CsSubParser2<TypeArgumentListParser.Walker, TypeArgumentListParser>
     {
         static UserNTDefinition
           _type_argument_list = _(
@@ -125,7 +126,7 @@ namespace Parser.MyCs
 
 
 
-    public class ExpressionParser : CsSubParser2<ExpressionParser.Walker>
+    public class ExpressionParser : CsSubParser2<ExpressionParser.Walker, ExpressionParser>
     {
 
         //operator precedence
@@ -572,7 +573,8 @@ namespace Parser.MyCs
 
 
 
-    public class ObjectOrCollectionInitializerParser : CsSubParser2<ObjectOrCollectionInitializerParser.Walker>
+    public class ObjectOrCollectionInitializerParser :
+        CsSubParser2<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
     {
         static UserNTDefinition
          _object_or_collection_initializer = _oneof(
@@ -624,7 +626,8 @@ namespace Parser.MyCs
     }
 
 
-    public class ArgumentListParser : CsSubParser2<ArgumentListParser.Walker>
+    public class ArgumentListParser : CsSubParser2<
+        ArgumentListParser.Walker, ArgumentListParser>
     {
         static UserNTDefinition
            _argument_list = _(o => list_c(_argument)),
@@ -650,7 +653,7 @@ namespace Parser.MyCs
 
     }
 
-    public class StatementParser : CsSubParser2<StatementParser.Walker>
+    public class StatementParser : CsSubParser2<StatementParser.Walker, StatementParser>
     {
         static UserNTDefinition
             //
@@ -1009,7 +1012,7 @@ namespace Parser.MyCs
     }
 
 
-    public class AttributesParser : CsSubParser2<AttributesParser.Walker>
+    public class AttributesParser : CsSubParser2<AttributesParser.Walker, AttributesParser>
     {
 
         static UserNTDefinition
@@ -1048,7 +1051,7 @@ namespace Parser.MyCs
 
 
 
-    public class ClassDeclParser : CsSubParser2<ClassDeclParser.Walker>
+    public class ClassDeclParser : CsSubParser2<ClassDeclParser.Walker, ClassDeclParser>
     {
 
         static UserNTDefinition
@@ -1139,7 +1142,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class PropertyDeclParser : CsSubParser2<PropertyDeclParser.Walker>
+    public class PropertyDeclParser : CsSubParser2<PropertyDeclParser.Walker, PropertyDeclParser>
     {
 
         static UserNTDefinition
@@ -1220,7 +1223,7 @@ namespace Parser.MyCs
     }
 
 
-    public class FieldDeclParser : CsSubParser2<FieldDeclParser.Walker>
+    public class FieldDeclParser : CsSubParser2<FieldDeclParser.Walker, FieldDeclParser>
     {
         //492
         static UserNTDefinition
@@ -1263,8 +1266,10 @@ namespace Parser.MyCs
         }
     }
 
-    public class FormalParameterListParser : CsSubParser2<FormalParameterListParser.Walker>
+    public class FormalParameterListParser : CsSubParser2<FormalParameterListParser.Walker, FormalParameterListParser>
     {
+        static bool init = Begin();
+
         static
         UserNTDefinition
             _formal_parameter_list = _oneof(
@@ -1314,7 +1319,7 @@ namespace Parser.MyCs
 
         }
     }
-    public class MethodDeclParser : CsSubParser2<MethodDeclParser.Walker>
+    public class MethodDeclParser : CsSubParser2<MethodDeclParser.Walker, MethodDeclParser>
     {
         static
         UserNTDefinition
@@ -1379,7 +1384,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class StructDeclParser : CsSubParser2<StructDeclParser.Walker>
+    public class StructDeclParser : CsSubParser2<StructDeclParser.Walker, StructDeclParser>
     {
         //497 
         static UserNTDefinition
@@ -1463,7 +1468,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class NamespaceParser : CsSubParser2<NamespaceParser.Walker>
+    public class NamespaceParser : CsSubParser2<NamespaceParser.Walker, NamespaceParser>
     {
         static UserNTDefinition
             _compilation_unit = _(              /**/ r => r.NewCompilationUnit,
@@ -1524,6 +1529,6 @@ namespace Parser.MyCs
             public virtual void AddTypeDeclToNamespaceMember() { }
             public virtual void NewUsingDirective() { }
             public virtual void NewCompilationUnit() { }
-        } 
-    } 
+        }
+    }
 }

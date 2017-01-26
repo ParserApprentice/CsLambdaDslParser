@@ -1601,6 +1601,7 @@ namespace Parser.ParserKit.LR
             //string teststr = "id ? id:id";//pass
 
             //-------------------------------------- 
+            ReflectionSubParserV2.s_tkInfoCollection = tkInfoCollection;
             System.Diagnostics.Stopwatch stopW1 = new System.Diagnostics.Stopwatch();
             stopW1.Start();
 
