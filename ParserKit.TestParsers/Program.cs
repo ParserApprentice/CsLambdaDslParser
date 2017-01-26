@@ -1,14 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.IO;
-
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Cecil.Pdb;
-
-
+using System; 
+using System.Windows.Forms; 
 namespace ParserKit.TestParsers
 {
     static class Program
