@@ -38,8 +38,7 @@ namespace Parser.ParserKit
                         UserExpectedSymbol s = sq[a];
                         if (s.SymbolKind == UserExpectedSymbolKind.UnknownNT)
                         {
-
-                            UserNTDefinition foundNT = tempList.Find(s.SymbolSting);
+                            UserNTDefinition foundNT = tempList.Find(s.SymbolString);
                             if (foundNT != null)
                             {
                                 s.SetResolveNT(foundNT);
@@ -47,6 +46,12 @@ namespace Parser.ParserKit
                             else
                             {
 
+                            }
+                        }
+                        else
+                        {
+                            if (s.ResolvedNt == null)
+                            {
                             }
                         }
                     }
@@ -169,6 +174,11 @@ namespace Parser.ParserKit
             }
             public void AddSymbol(ISymbolDefinition symbol, int originalPosition)
             {
+                if (symbol == null)
+                {
+
+                }
+
                 if (!hasMoreThanOne)
                 {
                     defaultSeq.Add(symbol);
@@ -331,7 +341,7 @@ namespace Parser.ParserKit
                                 "create_seq: " + leftsideNTName2 + " found unknown nt " + userExpectedSymbol.ToString());
 
 
-                            NTDefinition unknownNTSymbol = symbolResInfo.CreateUnknownNT(userExpectedSymbol.SymbolSting);
+                            NTDefinition unknownNTSymbol = symbolResInfo.CreateUnknownNT(userExpectedSymbol.SymbolString);
                             if (userExpectedSymbol.IsOptional)
                             {
                                 preSeqs.Bifurcate(unknownNTSymbol, pos);
@@ -609,10 +619,10 @@ namespace Parser.ParserKit
         }
         static void SwitchToUserUnderlyingNt(List<NTDefinition> nts)
         {
-            for (int i = nts.Count - 1; i > -1; --i)
+            for (int i = nts.Count - 1; i >= 0; --i)
             {
                 NTDefinition nt = nts[i];
-                for (int m = nt.SeqCount - 1; m > -1; --m)
+                for (int m = nt.SeqCount - 1; m >= 0; --m)
                 {
                     nt.GetSequence(m).SwitchToUserUnderlyingNtPresentation();
                 }
@@ -698,7 +708,7 @@ namespace Parser.ParserKit
         }
         public NTDefinition EndSG(UserNTDefinition rootUnt)
         {
-            return PrepareUserGrammarForAnyLR(rootUnt); 
+            return PrepareUserGrammarForAnyLR(rootUnt);
         }
         public NTDefinition PrepareUserGrammarForAnyLR(UserNTDefinition userRootNt)
         {
@@ -963,6 +973,11 @@ namespace Parser.ParserKit
         {
             ISymbolDefinition rootnt = userRootNt.GenNT;
             NTDefinition user_root_nt = (NTDefinition)rootnt;
+#if DEBUG
+            if (user_root_nt == null)
+            {
+            }
+#endif
             //----------------------------------------------------------------------
             UserNTDefinition augmentUserNt = new UserNTDefinition(user_root_nt.Name + "'");
             UserSymbolSequence augmentedUserSymbolSq = new UserSymbolSequence(augmentUserNt);

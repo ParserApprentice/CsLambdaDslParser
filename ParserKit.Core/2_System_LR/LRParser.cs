@@ -168,7 +168,7 @@ namespace Parser.ParserKit.LR
             ParseNode finalNode = null;
             // bool switchBack = false;
             bool breakOnReduce = this.EnableBreakOnReduce;
-            bool breakOnShift  = this.EnableBreakOnShift;
+            bool breakOnShift = this.EnableBreakOnShift;
             ParseNodeHolder holder = this.ParseNodeHolder = swContext.Holder;
 
             holder.Reporter = reporter;
@@ -265,12 +265,12 @@ namespace Parser.ParserKit.LR
                             //skip or reduce?
                             todo = myLRParsingTable.GetTodo(current_state, TokenDefinition._eof);
                             tk = new Token(TokenDefinition._eof);
-                           // symbolParseNodes.Push(new NTn1(new EmptyParseNode()));
+                            // symbolParseNodes.Push(new NTn1(new EmptyParseNode()));
                             continue;
                         }
-                       // symbolParseNodes.Push(swContext.SwitchBackParseNode);
-                      
-                       
+                        // symbolParseNodes.Push(swContext.SwitchBackParseNode);
+
+
                     }
 
                     //--------------------- 
@@ -550,7 +550,7 @@ namespace Parser.ParserKit.LR
 
                             swContext.SwitchDetail = table.GetSwitchDetail(todo.SwitchRecordNumber);
                             swContext.SwitchBackParseResult = new ParseResult();//result 
-                           
+
 
                             swHandler(swContext);
 
@@ -579,7 +579,12 @@ namespace Parser.ParserKit.LR
                             if (breakOnShift)
                             {
                                 SymbolSequence toSq = myLRParsingTable.GetSequence(todo.OriginalSeqNumberForShift);
+                                if (toSq.dbugId == 33)
+                                {
+
+                                }
                                 UserExpectedSymbol exp = toSq.GetOriginalUserExpectedSymbol(todo.SampleUserExpectedSymbolPos);
+
                                 if (exp.onStepDel != null)
                                 {
                                     exp.onStepDel(holder);
@@ -646,8 +651,8 @@ namespace Parser.ParserKit.LR
                         break;
                     case LRItemTodoKind.Accept:
                         {
-                            if(swContext.WaitingParserCount ==0 &&
-                                symbolParseNodes.Count != 1)                                 
+                            if (swContext.WaitingParserCount == 0 &&
+                                symbolParseNodes.Count != 1)
                             {
                                 throw new NotSupportedException();
                             }

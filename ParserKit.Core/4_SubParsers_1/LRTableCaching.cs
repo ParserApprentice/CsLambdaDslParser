@@ -211,21 +211,21 @@ namespace Parser.ParserKit.SubParsers
                             case UserExpectedSymbolKind.Nonterminal:
                                 {
                                     //6.1
-                                    writer.Write(usymbol.SymbolSting);
+                                    writer.Write(usymbol.SymbolString);
                                     writer.Write(usymbol.ResolvedNt.NtId);
                                 }
                                 break;
                             case UserExpectedSymbolKind.Terminal:
                                 {
                                     //6.2 
-                                    writer.Write(usymbol.SymbolSting);
+                                    writer.Write(usymbol.SymbolString);
                                     writer.Write(usymbol.ResolvedTokenDefinition.TokenInfoNumber);
                                 }
                                 break;
                             case UserExpectedSymbolKind.UnknownNT:
                                 {
                                     //6.3
-                                    writer.Write(usymbol.SymbolSting);
+                                    writer.Write(usymbol.SymbolString);
                                     writer.Write(0);
                                 } break;
                             default:

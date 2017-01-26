@@ -1,18 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{28CA452A-FFAB-46E0-B6D2-9CADB2C2A269}</ProjectGuid>
+    <ProjectGuid>{9CB42ECC-F382-43A7-A742-68EAD377218E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ParserKit.Lang.CSharp</RootNamespace>
-    <AssemblyName>ParserKit.Lang.CSharp</AssemblyName>
+    <RootNamespace>ParserKit.Lang.CSharpNew</RootNamespace>
+    <AssemblyName>ParserKit.Lang.CSharpNew</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,24 +29,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="0_Start\Start.cs" />
     <Compile Include="1_Lexer\CsTokenInfo.cs" />
     <Compile Include="1_Lexer\MyCsLexer.cs" />
     <Compile Include="2_Parsers\AstBuilder.cs" />
     <Compile Include="2_Parsers\CsParseNodeHolder.cs" />
     <Compile Include="2_Parsers\CsSubParserBase.cs" />
     <Compile Include="2_Parsers\CsSubParsers.cs" />
-    <Compile Include="4_Test\Lang01.cs" />
     <Compile Include="2_Parsers\UserLangSheetEz.cs" />
+    <Compile Include="4_Test\Lang01.cs" />
     <Compile Include="Internal\BridgeGeneratedAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="0_Start\Start.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ParserKit.Core\ParserKit.Core.csproj">

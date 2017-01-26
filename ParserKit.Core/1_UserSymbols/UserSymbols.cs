@@ -64,6 +64,7 @@ namespace Parser.ParserKit
 
     }
 
+
     public class UserNTDefinition : USymbol
     {
 
@@ -75,20 +76,26 @@ namespace Parser.ParserKit
         public int dbugId;
 #endif
 
-        public UserNTDefinition()
+        internal UserNTDefinition()
         {
             setupId();
+            //we can set the name later
         }
         public UserNTDefinition(string ntname)
         {
             setupId();
-            this.Name = ntname;
+            this.SetName(ntname);
         }
-        public int UserSeqCount
+
+        public virtual List<UserNTDefinition> GetLateNts()
+        {
+            return this.lateCreatedUserNts;
+        }
+        public virtual int UserSeqCount
         {
             get { return originalSymbolSqs.Count; }
         }
-        public UserNTDefinition BaseOnUserNt
+        public virtual UserNTDefinition BaseOnUserNt
         {
             get;
             set;
@@ -103,7 +110,7 @@ namespace Parser.ParserKit
 #endif
         }
 
-        public int NTPrecedence
+        public virtual int NTPrecedence
         {
             get;
             set;
@@ -111,27 +118,21 @@ namespace Parser.ParserKit
         /// <summary>
         /// for LR
         /// </summary>
-        public bool IsRightAssociative
+        public virtual bool IsRightAssociative
         {
             get;
             set;
         }
-        public string Name
+        string _name;
+        public virtual string Name
         {
-            get;
-            private set;
+            get { return _name; }
         }
-
-        public delegate void DefT<T>(T t);
-        public T _1<T>(T t)
+        internal virtual void SetName(string name)
         {
-            return t;
+            this._name = name;
         }
-        public T _1<T>(T t, DefT<T> t2)
-        {
-            return t;
-        }
-        public IEnumerable<UserSymbolSequence> GetAllOriginalSeqIterForward()
+        public virtual IEnumerable<UserSymbolSequence> GetAllOriginalSeqIterForward()
         {
             int j = this.originalSymbolSqs.Count;
             for (int i = 0; i < j; ++i)
@@ -140,7 +141,7 @@ namespace Parser.ParserKit
             }
 
         }
-        public IEnumerable<UserSymbolSequence> GetAllPossibleSeqIterForward()
+        public virtual IEnumerable<UserSymbolSequence> GetAllPossibleSeqIterForward()
         {
             int j = this.allPossibleSequences.Count;
             for (int i = 0; i < j; ++i)
@@ -148,18 +149,26 @@ namespace Parser.ParserKit
                 yield return this.allPossibleSequences[i];
             }
         }
-        public bool IsAutoGen
-        {
-            get;
-            set;
-        }
-        public NTDefinition GenNT
+        public virtual bool IsAutoGen
         {
             get;
             set;
         }
 
-        public void AddSymbolSequence(UserSymbolSequence sq)
+        NTDefinition _genNT;
+        public virtual NTDefinition GenNT
+        {
+            get { return this._genNT; }
+            set
+            {
+                if (value == null)
+                {
+                }
+                this._genNT = value;
+            }
+        }
+
+        public virtual void AddSymbolSequence(UserSymbolSequence sq)
         {
 
             this.originalSymbolSqs.Add(sq);
@@ -170,7 +179,7 @@ namespace Parser.ParserKit
             }
         }
 
-        public void CollectAllPossibleSequences()
+        public virtual void CollectAllPossibleSequences()
         {
             if (this.IsCompleteSelectSqs)
             {
@@ -185,28 +194,28 @@ namespace Parser.ParserKit
         }
 
 
-        public int SeqCount
+        public virtual int SeqCount
         {
             get
             {
                 return this.allPossibleSequences.Count;
             }
         }
-        internal bool MarkedAsUnknownNT
+        internal virtual bool MarkedAsUnknownNT
         {
             get;
             set;
         }
-        internal bool IsCompleteSelectSqs
+        internal virtual bool IsCompleteSelectSqs
         {
             get;
             set;
         }
 
-        internal void FilteroutDuplicateSequences()
+        internal virtual void FilteroutDuplicateSequences()
         {
+
             int j = this.allPossibleSequences.Count;
-
             //separate sq into groups if it has common
             Dictionary<UserSymbolSequence, int> dic = new Dictionary<UserSymbolSequence, int>();
             List<UserSymbolSequence> filter1 = new List<UserSymbolSequence>();
@@ -219,20 +228,390 @@ namespace Parser.ParserKit
                 }
             }
         }
-        internal object OwnerSubParser
+        List<UserNTDefinition> lateCreatedUserNts;
+        internal virtual void AddLateCreatedUserNt(UserNTDefinition lateUserNt)
+        {
+            if (lateCreatedUserNts == null)
+            {
+                lateCreatedUserNts = new List<UserNTDefinition>();
+            }
+            lateCreatedUserNts.Add(lateUserNt);
+        }
+
+        internal virtual object OwnerSubParser
         {
             get;
             set;
         }
-        public static UserNTDefinition operator +(UserNTDefinition unt, NtDefAssignSet assignSet)
+
+        internal virtual bool IsOneOf
         {
-            assignSet.AssignDataToNt(unt);
-            return unt;
+            get;
+            set;
         }
 
-        internal bool IsOneOf { get; set; }
-        internal bool IsClosed { get; set; }
+        internal virtual bool IsClosed
+        {
+            get;
+            set;
+        }
+
+        //---------------
+        public static UserNTDefinition CreateProxyUserNtDefinition(System.Reflection.FieldInfo fieldInfo, string name)
+        {
+            //this is special version of  UserNTDefinition
+            return new ProxyUserNTDefinition(fieldInfo, name);
+        }
+        public static implicit operator UserNTDefinition(NtDefAssignSet assignSet)
+        {
+            var newNt = new UserNTDefinition();
+            //the name of this nt will be set later
+            assignSet.AssignDataToNt(newNt);
+            return newNt;
+        }
+
     }
+
+    class ProxyUserNTDefinition : UserNTDefinition
+    {
+        System.Reflection.FieldInfo fieldInfo;
+        UserNTDefinition unt;
+        public ProxyUserNTDefinition(System.Reflection.FieldInfo fieldInfo, string name)
+        {
+            this.fieldInfo = fieldInfo;
+            base.SetName(name);
+        }
+        public override string Name
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.Name;
+                }
+                else
+                {
+                    return base.Name;
+                }
+            }
+        }
+        internal override void SetName(string name)
+        {
+            //should not visit here
+            throw new NotSupportedException();
+        }
+        public void SetActualImplementation(UserNTDefinition unt)
+        {
+            if (unt == null)
+            {
+                throw new NotSupportedException();
+            }
+            if (this.unt != null)
+            {
+                throw new NotSupportedException();
+            }
+            if (unt is ProxyUserNTDefinition)
+            {
+                if (unt != this)
+                {
+                    throw new NotSupportedException();
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                this.unt = unt;
+            }
+        }
+        internal override void AddLateCreatedUserNt(UserNTDefinition lateUserNt)
+        {
+            unt.AddLateCreatedUserNt(lateUserNt);
+        }
+        public override UserNTDefinition BaseOnUserNt
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.BaseOnUserNt;
+                }
+                else
+                {
+                    return base.BaseOnUserNt;
+                }
+            }
+            set
+            {
+                unt.BaseOnUserNt = value;
+            }
+        }
+        public override bool IsRightAssociative
+        {
+            get
+            {
+                return unt.IsRightAssociative;
+            }
+            set
+            {
+                unt.IsRightAssociative = value;
+            }
+        }
+        public override int NTPrecedence
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.NTPrecedence;
+                }
+                else
+                {
+                    return base.NTPrecedence;
+                }
+            }
+            set
+            {
+                unt.NTPrecedence = value;
+            }
+        }
+        public override int UserSeqCount
+        {
+            get
+            {
+                if (unt == null)
+                {
+                    return base.UserSeqCount;
+                }
+                else
+                {
+                    return unt.UserSeqCount;
+                }
+            }
+        }
+        public override List<UserNTDefinition> GetLateNts()
+        {
+            if (unt != null)
+            {
+                return unt.GetLateNts();
+            }
+            else
+            {
+                return base.GetLateNts();
+            }
+        }
+        public override void AddSymbolSequence(UserSymbolSequence sq)
+        {
+            unt.AddSymbolSequence(sq);
+        }
+        public override void CollectAllPossibleSequences()
+        {
+            if (unt != null)
+            {
+                unt.CollectAllPossibleSequences();
+            }
+            else
+            {
+                base.CollectAllPossibleSequences();
+            }
+        }
+        internal override void FilteroutDuplicateSequences()
+        {
+            if (unt != null)
+            {
+                unt.FilteroutDuplicateSequences();
+            }
+            else
+            {
+                base.FilteroutDuplicateSequences();
+            }
+
+        }
+        public override NTDefinition GenNT
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.GenNT;
+                }
+                else
+                {
+                    return base.GenNT;
+                }
+            }
+            set
+            {
+                if (unt != null)
+                {
+                    unt.GenNT = value;
+                }
+                else
+                {
+                    base.GenNT = value;
+                }
+            }
+        }
+        public override IEnumerable<UserSymbolSequence> GetAllOriginalSeqIterForward()
+        {
+            if (unt != null)
+            {
+                return unt.GetAllOriginalSeqIterForward();
+            }
+            else
+            {
+                return base.GetAllOriginalSeqIterForward();
+            }
+        }
+        public override IEnumerable<UserSymbolSequence> GetAllPossibleSeqIterForward()
+        {
+            if (unt != null)
+            {
+                return unt.GetAllPossibleSeqIterForward();
+            }
+            else
+            {
+                return base.GetAllPossibleSeqIterForward();
+            }
+        }
+
+
+        public override bool IsAutoGen
+        {
+            get
+            {
+                if (unt == null)
+                {
+                    return base.IsAutoGen;
+                }
+                else
+                {
+                    return unt.IsAutoGen;
+                }
+            }
+            set
+            {
+                unt.IsAutoGen = value;
+            }
+        }
+        internal override bool IsClosed
+        {
+            get
+            {
+                return unt.IsClosed;
+            }
+            set
+            {
+                unt.IsClosed = value;
+            }
+        }
+        internal override bool IsCompleteSelectSqs
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.IsCompleteSelectSqs;
+                }
+                else
+                {
+                    return base.IsCompleteSelectSqs;
+                }
+            }
+            set
+            {
+                if (unt != null)
+                {
+                    unt.IsCompleteSelectSqs = value;
+                }
+                else
+                {
+                    base.IsCompleteSelectSqs = value;
+                }
+            }
+        }
+        internal override bool IsOneOf
+        {
+            get
+            {
+                return unt.IsOneOf;
+            }
+            set
+            {
+                unt.IsOneOf = value;
+            }
+        }
+        internal override bool MarkedAsUnknownNT
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.MarkedAsUnknownNT;
+                }
+                else
+                {
+                    return base.MarkedAsUnknownNT;
+                }
+            }
+            set
+            {
+                if (unt != null)
+                {
+                    unt.MarkedAsUnknownNT = value;
+                }
+                else
+                {
+                    base.MarkedAsUnknownNT = value;
+                }
+
+            }
+        }
+
+        internal override object OwnerSubParser
+        {
+            get
+            {
+                if (unt == null)
+                {
+                    return base.OwnerSubParser;
+                }
+                else
+                {
+                    return unt.OwnerSubParser;
+                }
+            }
+            set
+            {
+                if (unt == null)
+                {
+                    base.OwnerSubParser = value;
+                }
+                else
+                {
+                    unt.OwnerSubParser = value;
+                }
+            }
+        }
+        public override int SeqCount
+        {
+            get
+            {
+                if (unt != null)
+                {
+                    return unt.SeqCount;
+                }
+                else
+                {
+                    return base.SeqCount;
+                }
+            }
+        }
+    }
+
+
 
 
 
@@ -246,11 +625,13 @@ namespace Parser.ParserKit
 
         bool isRightAssoc;
         UserNTDefinition ownerNT;
+        bool isSetup;
+
 #if DEBUG
         static int dbugTotalId = 0;
         public int dbugId;
 #endif
-
+        Action<object> lateSetupDel;
         public UserSymbolSequence(UserNTDefinition ownerNT)
         {
             setupId();
@@ -263,6 +644,11 @@ namespace Parser.ParserKit
             this.ownerNT = ownerNT;
             this.rightside_expectedGmParts = new List<UserExpectedSymbol>() { s };
         }
+        public void SetLateSetupDel(Action<object> lateSetupDel)
+        {
+            this.lateSetupDel = lateSetupDel;
+        }
+
 
         [System.Diagnostics.Conditional("DEBUG")]
         void setupId()
@@ -401,29 +787,11 @@ namespace Parser.ParserKit
             set;
         }
 
-
-
         internal string GetNewLeftSideSymbolInfo()
         {
             return this.ownerNT.ToString();
         }
-
-
     }
-
-    public class TopUserNtDefinition : UserNTDefinition
-    {
-        public TopUserNtDefinition(string name)
-            : base(name)
-        {
-        }
-        public static TopUserNtDefinition operator +(TopUserNtDefinition unt, NtDefAssignSet assignSet)
-        {
-            assignSet.AssignDataToNt(unt);
-            return unt;
-        }
-    }
-
 
     public class UserExpectedSymbol
     {
@@ -447,7 +815,7 @@ namespace Parser.ParserKit
             //-----------------------------------------------------
             EndOfFileSymbol = new UserExpectedSymbol();
             EndOfFileSymbol.SymbolKind = UserExpectedSymbolKind.End;
-            EndOfFileSymbol.SymbolSting = "$";
+            EndOfFileSymbol.SymbolString = "$";
             //-----------------------------------------------------
         }
 
@@ -472,7 +840,7 @@ namespace Parser.ParserKit
         {
             dbugSetupDebugId();
             this.SymbolKind = UserExpectedSymbolKind.UnknownNT;
-            this.SymbolSting = userNTName;
+            this.SymbolString = userNTName;
         }
         public UserExpectedSymbol(string userNTName, bool isOptional)
             : this(userNTName)
@@ -489,7 +857,7 @@ namespace Parser.ParserKit
                 throw new NotSupportedException();
             }
             this.resolvedUserNt = nt;
-            this.SymbolSting = nt.Name;
+            this.SymbolString = nt.Name;
             this.SymbolKind = UserExpectedSymbolKind.Nonterminal;
             this.IsAuto = nt.IsAutoGen;
         }
@@ -505,7 +873,7 @@ namespace Parser.ParserKit
             this.tokenInfo = tokenInfo;
             this.SymbolKind = UserExpectedSymbolKind.Terminal;
             this.IsOptional = isOptional;
-            this.SymbolSting = tokenInfo.PresentationString;
+            this.SymbolString = tokenInfo.PresentationString;
         }
         //------------------------------------------------------------------
         public UserExpectedSymbol(UserNTDefinition nt, bool isOptional, ParserNotifyDel onShiftDel)
@@ -520,7 +888,7 @@ namespace Parser.ParserKit
             this.tokenInfo = tokenInfo;
             this.SymbolKind = UserExpectedSymbolKind.Terminal;
             this.IsOptional = isOptional;
-            this.SymbolSting = tokenInfo.PresentationString;
+            this.SymbolString = tokenInfo.PresentationString;
             this.onStepDel = onShiftDel;
         }
         //------------------------------------------------------------------
@@ -536,7 +904,6 @@ namespace Parser.ParserKit
                             {
                                 return UserExpectedSymbolKind.UnknownNT;
                             }
-
                         }
                         break;
                 }
@@ -557,15 +924,36 @@ namespace Parser.ParserKit
             get;
             set;
         }
-        public string SymbolSting
+        string _symbolString;
+        public string SymbolString
         {
-            get;
-            private set;
+            get
+            {
+                if (_symbolString == null)
+                {
+                    if (this.resolvedUserNt != null)
+                    {
+                        return this.resolvedUserNt.Name;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return _symbolString;
+                }
+            }
+            private set
+            {
+                _symbolString = value;
+            }
         }
 
         public override string ToString()
         {
-            return this.SymbolSting;
+            return this.SymbolString;
         }
 
         internal TokenDefinition ResolvedTokenDefinition
@@ -614,6 +1002,15 @@ namespace Parser.ParserKit
         }
         internal void SetResolveNT(UserNTDefinition nt)
         {
+            if (nt == null)
+            {
+
+            }
+            if (this.resolvedUserNt != nt)
+            {
+
+            }
+
             if (this.SymbolKind == UserExpectedSymbolKind.UnknownNT)
             {
                 this.SymbolKind = UserExpectedSymbolKind.Nonterminal;
@@ -636,11 +1033,15 @@ namespace Parser.ParserKit
     }
 
 
-   
+
 
 
 
     public delegate object UserExpectedSymbolDef<T>(T r);
+
+    /// <summary>
+    /// non-terminal (Nt) definition assignment set
+    /// </summary>
     public abstract class NtDefAssignSet
     {
         internal abstract void AssignDataToNt(UserNTDefinition unt);
@@ -656,6 +1057,8 @@ namespace Parser.ParserKit
         object[] symbols;
         //------------------------------
         NtDefAssignSet<T>[] subAssignSets;
+
+
 
         public NtDefAssignSet(
             GetWalkerDel<T> getBuilder,
@@ -673,13 +1076,26 @@ namespace Parser.ParserKit
             for (int i = 0; i < j; ++i)
             {
                 UserExpectedSymbolDef<T> symDel = symbols[i];
-                object f_result = symbols[i](default(T));
+#if DEBUG
+                if (symDel == null)
+                {
+
+                }
+#endif
+                object f_result = symDel(default(T));
+#if DEBUG
+                if (f_result == null)
+                {
+                    //can't be null
+
+                }
+#endif
                 if (f_result is USymbol)
                 {
 
                     USymbol usymbol = (USymbol)f_result;
-                    SeqShiftDelMap seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
-                    SubParsers.SymbolWithStepInfo symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
+                    var seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
+                    var symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
                         new SubParsers.UserExpectedSymbolShift(seqShiftDelMap.Invoke));
                     firstLevelSymbols.Add(symbolWithStepInfo);
 
@@ -720,6 +1136,8 @@ namespace Parser.ParserKit
                     subAssignSets[i].AssignDataToNt(unt);
                 }
                 unt.IsClosed = true;
+
+
             }
             else
             {
@@ -729,6 +1147,8 @@ namespace Parser.ParserKit
                 }
 
                 UserSymbolSequence newss = UserNTSubParserExtension.CreateUserSymbolSeq(unt, symbols);
+
+
                 if (symbolShiftDel != null)
                 {
                     ShiftMap shMap = new ShiftMap(symbolShiftDel);
@@ -744,8 +1164,32 @@ namespace Parser.ParserKit
                 {
                     unt.IsClosed = true;
                 }
+
+                if (this.Precedence > 0)
+                {
+                    int prec = this.Precedence;
+                    for (int i = newss.RightCount - 1; i >= 0; --i)
+                    {
+                        UserExpectedSymbol ues = newss[i];
+                        if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
+                        {
+                            UserNTDefinition unt2 = ues.ResolvedUserNtDef;
+                            if (unt.IsAutoGen)
+                            {
+                                unt.NTPrecedence = prec;
+                            }
+                            else
+                            {
+                                // Console.WriteLine(unt);
+                            }
+                        }
+                    }
+                }
+
             }
         }
+
+
         class ShiftMap
         {
             SubParsers.UserExpectedSymbolShift shiftDel;
@@ -810,6 +1254,21 @@ namespace Parser.ParserKit
                 return (object)builderDel(cachedBuilder);
             }
         }
+
+
+
+        /// <summary>
+        /// set precedence
+        /// </summary>
+        /// <returns></returns>
+        public NtDefAssignSet<T> set_prec(int value)
+        {
+            //TODO: review here again ***
+            this.Precedence = value;
+
+            return this;
+        }
+        public int Precedence { get; private set; }
     }
 
 

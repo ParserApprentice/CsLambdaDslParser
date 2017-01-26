@@ -28,7 +28,7 @@ namespace Parser.ParserKit
         protected TokenInfoCollection _tkInfoCollection;
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
-        protected RootHolder _rootNtDef;
+        protected UserNTDefinition _rootNtDef;
 
         //------------------------------
         protected LRParsingTable _parsingTable;
@@ -36,16 +36,14 @@ namespace Parser.ParserKit
         //------------------------------
 
         int _autoNumber;
-        protected internal UserSymbolSequence currentSq;
+        //protected internal UserSymbolSequence currentSq;
 
         public SubParser()
         {
 
         }
-        internal List<SyncSequence> GetSyncSeqs()
-        {
-            return _syncSeqs;
-        }
+        internal abstract List<SyncSequence> GetSyncSeqs();
+        
         public bool TryUseTableDataCache { get; set; }
 
         protected abstract void InternalSetup(TokenInfoCollection tkInfoCollection);
@@ -163,20 +161,15 @@ namespace Parser.ParserKit
         }
 
 
-
-        protected abstract void Define();
-        protected UserNTDefinition RootNt { get { return _rootNtDef._rootNtDef; } }
+        protected UserNTDefinition RootNt { get { return _rootNtDef; } }
 
 
         public string RootNtName
         {
             get { return _rootNtDef.Name; }
         }
-        internal List<SyncSequence> _syncSeqs;
-        internal static void SetCurrentUserSymbolSeq(SubParser subParser, UserSymbolSequence userSymbolSeq)
-        {
-            subParser.currentSq = userSymbolSeq;
-        }
+
+
 
         //------------------------------------------------------------------------------------------------
         static SubParser FindSubParser(Dictionary<string, SubParser> dic, string subParserName)
@@ -231,153 +224,126 @@ namespace Parser.ParserKit
     }
 
 
+
     public abstract class ReflectionSubParser : SubParser
     {
 
+
+        public static TokenInfoCollection s_tkInfoCollection;
         List<UserNTDefinition> _initUserNts;
-        List<UserNTDefinition> _lateNts;
-        public void AddLateCreatedUserNt(UserNTDefinition lateNt)
-        {
-            if (_lateNts == null)
-            {
-                _lateNts = new List<UserNTDefinition>();
-            }
-            _lateNts.Add(lateNt);
-        }
+
+        protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
+
         public TokenDefinition GetTokenDefintion(string grammarPresentationString)
         {
             return _tkInfoCollection.GetTokenInfo(grammarPresentationString);
         }
         public abstract string GetTokenPresentationName(string fieldname);
 
-        protected OptSymbol opt(TokenDefinition tk)
+        protected static OptSymbol opt(TokenDefinition tk)
         {
             return new OptSymbol(tk);
         }
-        protected OptSymbol opt(UserNTDefinition nt)
+        protected static OptSymbol opt(UserNTDefinition nt)
         {
             return new OptSymbol(nt);
         }
-        protected OptSymbol opt(ListSymbol listSymbol)
+        protected static OptSymbol opt(ListSymbol listSymbol)
         {
             return new OptSymbol(listSymbol);
         }
-        protected OptSymbol opt(OneOfSymbol oneofSymbol)
+        protected static OptSymbol opt(OneOfSymbol oneofSymbol)
         {
             return new OptSymbol(oneofSymbol);
         }
-        protected ListSymbol list(UserNTDefinition nt)
+
+        protected static ListSymbol list(UserNTDefinition nt)
         {
             return new ListSymbol(nt);
         }
-        protected ListSymbol list(TokenDefinition tk)
+        protected static ListSymbol list(TokenDefinition tk)
         {
             return new ListSymbol(tk);
         }
-        protected ListSymbol list(UserNTDefinition nt, TokenDefinition sep)
+        protected static ListSymbol list(UserNTDefinition nt, TokenDefinition sep)
         {
             return new ListSymbol(nt, sep);
         }
-        protected ListSymbol list(TokenDefinition tk, TokenDefinition sep)
+        protected static ListSymbol list(TokenDefinition tk, TokenDefinition sep)
         {
             return new ListSymbol(tk, sep);
         }
-        protected OneOfSymbol oneof(params object[] symbols)
+
+        //------
+        protected static OneOfSymbol oneof(params object[] symbols)
         {
             return new OneOfSymbol(symbols);
         }
 
-        protected void set_prec(int prec)
-        {
-            //assign prec to current seq
-            currentSq.Precedence = prec;
-            for (int i = currentSq.RightCount - 1; i >= 0; --i)
-            {
-                UserExpectedSymbol ues = currentSq[i];
-                if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
-                {
-                    UserNTDefinition unt = ues.ResolvedUserNtDef;
-                    if (unt.IsAutoGen)
-                    {
-                        unt.NTPrecedence = prec;
 
-                    }
-                    else
-                    {
-                        // Console.WriteLine(unt);
-                    }
-                }
-            }
-        }
-        protected void sync(params TokenDefinition[] syncTks)
-        {
-            if (_syncSeqs == null)
-            {
-                _syncSeqs = new List<SyncSequence>();
-            }
 
-            int j = syncTks.Length;
-            SeqSyncCmd[] syncCmds = new SeqSyncCmd[j];
-            for (int i = 0; i < j; ++i)
-            {
-                syncCmds[i] = new SeqSyncCmd(SyncCmdName.Match, syncTks[i]);
-            }
-
-            _syncSeqs.Add(new SyncSequence(syncCmds));
-        }
-        protected void sync_start(TokenDefinition startSync)
-        {
-            if (_syncSeqs == null)
-            {
-                _syncSeqs = new List<SyncSequence>();
-            }
-            SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
-                 new SeqSyncCmd(SyncCmdName.First, startSync)
-            };
-            _syncSeqs.Add(new SyncSequence(syncCmds));
-        }
         internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
         {
             //ignor this pair
             return new SyncSymbol(begin, end, SyncSymbolKind.Ignor);
         }
 
+        static FieldInfo[] GetFields(Type instanceType)
+        {
+            //get field from instance Type and its base
+            List<FieldInfo> list = new List<FieldInfo>();
+            list.AddRange(instanceType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+            //
+            Type baseType = instanceType.BaseType;
+            if (baseType != null)
+            {
+                baseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                list.AddRange(baseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+            }
+            return list.ToArray();
+        }
+
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
             _initUserNts = new List<UserNTDefinition>();
-
-
-            Type t = this.GetType();
-            FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-
-            //init field
+            //get all static user nt              
+            List<UserNTDefinition> lateNts = null;
+            FieldInfo[] fields = GetFields(this.GetType());
             foreach (FieldInfo f in fields)
             {
-
-                if (f.FieldType == typeof(TopUserNtDefinition))
+                if (f.FieldType == typeof(UserNTDefinition))
                 {
-                    var unt = new TopUserNtDefinition(f.Name);
-                    unt.OwnerSubParser = this;
-                    _initUserNts.Add(unt);
-                    f.SetValue(this, unt);
-                    //---------------------
-                    if (_rootNtDef != null)
+                    UserNTDefinition unt = (UserNTDefinition)f.GetValue(null);
+                    if (this._rootNtDef == null)
                     {
-                        //must has only1
-                        throw new NotSupportedException();
+                        //TODO: review here again
+                        _rootNtDef = unt;
                     }
-                    this._rootNtDef = new RootHolder(unt);
-                    //---------------------
-                }
-                else if (f.FieldType == typeof(UserNTDefinition))
-                {
-                    //init this field
-                    //user field name              
-                    var unt = new UserNTDefinition(f.Name);
+
+                    if (unt.Name == null)
+                    {
+                        unt.SetName(f.Name);
+                    }
+
+                    UserNTDefinition proxyNtDef = GetRegisteredProxyUserNt(f);
+                    ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
+
+
                     unt.OwnerSubParser = this;
                     _initUserNts.Add(unt);
-                    f.SetValue(this, unt);
+
+                    List<UserNTDefinition> lateUserNts = unt.GetLateNts();
+                    if (lateUserNts != null)
+                    {
+                        if (lateNts == null)
+                        {
+                            lateNts = new List<UserNTDefinition>();
+                        }
+                        foreach (UserNTDefinition lateNt in lateUserNts)
+                        {
+                            lateNts.Add(lateNt);
+                        }
+                    }
                 }
                 else if (f.FieldType == typeof(UserTokenDefinition))
                 {
@@ -392,7 +358,6 @@ namespace Parser.ParserKit
                         //use presentation string 
                         fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
                     }
-
                 }
                 else if (f.FieldType == typeof(TokenDefinition))
                 {
@@ -404,17 +369,14 @@ namespace Parser.ParserKit
                         f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
                     }
                 }
-                else
+                else if (f.FieldType == typeof(ProxyUserNTDefinition))
                 {
 
                 }
             }
-            //---------------------------------------
-            Define();
-            //--------------------------------------- 
-            if (_lateNts != null)
+            if (lateNts != null)
             {
-                _initUserNts.AddRange(_lateNts);
+                _initUserNts.AddRange(lateNts);
             }
 
             //check if all user nt is define
@@ -444,40 +406,86 @@ namespace Parser.ParserKit
             //    _syncParser.Setup(tkInfoCollection, this._syncNts);
             //}
         }
+
     }
-
-
 
     public abstract class ReflectionSubParser<T> : ReflectionSubParser
     {
-
-        GetWalkerDel<T> getWalkerDel;
-
+        protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
+                      proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
+        static GetWalkerDel<T> getWalkerDel;
         public GetWalkerDel<T> GetWalker
         {
             get { return getWalkerDel; }
             set { getWalkerDel = value; }
         }
 
+        internal override List<SyncSequence> GetSyncSeqs()
+        {
+            return _syncSeqs;
+        }
+        static internal List<SyncSequence> _syncSeqs;
+        protected static bool sync(params TokenDefinition[] syncTks)
+        {
+            if (_syncSeqs == null)
+            {
+                _syncSeqs = new List<SyncSequence>();
+            }
 
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
+            int j = syncTks.Length;
+            SeqSyncCmd[] syncCmds = new SeqSyncCmd[j];
+            for (int i = 0; i < j; ++i)
+            {
+                syncCmds[i] = new SeqSyncCmd(SyncCmdName.Match, syncTks[i]);
+            }
+
+            _syncSeqs.Add(new SyncSequence(syncCmds));
+            return true;
+        }
+        protected static bool sync_start(TokenDefinition startSync)
+        {
+            if (_syncSeqs == null)
+            {
+                _syncSeqs = new List<SyncSequence>();
+            }
+            SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
+                 new SeqSyncCmd(SyncCmdName.First, startSync)
+            };
+            _syncSeqs.Add(new SyncSequence(syncCmds));
+            return true;
+        }
+        protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
+        {
+            UserNTDefinition u;
+            if (proxyUserNts.TryGetValue(fieldInfo, out u))
+            {
+                return u;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -485,7 +493,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
              UserExpectedSymbolDef<T> s1,
              UserExpectedSymbolDef<T> s2,
              UserExpectedSymbolDef<T> s3,
@@ -494,7 +502,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -504,7 +512,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -515,7 +523,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6, s7 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -527,7 +535,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6, s7, s8 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -540,7 +548,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -555,7 +563,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -571,7 +579,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11 });
         }
-        protected NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
+        protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel,
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -600,7 +608,7 @@ namespace Parser.ParserKit
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, total);
         }
 
-        protected NtDefAssignSet<T> _oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
+        protected static NtDefAssignSet<T> _oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
         {
             //at least 2 choices
             int j = others.Length;
@@ -615,7 +623,7 @@ namespace Parser.ParserKit
         }
 
 
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
          UserExpectedSymbolDef<T> c1,
          UserExpectedSymbolDef<T> c2)
         {
@@ -625,7 +633,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c2 })
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
             UserExpectedSymbolDef<T> c1,
             UserExpectedSymbolDef<T> c2,
             UserExpectedSymbolDef<T> c3)
@@ -637,7 +645,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c3 })
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
            UserExpectedSymbolDef<T> c1,
            UserExpectedSymbolDef<T> c2,
            UserExpectedSymbolDef<T> c3,
@@ -651,7 +659,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c4 })
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
           UserExpectedSymbolDef<T> c1,
           UserExpectedSymbolDef<T> c2,
           UserExpectedSymbolDef<T> c3,
@@ -667,7 +675,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c5 })
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
           UserExpectedSymbolDef<T> c1,
           UserExpectedSymbolDef<T> c2,
           UserExpectedSymbolDef<T> c3,
@@ -685,7 +693,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c6 }),
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
          UserExpectedSymbolDef<T> c1,
          UserExpectedSymbolDef<T> c2,
          UserExpectedSymbolDef<T> c3,
@@ -705,7 +713,7 @@ namespace Parser.ParserKit
                      new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { c7 }),
                 });
         }
-        protected NtDefAssignSet<T> _oneof(
+        protected static NtDefAssignSet<T> _oneof(
          UserExpectedSymbolDef<T> c1,
          UserExpectedSymbolDef<T> c2,
          UserExpectedSymbolDef<T> c3,
@@ -735,24 +743,27 @@ namespace Parser.ParserKit
 
 
 
-        protected NtDefAssignSet<T> _(UserExpectedSymbolDef<T> s1)
+        protected static NtDefAssignSet<T> _(UserExpectedSymbolDef<T> s1)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1 });
         }
-        protected NtDefAssignSet<T> _(
+
+        protected static NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2 });
         }
-        protected NtDefAssignSet<T> _(
+
+        protected static NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3 });
         }
-        protected NtDefAssignSet<T> _(
+
+        protected static NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -760,7 +771,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
              UserExpectedSymbolDef<T> s1,
              UserExpectedSymbolDef<T> s2,
              UserExpectedSymbolDef<T> s3,
@@ -769,7 +780,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -779,7 +790,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -790,7 +801,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6, s7 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -802,7 +813,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6, s7, s8 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -815,7 +826,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
             UserExpectedSymbolDef<T> s1,
             UserExpectedSymbolDef<T> s2,
             UserExpectedSymbolDef<T> s3,
@@ -830,7 +841,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -846,7 +857,7 @@ namespace Parser.ParserKit
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, null, new[] { s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11 });
         }
-        protected NtDefAssignSet<T> _(
+        protected static NtDefAssignSet<T> _(
            UserExpectedSymbolDef<T> s1,
            UserExpectedSymbolDef<T> s2,
            UserExpectedSymbolDef<T> s3,
@@ -874,15 +885,31 @@ namespace Parser.ParserKit
 
             return new NtDefAssignSet<T>(getWalkerDel, null, null, total);
         }
-
-
     }
 
 
+    public class LateSymbolCollection
+    {
+        List<USymbol> lateSymbols = new List<USymbol>();
+        public void AddLateCreatedUserNt(USymbol lateSymbol)
+        {
+            this.lateSymbols.Add(lateSymbol);
+        }
+        public List<USymbol> GetLateSymbols()
+        {
+            return this.lateSymbols;
+        }
 
+    }
     static class UserNTSubParserExtension
     {
-        static UserExpectedSymbol CreateUserExpectedSymbol(ReflectionSubParser ownerSubParser, object expSS)
+        static int totalAutoNum;
+        static int GetAutoNum()
+        {
+            return totalAutoNum++;
+        }
+
+        static UserExpectedSymbol CreateUserExpectedSymbol(LateSymbolCollection lateSymbols, object expSS)
         {
             SymbolWithStepInfo symbolReduction = expSS as SymbolWithStepInfo;
             ReductionMonitor reductionDel = null;
@@ -903,6 +930,7 @@ namespace Parser.ParserKit
                 expSS = optSymbol.ss;
             }
             //--------------------------------------------------------
+            TokenInfoCollection tkinfoCollection = ReflectionSubParser.s_tkInfoCollection;
             //content is user nt
             UserNTDefinition ntss = expSS as UserNTDefinition;
             if (ntss != null)
@@ -915,7 +943,8 @@ namespace Parser.ParserKit
             if (expSS is string)
             {
                 //should be sometoken , not nt
-                tkdef = ownerSubParser.GetTokenDefintion((string)expSS);
+
+                tkdef = tkinfoCollection.GetTokenInfo((string)expSS);
                 if (tkdef != null)
                 {
                     return new UserExpectedSymbol(tkdef, isOpt, shiftDel) { ReductionDel = reductionDel };
@@ -941,18 +970,18 @@ namespace Parser.ParserKit
             {
                 //auto create oneof symbol 
                 //throw new NotSupportedException();
-                UserNTDefinition newOneOfNt = new UserNTDefinition("oneof_" + (ownerSubParser.GetNewAutoNumber()).ToString());
+                UserNTDefinition newOneOfNt = new UserNTDefinition("oneof_" + (GetAutoNum()).ToString());
                 object[] symbols = oneOf.symbols;
                 int j = symbols.Length;
                 for (int i = 0; i < j; ++i)
                 {
-                    UserExpectedSymbol ues1 = CreateUserExpectedSymbol(ownerSubParser, symbols[i]);
+                    UserExpectedSymbol ues1 = CreateUserExpectedSymbol(lateSymbols, symbols[i]);
                     var seq1 = new UserSymbolSequence(newOneOfNt);
                     seq1.AppendLast(ues1);
                     newOneOfNt.AddSymbolSequence(seq1);
                 }
                 newOneOfNt.IsAutoGen = true;
-                ownerSubParser.AddLateCreatedUserNt(newOneOfNt);
+                lateSymbols.AddLateCreatedUserNt(newOneOfNt);
                 return new UserExpectedSymbol(newOneOfNt, isOpt, shiftDel) { ReductionDel = reductionDel };
             }
             //----------------------------------------------------------
@@ -961,8 +990,8 @@ namespace Parser.ParserKit
             if (listOf != null)
             {
                 //list of what?
-                UserExpectedSymbol ues1 = CreateUserExpectedSymbol(ownerSubParser, listOf.ss); //for seq1
-                UserExpectedSymbol ues2 = CreateUserExpectedSymbol(ownerSubParser, listOf.ss); //for seq2 
+                UserExpectedSymbol ues1 = CreateUserExpectedSymbol(lateSymbols, listOf.ss); //for seq1
+                UserExpectedSymbol ues2 = CreateUserExpectedSymbol(lateSymbols, listOf.ss); //for seq2 
                 UserExpectedSymbol sep_ss = null;
                 if (listOf.sep != null)
                 {
@@ -970,7 +999,7 @@ namespace Parser.ParserKit
                     TokenDefinition sepTk = null;
                     if (listOf.sep is string)
                     {
-                        sepTk = ownerSubParser.GetTokenDefintion((string)(listOf.sep));
+                        sepTk = tkinfoCollection.GetTokenInfo((string)(listOf.sep));
                     }
                     else if (listOf.sep is TokenDefinition)
                     {
@@ -985,7 +1014,7 @@ namespace Parser.ParserKit
                     sep_ss = new UserExpectedSymbol(sepTk, false, shiftDel) { ReductionDel = reductionDel };
                 }
 
-                UserNTDefinition newListOfUserNT = new UserNTDefinition("list_of" + (ownerSubParser.GetNewAutoNumber()).ToString());
+                UserNTDefinition newListOfUserNT = new UserNTDefinition("list_of" + (GetAutoNum()).ToString());
                 newListOfUserNT.IsAutoGen = true;
                 var seq1 = new UserSymbolSequence(newListOfUserNT);
                 seq1.AppendLast(ues1);
@@ -1001,7 +1030,8 @@ namespace Parser.ParserKit
                 newListOfUserNT.AddSymbolSequence(seq1);
                 newListOfUserNT.AddSymbolSequence(seq2);
                 //create autogenerate user nt for list symbol  
-                ownerSubParser.AddLateCreatedUserNt(newListOfUserNT);
+                lateSymbols.AddLateCreatedUserNt(newListOfUserNT);
+
                 return new UserExpectedSymbol(newListOfUserNT, isOpt, shiftDel) { ReductionDel = reductionDel };
             }
             //----------
@@ -1012,16 +1042,30 @@ namespace Parser.ParserKit
         internal static UserSymbolSequence CreateUserSymbolSeq(UserNTDefinition ntdef, params object[] expectedSymbols)
         {
             UserSymbolSequence ss = new UserSymbolSequence(ntdef);
-            ReflectionSubParser ownerSubParser = ntdef.OwnerSubParser as ReflectionSubParser;
-            SubParser.SetCurrentUserSymbolSeq(ownerSubParser, ss);
+            LateSymbolCollection lateSymbols = new LateSymbolCollection();
+
             int j = expectedSymbols.Length;
             //check if symbol or delegate
             for (int i = 0; i < j; ++i)
             {
-                ss.AppendLast(CreateUserExpectedSymbol(ownerSubParser, expectedSymbols[i]));
+                ss.AppendLast(CreateUserExpectedSymbol(lateSymbols, expectedSymbols[i]));
             }
-            ntdef.AddSymbolSequence(ss);
             ss.ClearParserReductionNotifyDel();
+            ntdef.AddSymbolSequence(ss);
+
+            List<USymbol> lateSymbolList = lateSymbols.GetLateSymbols();
+            foreach (USymbol usymbol in lateSymbolList)
+            {
+                if (usymbol is UserNTDefinition)
+                {
+                    ntdef.AddLateCreatedUserNt((UserNTDefinition)usymbol);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+
+            }
             return ss;
         }
     }

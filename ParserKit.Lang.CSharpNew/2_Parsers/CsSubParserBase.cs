@@ -8,12 +8,12 @@ using Parser.ParserKit.LR;
 
 namespace Parser.MyCs
 {
-
-    public abstract class CsSubParser<T> : ReflectionSubParser<T>
-         where T : AstWalker, new()
+    public abstract class CsSubParser<T, P> : ReflectionSubParser<T>
+        where T : AstWalker, new()
+        where P : ReflectionSubParser /*exact class */
     {
         //has built-in CS token info 
-        protected readonly UserTokenDefinition
+        static protected readonly UserTokenDefinition
         _token_literal_integer = mtk("'literal_integer"),
         _token_literal_string = mtk("'literal_string"),
         _token_id = mtk("'identifier"),
@@ -146,6 +146,80 @@ namespace Parser.MyCs
         _token_set  //contextual 
        ;
 
+
+
+        static CsSubParser()
+        {
+            //init all default values
+            //1. set at base type
+            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
+            //2. and this type (P)
+            SetDefaultFieldValues(typeof(P));
+        }
+
+        static void SetDefaultFieldValues(Type tt)
+        {
+
+            System.Reflection.FieldInfo[] allStaticFields =
+                tt.GetFields(System.Reflection.BindingFlags.Static |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.DeclaredOnly);
+            int j = allStaticFields.Length;
+            TokenInfoCollection tkInfoCollection = s_tkInfoCollection;
+
+            for (int i = 0; i < j; ++i)
+            {
+                System.Reflection.FieldInfo field = allStaticFields[i];
+                if (field.FieldType == typeof(UserTokenDefinition))
+                {
+                    var fieldValue = field.GetValue(null) as UserTokenDefinition;
+
+                    if (fieldValue == null)
+                    {
+                        //no init value 
+                        field.SetValue(null, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name))));
+                    }
+                    else
+                    {
+                        //use presentation string 
+                        fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
+                    }
+                }
+                else if (field.FieldType == typeof(UserNTDefinition))
+                {
+                    //create dummy user nt def
+                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, GetPresentationName2(field.Name));
+                    proxyUserNts[field] = proxyUserNt; //last resolve
+                    field.SetValue(null, proxyUserNt);
+                }
+                else if (field.FieldType == typeof(TokenDefinition))
+                {
+                    var fieldValue = field.GetValue(null) as TokenDefinition;
+                    if (fieldValue == null)
+                    {
+                        field.SetValue(null, tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name)));
+                    }
+                }
+
+            }
+        }
+        static string GetPresentationName2(string fieldname)
+        {
+            //convention here
+            if (fieldname.StartsWith("_token_"))
+            {
+                return fieldname.Substring(7);
+            }
+            else
+            {
+                return fieldname;
+            }
+        }
+        protected static bool Begin()
+        {
+            return true;
+        }
+
         static UserTokenDefinition mtk(string grammarString)
         {
             return new UserTokenDefinition(grammarString);
@@ -247,16 +321,15 @@ namespace Parser.MyCs
                     }
             }
         }
-        protected ParserKit.SubParsers.ListSymbol list_c(UserNTDefinition nt)
+        protected static ParserKit.SubParsers.ListSymbol list_c(UserNTDefinition nt)
         {
             return list(nt, _token_comma);
         }
-        protected ParserKit.SubParsers.ListSymbol list_c(TokenDefinition tk)
+        protected static ParserKit.SubParsers.ListSymbol list_c(TokenDefinition tk)
         {
             return list(tk, _token_comma);
         }
 
     }
-
 
 }
