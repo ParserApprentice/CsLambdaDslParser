@@ -1,8 +1,5 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Parser.AsmInfrastructures;
+ 
 
 namespace Parser.CodeDom
 {
@@ -12,16 +9,12 @@ namespace Parser.CodeDom
     /// </summary>
     public class CodeImplicitThisReferenceExpression : CodeThisReferenceExpression
     {
-        //eg. xxx()
-
+        //eg. xxx() 
         public CodeImplicitThisReferenceExpression()
-        {
-
+        { 
         }
 
-    }
-
-
+    } 
 
 
 }

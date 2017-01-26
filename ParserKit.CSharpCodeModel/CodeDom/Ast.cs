@@ -27,7 +27,7 @@
 //    public abstract class TypeMemberDecl
 //    {
 //    }
-    
+
 //    public class ClassDeclaration : AstNode
 //    {
 

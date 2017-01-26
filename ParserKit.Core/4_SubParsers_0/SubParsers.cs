@@ -11,7 +11,7 @@ namespace Parser.ParserKit
     public abstract class SubParser
     {
 
-        
+
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
         protected UserNTDefinition _rootNtDef;
@@ -33,11 +33,11 @@ namespace Parser.ParserKit
 
         protected abstract void InternalSetup(TokenInfoCollection tkInfoCollection);
 
-        public static void BaseInit2() { }
+
         public void Setup(TokenInfoCollection tkInfoCollection)
         {
 
-            
+
             //---------------------------------------
             InternalSetup(tkInfoCollection);
             //--------------------------------------- 
@@ -78,7 +78,7 @@ namespace Parser.ParserKit
         }
 
 
-        internal LRParsingTable InternalParsingTable { get { return _parsingTable; } }
+        public LRParsingTable InternalParsingTable { get { return _parsingTable; } }
 
         public void SetParserSwitchHandler(LRParserSwitchHandler swHandler)
         {
@@ -221,6 +221,7 @@ namespace Parser.ParserKit
         }
 
     }
+
     static class UserNTSubParserExtension
     {
         static int totalAutoNum;

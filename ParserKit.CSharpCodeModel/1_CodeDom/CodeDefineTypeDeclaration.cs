@@ -1,11 +1,9 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections.Generic;
-using System.Text;
+ 
 
 namespace Parser.CodeDom
 {
-    
+
     public class CodeDefineTypeDeclaration : CodeTypeDeclaration
     {
         bool passSemanticCheck = false;
@@ -13,9 +11,9 @@ namespace Parser.CodeDom
         public CodeDefineTypeDeclaration(CompilationUnit cu,
             CodeDefineFieldExpressionCollection defineFieldExpressionCollection,
             string typenameSpace, string typeName)
-            : base(cu, CodeObjectKind.DefineClass,typenameSpace,typeName)            
+            : base(cu, CodeObjectKind.DefineClass, typenameSpace, typeName)
         {
-             
+
             this.defineFieldExpressionCollection = defineFieldExpressionCollection;
 
         }

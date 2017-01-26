@@ -1,14 +1,10 @@
 ﻿//MIT, 2015-2017, ParserApprentice
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Parser.AsmInfrastructures;
 
 namespace Parser.CodeDom
 {
-
-
     public enum CodeStatementType
     {
         Unknown,
@@ -296,7 +292,7 @@ namespace Parser.CodeDom
     {
         public CodeBlockStatement()
         {
-            
+
         }
         public List<CodeStatement> Body { get; set; }
         public override CodeStatementType StatementType

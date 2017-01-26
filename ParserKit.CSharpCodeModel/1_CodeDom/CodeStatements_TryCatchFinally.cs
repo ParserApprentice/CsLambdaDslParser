@@ -1,9 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
+using System.Collections.Generic;
 
 namespace Parser.CodeDom
 {
@@ -15,7 +12,7 @@ namespace Parser.CodeDom
     {
         CodeExpression toThrow;
         public CodeThrowExceptionStatement()
-        { 
+        {
         }
         public CodeThrowExceptionStatement(CodeExpression toThrow)
         {
@@ -72,7 +69,7 @@ namespace Parser.CodeDom
                     AcceptChild(value, CodeObjectRoles.CodeTryCatchFinallyStatement_FinallyClause);
                 }
             }
-        } 
+        }
         public void AddCatchClause(CodeCatchClause catchClause)
         {
             if (catchClauses == null)
@@ -113,13 +110,13 @@ namespace Parser.CodeDom
             }
         }
 
-    } 
+    }
     public class CodeCatchClause : CodeObject
     {
-        CodeTypeReference catchExceptionType; 
+        CodeTypeReference catchExceptionType;
         CodeNamedItem catchExceptionTypeName;
         CodeBlockStatement body;
-        CodeSimpleName localName; 
+        CodeSimpleName localName;
         public CodeVariableDeclarationStatement compilerGenExceptionVarDeclStatement;
         public CodeCatchClause()
         {
@@ -144,7 +141,7 @@ namespace Parser.CodeDom
                 this.body = value;
 
             }
-        } 
+        }
         public CodeTypeReference CatchExceptionType
         {
             get
@@ -167,7 +164,7 @@ namespace Parser.CodeDom
         /// </summary> 
         public string LocalNameAsString
         {
-            
+
             get
             {
                 if (localName != null)

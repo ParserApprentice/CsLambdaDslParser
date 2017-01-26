@@ -152,7 +152,7 @@ namespace Parser.CodeDom
             return "using " + this.Namespacename + ";";
         }
     }
-    
+
     public class CodeNamespace : CodeObject, INamespaceMember
     {
         List<INamespaceMember> members = new List<INamespaceMember>();

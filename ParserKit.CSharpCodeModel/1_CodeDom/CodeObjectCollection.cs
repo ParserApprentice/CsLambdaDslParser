@@ -1,6 +1,5 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections;
+using System; 
 using System.Collections.Generic;
 using System.Text;
 

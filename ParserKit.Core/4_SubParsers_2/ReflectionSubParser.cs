@@ -9,7 +9,7 @@ using Parser.ParserKit.SubParsers;
 namespace Parser.ParserKit
 {
     public abstract class ReflectionSubParser : SubParser
-    {   
+    {
         public static TokenInfoCollection s_tkInfoCollection;
         List<UserNTDefinition> _initUserNts;
 
@@ -62,6 +62,7 @@ namespace Parser.ParserKit
 
         internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
         {
+            //TODO: review here
             //ignor this pair
             return new SyncSymbol(begin, end, SyncSymbolKind.Ignor);
         }
@@ -200,12 +201,26 @@ namespace Parser.ParserKit
             get { return getWalkerDel; }
             set { getWalkerDel = value; }
         }
-
+        //--------------------------------------------------------
+        protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
+        {
+            UserNTDefinition u;
+            if (proxyUserNts.TryGetValue(fieldInfo, out u))
+            {
+                return u;
+            }
+            else
+            {
+                return null;
+            }
+        }
         internal override List<SyncSequence> GetSyncSeqs()
         {
             return _syncSeqs;
         }
-        static internal List<SyncSequence> _syncSeqs;
+        static List<SyncSequence> _syncSeqs;
+        //--------------------------------------------------------
+
         protected static bool sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
@@ -235,18 +250,7 @@ namespace Parser.ParserKit
             _syncSeqs.Add(new SyncSequence(syncCmds));
             return true;
         }
-        protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
-        {
-            UserNTDefinition u;
-            if (proxyUserNts.TryGetValue(fieldInfo, out u))
-            {
-                return u;
-            }
-            else
-            {
-                return null;
-            }
-        }
+
         protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1 });
