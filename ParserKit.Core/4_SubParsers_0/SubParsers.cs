@@ -36,7 +36,7 @@ namespace Parser.ParserKit
         //------------------------------
 
         int _autoNumber;
-        protected internal UserSymbolSequence currentSq;
+        //protected internal UserSymbolSequence currentSq;
 
         public SubParser()
         {
@@ -173,10 +173,10 @@ namespace Parser.ParserKit
             get { return _rootNtDef.Name; }
         }
         internal List<SyncSequence> _syncSeqs;
-        internal static void SetCurrentUserSymbolSeq(SubParser subParser, UserSymbolSequence userSymbolSeq)
-        {
-            subParser.currentSq = userSymbolSeq;
-        }
+        //internal static void SetCurrentUserSymbolSeq(SubParser subParser, UserSymbolSequence userSymbolSeq)
+        //{
+        //    subParser.currentSq = userSymbolSeq;
+        //}
 
         //------------------------------------------------------------------------------------------------
         static SubParser FindSubParser(Dictionary<string, SubParser> dic, string subParserName)
@@ -230,7 +230,7 @@ namespace Parser.ParserKit
 #endif
     }
 
- 
+
 
     public abstract class ReflectionSubParserV2 : SubParser
     {
@@ -293,28 +293,7 @@ namespace Parser.ParserKit
             return new OneOfSymbol(symbols);
         }
 
-        protected void set_prec(int prec)
-        {
-            //assign prec to current seq
-            currentSq.Precedence = prec;
-            for (int i = currentSq.RightCount - 1; i >= 0; --i)
-            {
-                UserExpectedSymbol ues = currentSq[i];
-                if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
-                {
-                    UserNTDefinition unt = ues.ResolvedUserNtDef;
-                    if (unt.IsAutoGen)
-                    {
-                        unt.NTPrecedence = prec;
 
-                    }
-                    else
-                    {
-                        // Console.WriteLine(unt);
-                    }
-                }
-            }
-        }
         protected void sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
@@ -350,8 +329,8 @@ namespace Parser.ParserKit
 
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
-            _initUserNts = new List<UserNTDefinition>(); 
-
+            _initUserNts = new List<UserNTDefinition>();
+            //get all static user nt 
             //Type t = this.GetType();
             //FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance); 
             ////init field
@@ -904,9 +883,28 @@ namespace Parser.ParserKit
     }
 
 
+    public class LateSymbolCollection
+    {
+        List<USymbol> lateSymbols = new List<USymbol>();
+        public void AddLateCreatedUserNt(USymbol lateSymbol)
+        {
+            this.lateSymbols.Add(lateSymbol);
+        }
+        public List<USymbol> GetLateSymbols()
+        {
+            return this.lateSymbols;
+        }
+
+    }
     static class UserNTSubParserExtension
     {
-        static UserExpectedSymbol CreateUserExpectedSymbol(ReflectionSubParserV2 ownerSubParser, object expSS)
+        static int totalAutoNum;
+        static int GetAutoNum()
+        {
+            return totalAutoNum++;
+        }
+
+        static UserExpectedSymbol CreateUserExpectedSymbol(LateSymbolCollection lateSymbols, object expSS)
         {
             SymbolWithStepInfo symbolReduction = expSS as SymbolWithStepInfo;
             ReductionMonitor reductionDel = null;
@@ -927,6 +925,7 @@ namespace Parser.ParserKit
                 expSS = optSymbol.ss;
             }
             //--------------------------------------------------------
+            TokenInfoCollection tkinfoCollection = ReflectionSubParserV2.s_tkInfoCollection;
             //content is user nt
             UserNTDefinition ntss = expSS as UserNTDefinition;
             if (ntss != null)
@@ -939,7 +938,8 @@ namespace Parser.ParserKit
             if (expSS is string)
             {
                 //should be sometoken , not nt
-                tkdef = ownerSubParser.GetTokenDefintion((string)expSS);
+
+                tkdef = tkinfoCollection.GetTokenInfo((string)expSS);
                 if (tkdef != null)
                 {
                     return new UserExpectedSymbol(tkdef, isOpt, shiftDel) { ReductionDel = reductionDel };
@@ -965,18 +965,18 @@ namespace Parser.ParserKit
             {
                 //auto create oneof symbol 
                 //throw new NotSupportedException();
-                UserNTDefinition newOneOfNt = new UserNTDefinition("oneof_" + (ownerSubParser.GetNewAutoNumber()).ToString());
+                UserNTDefinition newOneOfNt = new UserNTDefinition("oneof_" + (GetAutoNum()).ToString());
                 object[] symbols = oneOf.symbols;
                 int j = symbols.Length;
                 for (int i = 0; i < j; ++i)
                 {
-                    UserExpectedSymbol ues1 = CreateUserExpectedSymbol(ownerSubParser, symbols[i]);
+                    UserExpectedSymbol ues1 = CreateUserExpectedSymbol(lateSymbols, symbols[i]);
                     var seq1 = new UserSymbolSequence(newOneOfNt);
                     seq1.AppendLast(ues1);
                     newOneOfNt.AddSymbolSequence(seq1);
                 }
                 newOneOfNt.IsAutoGen = true;
-                ownerSubParser.AddLateCreatedUserNt(newOneOfNt);
+                lateSymbols.AddLateCreatedUserNt(newOneOfNt);
                 return new UserExpectedSymbol(newOneOfNt, isOpt, shiftDel) { ReductionDel = reductionDel };
             }
             //----------------------------------------------------------
@@ -985,8 +985,8 @@ namespace Parser.ParserKit
             if (listOf != null)
             {
                 //list of what?
-                UserExpectedSymbol ues1 = CreateUserExpectedSymbol(ownerSubParser, listOf.ss); //for seq1
-                UserExpectedSymbol ues2 = CreateUserExpectedSymbol(ownerSubParser, listOf.ss); //for seq2 
+                UserExpectedSymbol ues1 = CreateUserExpectedSymbol(lateSymbols, listOf.ss); //for seq1
+                UserExpectedSymbol ues2 = CreateUserExpectedSymbol(lateSymbols, listOf.ss); //for seq2 
                 UserExpectedSymbol sep_ss = null;
                 if (listOf.sep != null)
                 {
@@ -994,7 +994,7 @@ namespace Parser.ParserKit
                     TokenDefinition sepTk = null;
                     if (listOf.sep is string)
                     {
-                        sepTk = ownerSubParser.GetTokenDefintion((string)(listOf.sep));
+                        sepTk = tkinfoCollection.GetTokenInfo((string)(listOf.sep));
                     }
                     else if (listOf.sep is TokenDefinition)
                     {
@@ -1009,7 +1009,7 @@ namespace Parser.ParserKit
                     sep_ss = new UserExpectedSymbol(sepTk, false, shiftDel) { ReductionDel = reductionDel };
                 }
 
-                UserNTDefinition newListOfUserNT = new UserNTDefinition("list_of" + (ownerSubParser.GetNewAutoNumber()).ToString());
+                UserNTDefinition newListOfUserNT = new UserNTDefinition("list_of" + (GetAutoNum()).ToString());
                 newListOfUserNT.IsAutoGen = true;
                 var seq1 = new UserSymbolSequence(newListOfUserNT);
                 seq1.AppendLast(ues1);
@@ -1025,7 +1025,8 @@ namespace Parser.ParserKit
                 newListOfUserNT.AddSymbolSequence(seq1);
                 newListOfUserNT.AddSymbolSequence(seq2);
                 //create autogenerate user nt for list symbol  
-                ownerSubParser.AddLateCreatedUserNt(newListOfUserNT);
+                lateSymbols.AddLateCreatedUserNt(newListOfUserNT);
+
                 return new UserExpectedSymbol(newListOfUserNT, isOpt, shiftDel) { ReductionDel = reductionDel };
             }
             //----------
@@ -1036,19 +1037,30 @@ namespace Parser.ParserKit
         internal static UserSymbolSequence CreateUserSymbolSeq(UserNTDefinition ntdef, params object[] expectedSymbols)
         {
             UserSymbolSequence ss = new UserSymbolSequence(ntdef);
-            ss.SetLateSetupDel((o) =>
+            LateSymbolCollection lateSymbols = new LateSymbolCollection();
+
+            int j = expectedSymbols.Length;
+            //check if symbol or delegate
+            for (int i = 0; i < j; ++i)
             {
-                ReflectionSubParserV2 ownerSubParser = ntdef.OwnerSubParser as ReflectionSubParserV2;
-                SubParser.SetCurrentUserSymbolSeq(ownerSubParser, ss);
-                int j = expectedSymbols.Length;
-                //check if symbol or delegate
-                for (int i = 0; i < j; ++i)
-                {
-                    ss.AppendLast(CreateUserExpectedSymbol(ownerSubParser, expectedSymbols[i]));
-                } 
-                ss.ClearParserReductionNotifyDel();
-            });
+                ss.AppendLast(CreateUserExpectedSymbol(lateSymbols, expectedSymbols[i]));
+            }
+            ss.ClearParserReductionNotifyDel();
             ntdef.AddSymbolSequence(ss);
+
+            List<USymbol> lateSymbolList = lateSymbols.GetLateSymbols();
+            foreach (USymbol usymbol in lateSymbolList)
+            {
+                if (usymbol is UserNTDefinition)
+                {
+                    ntdef.AddLateCreatedUserNt((UserNTDefinition)usymbol);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+
+            }
             return ss;
         }
     }

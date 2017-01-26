@@ -1268,10 +1268,12 @@ namespace Parser.MyCs
 
     public class FormalParameterListParser : CsSubParser2<FormalParameterListParser.Walker, FormalParameterListParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
         static bool init = Begin();
-
-        static
-        UserNTDefinition
+        //--------------------------
+        static UserNTDefinition             
             _formal_parameter_list = _oneof(
             /*1*/_(
                     o => _fixedParameters),
@@ -1314,6 +1316,7 @@ namespace Parser.MyCs
             _array_type,
             _expression
             ;
+         
         public class Walker : AstWalker
         {
 

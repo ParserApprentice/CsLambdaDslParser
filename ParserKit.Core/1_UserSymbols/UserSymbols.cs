@@ -69,7 +69,7 @@ namespace Parser.ParserKit
 
         List<UserSymbolSequence> originalSymbolSqs = new List<UserSymbolSequence>();
         List<UserSymbolSequence> allPossibleSequences = new List<UserSymbolSequence>();
-
+        List<UserNTDefinition> lateCreatedUserNts;
 #if DEBUG
         static int dbugTotalId = 0;
         public int dbugId;
@@ -83,6 +83,14 @@ namespace Parser.ParserKit
         {
             setupId();
             this.Name = ntname;
+        }
+        internal void AddLateCreatedUserNt(UserNTDefinition lateUserNt)
+        {
+            if (lateCreatedUserNts == null)
+            {
+                lateCreatedUserNts = new List<UserNTDefinition>();
+            }
+            lateCreatedUserNts.Add(lateUserNt);
         }
         public int UserSeqCount
         {
@@ -420,25 +428,8 @@ namespace Parser.ParserKit
         internal string GetNewLeftSideSymbolInfo()
         {
             return this.ownerNT.ToString();
-        }
-
-
-    }
-
-    public class TopUserNtDefinition : UserNTDefinition
-    {
-        public TopUserNtDefinition(string name)
-            : base(name)
-        {
-        }
-        public static TopUserNtDefinition operator +(TopUserNtDefinition unt, NtDefAssignSet assignSet)
-        {
-            assignSet.AssignDataToNt(unt);
-            return unt;
-        }
-
-    }
-
+        } 
+    } 
 
     public class UserExpectedSymbol
     {
@@ -849,8 +840,28 @@ namespace Parser.ParserKit
         /// <returns></returns>
         public NtDefAssignSet<T> set_prec(int value)
         {
-            //TODO: review here again
+            //TODO: review here again ***
             this.Precedence = value;
+
+
+            //currentSq.Precedence = prec;
+            //for (int i = currentSq.RightCount - 1; i >= 0; --i)
+            //{
+            //    UserExpectedSymbol ues = currentSq[i];
+            //    if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
+            //    {
+            //        UserNTDefinition unt = ues.ResolvedUserNtDef;
+            //        if (unt.IsAutoGen)
+            //        {
+            //            unt.NTPrecedence = prec;
+
+            //        }
+            //        else
+            //        {
+            //            // Console.WriteLine(unt);
+            //        }
+            //    }
+            //}
             return this;
         }
         public int Precedence { get; private set; }

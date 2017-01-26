@@ -219,6 +219,7 @@ namespace Parser.MyCs
         {
             return true;
         }
+        
         static UserTokenDefinition mtk(string grammarString)
         {
             return new UserTokenDefinition(grammarString);
