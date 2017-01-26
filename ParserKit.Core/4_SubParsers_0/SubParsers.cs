@@ -396,6 +396,10 @@ namespace Parser.ParserKit
                         f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
                     }
                 }
+                else if (f.FieldType == typeof(ProxyUserNTDefinition))
+                {
+
+                }
             }
             if (lateNts != null)
             {
