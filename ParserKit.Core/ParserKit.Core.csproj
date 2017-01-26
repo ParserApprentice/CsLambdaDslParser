@@ -60,6 +60,7 @@
     <Compile Include="4_SubParsers_0\SubParsers.cs" />
     <Compile Include="4_SubParsers_1\LRTableCaching.cs" />
     <Compile Include="4_SubParsers_1\ParserManager.cs" />
+    <Compile Include="4_SubParsers_2\ReflectionSubParser.cs" />
     <Compile Include="4_SubParsers_1\SubParsers.cs" />
     <Compile Include="4_SubParsers_1\SwicthDetail.cs" />
     <Compile Include="4_SubParsers_1\SyncSymbols.cs" />
