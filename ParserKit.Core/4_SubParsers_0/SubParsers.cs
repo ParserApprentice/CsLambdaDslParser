@@ -28,7 +28,7 @@ namespace Parser.ParserKit
         protected TokenInfoCollection _tkInfoCollection;
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
-        protected RootHolder _rootNtDef;
+        protected UserNTDefinition _rootNtDef;
 
         //------------------------------
         protected LRParsingTable _parsingTable;
@@ -162,10 +162,8 @@ namespace Parser.ParserKit
             get { return _actualLRParser.FinalNode; }
         }
 
-
-
         protected abstract void Define();
-        protected UserNTDefinition RootNt { get { return _rootNtDef._rootNtDef; } }
+        protected UserNTDefinition RootNt { get { return _rootNtDef; } }
 
 
         public string RootNtName
@@ -173,10 +171,6 @@ namespace Parser.ParserKit
             get { return _rootNtDef.Name; }
         }
         internal List<SyncSequence> _syncSeqs;
-        //internal static void SetCurrentUserSymbolSeq(SubParser subParser, UserSymbolSequence userSymbolSeq)
-        //{
-        //    subParser.currentSq = userSymbolSeq;
-        //}
 
         //------------------------------------------------------------------------------------------------
         static SubParser FindSubParser(Dictionary<string, SubParser> dic, string subParserName)
@@ -232,21 +226,14 @@ namespace Parser.ParserKit
 
 
 
-    public abstract class ReflectionSubParserV2 : SubParser
+    public abstract class ReflectionSubParser : SubParser
     {
 
+        protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
+            proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
         public static TokenInfoCollection s_tkInfoCollection;
-
         List<UserNTDefinition> _initUserNts;
-        List<UserNTDefinition> _lateNts;
-        public void AddLateCreatedUserNt(UserNTDefinition lateNt)
-        {
-            if (_lateNts == null)
-            {
-                _lateNts = new List<UserNTDefinition>();
-            }
-            _lateNts.Add(lateNt);
-        }
+
         public TokenDefinition GetTokenDefintion(string grammarPresentationString)
         {
             return _tkInfoCollection.GetTokenInfo(grammarPresentationString);
@@ -327,76 +314,92 @@ namespace Parser.ParserKit
             return new SyncSymbol(begin, end, SyncSymbolKind.Ignor);
         }
 
+        static FieldInfo[] GetFields(Type instanceType)
+        {
+            //get field from instance Type and its base
+            List<FieldInfo> list = new List<FieldInfo>();
+            list.AddRange(instanceType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+            //
+            Type baseType = instanceType.BaseType;
+            if (baseType != null)
+            {
+                baseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                list.AddRange(baseType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static));
+            }
+            return list.ToArray();
+        }
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
             _initUserNts = new List<UserNTDefinition>();
-            //get all static user nt 
-            //Type t = this.GetType();
-            //FieldInfo[] fields = t.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance); 
-            ////init field
-            //foreach (FieldInfo f in fields)
-            //{
-
-            //    if (f.FieldType == typeof(TopUserNtDefinition))
-            //    {
-            //        var unt = new TopUserNtDefinition(f.Name);
-            //        unt.OwnerSubParser = this;
-            //        _initUserNts.Add(unt);
-            //        f.SetValue(this, unt);
-            //        //---------------------
-            //        if (_rootNtDef != null)
-            //        {
-            //            //must has only1
-            //            throw new NotSupportedException();
-            //        }
-            //        this._rootNtDef = new RootHolder(unt);
-            //        //---------------------
-            //    }
-            //    else if (f.FieldType == typeof(UserNTDefinition))
-            //    {
-            //        //init this field
-            //        //user field name              
-            //        var unt = new UserNTDefinition(f.Name);
-            //        unt.OwnerSubParser = this;
-            //        _initUserNts.Add(unt);
-            //        f.SetValue(this, unt);
-            //    }
-            //    else if (f.FieldType == typeof(UserTokenDefinition))
-            //    {
-            //        var fieldValue = f.GetValue(this) as UserTokenDefinition;
-            //        if (fieldValue == null)
-            //        {
-            //            //no init value 
-            //            f.SetValue(this, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name))));
-            //        }
-            //        else
-            //        {
-            //            //use presentation string 
-            //            fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
-            //        }
-
-            //    }
-            //    else if (f.FieldType == typeof(TokenDefinition))
-            //    {
-            //        //get token from grammar sheet
-            //        //get existing value 
-            //        var fieldValue = f.GetValue(this) as TokenDefinition;
-            //        if (fieldValue == null)
-            //        {
-            //            f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
-            //        }
-            //    }
-            //    else
-            //    {
-
-            //    }
-            //}
-            //---------------------------------------
-            Define();
-            //--------------------------------------- 
-            if (_lateNts != null)
+            //get all static user nt              
+            List<UserNTDefinition> lateNts = null;
+            FieldInfo[] fields = GetFields(this.GetType());
+            foreach (FieldInfo f in fields)
             {
-                _initUserNts.AddRange(_lateNts);
+                if (f.FieldType == typeof(UserNTDefinition))
+                {
+                    UserNTDefinition unt = (UserNTDefinition)f.GetValue(null);
+                    if (this._rootNtDef == null)
+                    {
+                        //TODO: review here again
+                        _rootNtDef = unt;
+                    }
+
+                    if (unt.Name == null)
+                    {
+                        unt.SetName(f.Name);
+                    }
+
+                    UserNTDefinition proxyNtDef;
+                    if (proxyUserNts.TryGetValue(f, out proxyNtDef))
+                    {
+                        ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
+                    }
+
+                    unt.OwnerSubParser = this;
+                    _initUserNts.Add(unt);
+
+                    List<UserNTDefinition> lateUserNts = unt.GetLateNts();
+                    if (lateUserNts != null)
+                    {
+                        if (lateNts == null)
+                        {
+                            lateNts = new List<UserNTDefinition>();
+                        }
+                        foreach (UserNTDefinition lateNt in lateUserNts)
+                        {
+                            lateNts.Add(lateNt);
+                        }
+                    }
+                }
+                else if (f.FieldType == typeof(UserTokenDefinition))
+                {
+                    var fieldValue = f.GetValue(this) as UserTokenDefinition;
+                    if (fieldValue == null)
+                    {
+                        //no init value 
+                        f.SetValue(this, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name))));
+                    }
+                    else
+                    {
+                        //use presentation string 
+                        fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
+                    }
+                }
+                else if (f.FieldType == typeof(TokenDefinition))
+                {
+                    //get token from grammar sheet
+                    //get existing value 
+                    var fieldValue = f.GetValue(this) as TokenDefinition;
+                    if (fieldValue == null)
+                    {
+                        f.SetValue(this, tkInfoCollection.GetTokenInfo(GetTokenPresentationName(f.Name)));
+                    }
+                }
+            }
+            if (lateNts != null)
+            {
+                _initUserNts.AddRange(lateNts);
             }
 
             //check if all user nt is define
@@ -432,18 +435,14 @@ namespace Parser.ParserKit
         }
     }
 
-    public abstract class ReflectionSubParserV2<T> : ReflectionSubParserV2
+    public abstract class ReflectionSubParser<T> : ReflectionSubParser
     {
-
         static GetWalkerDel<T> getWalkerDel;
-
         public GetWalkerDel<T> GetWalker
         {
             get { return getWalkerDel; }
             set { getWalkerDel = value; }
         }
-
-
         protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, new[] { s1 });
@@ -584,23 +583,6 @@ namespace Parser.ParserKit
             }
 
             return new NtDefAssignSet<T>(getWalkerDel, null, reductionDel, total);
-        }
-
-        protected static UserNTDefinition s_oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
-        {
-            //at least 2 choices
-            int j = others.Length;
-            NtDefAssignSet<T>[] choices = new NtDefAssignSet<T>[j + 2];
-            choices[0] = c1;
-            choices[1] = c2;
-            for (int i = 0; i < j; ++i)
-            {
-                choices[2 + i] = others[i];
-            }
-            UserNTDefinition newnt = new UserNTDefinition();
-            var ntSefAssignSet = new NtDefAssignSet<T>(null, choices);
-            ntSefAssignSet.AssignDataToNt(newnt);
-            return newnt;
         }
 
         protected static NtDefAssignSet<T> _oneof(NtDefAssignSet<T> c1, NtDefAssignSet<T> c2, params NtDefAssignSet<T>[] others)
@@ -925,7 +907,7 @@ namespace Parser.ParserKit
                 expSS = optSymbol.ss;
             }
             //--------------------------------------------------------
-            TokenInfoCollection tkinfoCollection = ReflectionSubParserV2.s_tkInfoCollection;
+            TokenInfoCollection tkinfoCollection = ReflectionSubParser.s_tkInfoCollection;
             //content is user nt
             UserNTDefinition ntss = expSS as UserNTDefinition;
             if (ntss != null)

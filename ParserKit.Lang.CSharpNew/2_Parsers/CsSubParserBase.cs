@@ -8,9 +8,9 @@ using Parser.ParserKit.LR;
 
 namespace Parser.MyCs
 {
-    public abstract class CsSubParser2<T, P> : ReflectionSubParserV2<T>
+    public abstract class CsSubParser2<T, P> : ReflectionSubParser<T>
         where T : AstWalker, new()
-        where P : ReflectionSubParserV2
+        where P : ReflectionSubParser
     {
 
 
@@ -149,15 +149,15 @@ namespace Parser.MyCs
         _token_set  //contextual 
        ;
 
+
+
         static CsSubParser2()
         {
-
             //init all default values
             //1. set at base type
             SetDefaultFieldValues(typeof(CsSubParser2<T, P>));
             //2. and this type (P)
             SetDefaultFieldValues(typeof(P));
-
         }
         static void SetDefaultFieldValues(Type tt)
         {
@@ -190,7 +190,9 @@ namespace Parser.MyCs
                 else if (field.FieldType == typeof(UserNTDefinition))
                 {
                     //create dummy user nt def
-                    field.SetValue(null, new UserNTDefinition(GetPresentationName2(field.Name)));
+                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, GetPresentationName2(field.Name));
+                    proxyUserNts[field] = proxyUserNt; //last resolve
+                    field.SetValue(null, proxyUserNt);
                 }
                 else if (field.FieldType == typeof(TokenDefinition))
                 {
@@ -198,7 +200,7 @@ namespace Parser.MyCs
                     if (fieldValue == null)
                     {
                         field.SetValue(null, tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name)));
-                    } 
+                    }
                 }
 
             }
@@ -219,7 +221,7 @@ namespace Parser.MyCs
         {
             return true;
         }
-        
+
         static UserTokenDefinition mtk(string grammarString)
         {
             return new UserTokenDefinition(grammarString);

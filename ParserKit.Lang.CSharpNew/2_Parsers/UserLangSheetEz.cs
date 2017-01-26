@@ -143,14 +143,7 @@ namespace Parser.ParserKit
             this.allUserNTs.AddNT(this.currentUserNT);
             return this.currentUserNT;
         }
-        public UserNTDefinition nt_rr(string name)
-        {
-            this.currentSqName = null;
-            this.currentSqPrecedence = 0;
-            this.currentUserNT = new UserNTDefinition(name);
-            this.allUserNTs.AddNT(this.currentUserNT);
-            return this.currentUserNT;
-        }
+      
         /// <summary>
         /// create user symbol from specific string
         /// </summary>

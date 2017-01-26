@@ -788,10 +788,7 @@ namespace Parser.ParserKit
         /// <returns></returns>
         internal bool CollectFirstTerminalPhase3()
         {
-            //if (this.dbugId == 3 || this.dbugId == 5)
-            //{
-
-            //}
+           
             SymbolSequence[] selectedSymbolList = null;
             if (this.allPossibleSqs != null && this.allPossibleSqs.Length > 0)
             {

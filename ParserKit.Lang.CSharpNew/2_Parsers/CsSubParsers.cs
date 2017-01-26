@@ -12,12 +12,16 @@ namespace Parser.MyCs
 
     public class TypeParser : CsSubParser2<TypeParser.Walker, TypeParser>
     {
-
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
 
         static UserNTDefinition
             //
             //top ***
-            _type = s_oneof(
+            _type = _oneof(
             /*1*/
                 _(
                     o => _token_id,
@@ -58,6 +62,12 @@ namespace Parser.MyCs
 
     public class ArrayTypeParser : CsSubParser2<ArrayTypeParser.Walker, ArrayTypeParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
+
         static UserNTDefinition
             //
         _array_type = _(                /**/ r => r.NewArrayType,
@@ -80,9 +90,13 @@ namespace Parser.MyCs
     public class TypeParameterConstraintsClausesParser :
         CsSubParser2<TypeParameterConstraintsClausesParser.Walker, TypeParameterConstraintsClausesParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             //
-
            _type_parameter_constraints_clauses = _(
                o => list(_type_parameter_constraints_clause)),
             //----------------------------------------------
@@ -128,7 +142,11 @@ namespace Parser.MyCs
 
     public class ExpressionParser : CsSubParser2<ExpressionParser.Walker, ExpressionParser>
     {
-
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         //operator precedence
         //     //low
         //Unknown,
@@ -575,7 +593,12 @@ namespace Parser.MyCs
 
     public class ObjectOrCollectionInitializerParser :
         CsSubParser2<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
-    {
+    {   
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
          _object_or_collection_initializer = _oneof(
                _(  /*1*/                        r => r.NewObjectInitialization,
@@ -629,6 +652,11 @@ namespace Parser.MyCs
     public class ArgumentListParser : CsSubParser2<
         ArgumentListParser.Walker, ArgumentListParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
            _argument_list = _(o => list_c(_argument)),
             //--------------------------------------------
@@ -655,6 +683,11 @@ namespace Parser.MyCs
 
     public class StatementParser : CsSubParser2<StatementParser.Walker, StatementParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             //
             _statement = _oneof(
@@ -1014,7 +1047,11 @@ namespace Parser.MyCs
 
     public class AttributesParser : CsSubParser2<AttributesParser.Walker, AttributesParser>
     {
-
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             _attributes = _(o => list_c(_attribute_section)),
             _attribute_section = _(
@@ -1053,7 +1090,11 @@ namespace Parser.MyCs
 
     public class ClassDeclParser : CsSubParser2<ClassDeclParser.Walker, ClassDeclParser>
     {
-
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             _class_decl = _(                              /**/ r => r.NewClassDeclaration,
               o => opt(_attributes),
@@ -1144,7 +1185,11 @@ namespace Parser.MyCs
 
     public class PropertyDeclParser : CsSubParser2<PropertyDeclParser.Walker, PropertyDeclParser>
     {
-
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             //--------------------------------
             _property_declaration = _(
@@ -1225,6 +1270,11 @@ namespace Parser.MyCs
 
     public class FieldDeclParser : CsSubParser2<FieldDeclParser.Walker, FieldDeclParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         //492
         static UserNTDefinition
             _field_declaration = _(
@@ -1273,7 +1323,7 @@ namespace Parser.MyCs
         //before we go further
         static bool init = Begin();
         //--------------------------
-        static UserNTDefinition             
+        static UserNTDefinition
             _formal_parameter_list = _oneof(
             /*1*/_(
                     o => _fixedParameters),
@@ -1316,14 +1366,18 @@ namespace Parser.MyCs
             _array_type,
             _expression
             ;
-         
+
         public class Walker : AstWalker
         {
 
         }
     }
     public class MethodDeclParser : CsSubParser2<MethodDeclParser.Walker, MethodDeclParser>
-    {
+    { //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static
         UserNTDefinition
             _method_declaration = _(
@@ -1388,7 +1442,12 @@ namespace Parser.MyCs
     }
 
     public class StructDeclParser : CsSubParser2<StructDeclParser.Walker, StructDeclParser>
-    {
+    {   
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         //497 
         static UserNTDefinition
             _struct_decl = _(
@@ -1473,6 +1532,11 @@ namespace Parser.MyCs
 
     public class NamespaceParser : CsSubParser2<NamespaceParser.Walker, NamespaceParser>
     {
+        //must call begin first
+        //this tricker static base-class call
+        //before we go further
+        static bool init = Begin();
+        //--------------------------
         static UserNTDefinition
             _compilation_unit = _(              /**/ r => r.NewCompilationUnit,
                  o => opt(list(_using_directive)),
