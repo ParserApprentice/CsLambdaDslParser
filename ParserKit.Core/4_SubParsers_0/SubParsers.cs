@@ -10,22 +10,8 @@ namespace Parser.ParserKit
 {
     public abstract class SubParser
     {
-        protected class RootHolder
-        {
-            public UserNTDefinition _rootNtDef;
-            public RootHolder(UserNTDefinition rootNtDef)
-            {
-                this._rootNtDef = rootNtDef;
-            }
-            public string Name
-            {
-                get
-                {
-                    return this._rootNtDef.Name;
-                }
-            }
-        }
-        protected TokenInfoCollection _tkInfoCollection;
+
+        
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
         protected UserNTDefinition _rootNtDef;
@@ -35,24 +21,23 @@ namespace Parser.ParserKit
         protected LRParser _actualLRParser;
         //------------------------------
 
-        int _autoNumber;
-        //protected internal UserSymbolSequence currentSq;
+
 
         public SubParser()
         {
 
         }
         internal abstract List<SyncSequence> GetSyncSeqs();
-        
+
         public bool TryUseTableDataCache { get; set; }
 
         protected abstract void InternalSetup(TokenInfoCollection tkInfoCollection);
 
-
+        public static void BaseInit2() { }
         public void Setup(TokenInfoCollection tkInfoCollection)
         {
-            _autoNumber = 0;
-            _tkInfoCollection = tkInfoCollection;
+
+            
             //---------------------------------------
             InternalSetup(tkInfoCollection);
             //--------------------------------------- 
@@ -94,10 +79,7 @@ namespace Parser.ParserKit
 
 
         internal LRParsingTable InternalParsingTable { get { return _parsingTable; } }
-        internal int GetNewAutoNumber()
-        {
-            return _autoNumber++;
-        }
+
         public void SetParserSwitchHandler(LRParserSwitchHandler swHandler)
         {
             _actualLRParser.SetSwitchHandler(swHandler);
@@ -234,10 +216,7 @@ namespace Parser.ParserKit
 
         protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
 
-        public TokenDefinition GetTokenDefintion(string grammarPresentationString)
-        {
-            return _tkInfoCollection.GetTokenInfo(grammarPresentationString);
-        }
+      
         public abstract string GetTokenPresentationName(string fieldname);
 
         protected static OptSymbol opt(TokenDefinition tk)
