@@ -42,10 +42,8 @@ namespace Parser.ParserKit
         {
 
         }
-        internal List<SyncSequence> GetSyncSeqs()
-        {
-            return _syncSeqs;
-        }
+        internal abstract List<SyncSequence> GetSyncSeqs();
+        
         public bool TryUseTableDataCache { get; set; }
 
         protected abstract void InternalSetup(TokenInfoCollection tkInfoCollection);
@@ -162,7 +160,7 @@ namespace Parser.ParserKit
             get { return _actualLRParser.FinalNode; }
         }
 
-        protected abstract void Define();
+
         protected UserNTDefinition RootNt { get { return _rootNtDef; } }
 
 
@@ -170,7 +168,8 @@ namespace Parser.ParserKit
         {
             get { return _rootNtDef.Name; }
         }
-        internal List<SyncSequence> _syncSeqs;
+
+
 
         //------------------------------------------------------------------------------------------------
         static SubParser FindSubParser(Dictionary<string, SubParser> dic, string subParserName)
@@ -229,10 +228,11 @@ namespace Parser.ParserKit
     public abstract class ReflectionSubParser : SubParser
     {
 
-        protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
-            proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
+
         public static TokenInfoCollection s_tkInfoCollection;
         List<UserNTDefinition> _initUserNts;
+
+        protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
 
         public TokenDefinition GetTokenDefintion(string grammarPresentationString)
         {
@@ -281,33 +281,7 @@ namespace Parser.ParserKit
         }
 
 
-        protected void sync(params TokenDefinition[] syncTks)
-        {
-            if (_syncSeqs == null)
-            {
-                _syncSeqs = new List<SyncSequence>();
-            }
 
-            int j = syncTks.Length;
-            SeqSyncCmd[] syncCmds = new SeqSyncCmd[j];
-            for (int i = 0; i < j; ++i)
-            {
-                syncCmds[i] = new SeqSyncCmd(SyncCmdName.Match, syncTks[i]);
-            }
-
-            _syncSeqs.Add(new SyncSequence(syncCmds));
-        }
-        protected void sync_start(TokenDefinition startSync)
-        {
-            if (_syncSeqs == null)
-            {
-                _syncSeqs = new List<SyncSequence>();
-            }
-            SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
-                 new SeqSyncCmd(SyncCmdName.First, startSync)
-            };
-            _syncSeqs.Add(new SyncSequence(syncCmds));
-        }
         internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
         {
             //ignor this pair
@@ -328,6 +302,7 @@ namespace Parser.ParserKit
             }
             return list.ToArray();
         }
+
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
             _initUserNts = new List<UserNTDefinition>();
@@ -350,11 +325,9 @@ namespace Parser.ParserKit
                         unt.SetName(f.Name);
                     }
 
-                    UserNTDefinition proxyNtDef;
-                    if (proxyUserNts.TryGetValue(f, out proxyNtDef))
-                    {
-                        ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
-                    }
+                    UserNTDefinition proxyNtDef = GetRegisteredProxyUserNt(f);
+                    ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
+
 
                     unt.OwnerSubParser = this;
                     _initUserNts.Add(unt);
@@ -433,19 +406,65 @@ namespace Parser.ParserKit
             //    _syncParser.Setup(tkInfoCollection, this._syncNts);
             //}
         }
-        protected sealed override void Define()
-        {
 
-        }
     }
 
     public abstract class ReflectionSubParser<T> : ReflectionSubParser
     {
+        protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
+                      proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
         static GetWalkerDel<T> getWalkerDel;
         public GetWalkerDel<T> GetWalker
         {
             get { return getWalkerDel; }
             set { getWalkerDel = value; }
+        }
+
+        internal override List<SyncSequence> GetSyncSeqs()
+        {
+            return _syncSeqs;
+        }
+        static internal List<SyncSequence> _syncSeqs;
+        protected static bool sync(params TokenDefinition[] syncTks)
+        {
+            if (_syncSeqs == null)
+            {
+                _syncSeqs = new List<SyncSequence>();
+            }
+
+            int j = syncTks.Length;
+            SeqSyncCmd[] syncCmds = new SeqSyncCmd[j];
+            for (int i = 0; i < j; ++i)
+            {
+                syncCmds[i] = new SeqSyncCmd(SyncCmdName.Match, syncTks[i]);
+            }
+
+            _syncSeqs.Add(new SyncSequence(syncCmds));
+            return true;
+        }
+        protected static bool sync_start(TokenDefinition startSync)
+        {
+            if (_syncSeqs == null)
+            {
+                _syncSeqs = new List<SyncSequence>();
+            }
+            SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
+                 new SeqSyncCmd(SyncCmdName.First, startSync)
+            };
+            _syncSeqs.Add(new SyncSequence(syncCmds));
+            return true;
+        }
+        protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
+        {
+            UserNTDefinition u;
+            if (proxyUserNts.TryGetValue(fieldInfo, out u))
+            {
+                return u;
+            }
+            else
+            {
+                return null;
+            }
         }
         protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {

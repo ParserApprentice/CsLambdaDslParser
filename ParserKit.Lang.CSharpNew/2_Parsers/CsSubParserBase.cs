@@ -8,13 +8,10 @@ using Parser.ParserKit.LR;
 
 namespace Parser.MyCs
 {
-    public abstract class CsSubParser2<T, P> : ReflectionSubParser<T>
+    public abstract class CsSubParser<T, P> : ReflectionSubParser<T>
         where T : AstWalker, new()
-        where P : ReflectionSubParser
+        where P : ReflectionSubParser /*exact class */
     {
-
-
-
         //has built-in CS token info 
         static protected readonly UserTokenDefinition
         _token_literal_integer = mtk("'literal_integer"),
@@ -151,14 +148,15 @@ namespace Parser.MyCs
 
 
 
-        static CsSubParser2()
+        static CsSubParser()
         {
             //init all default values
             //1. set at base type
-            SetDefaultFieldValues(typeof(CsSubParser2<T, P>));
+            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
             //2. and this type (P)
             SetDefaultFieldValues(typeof(P));
         }
+
         static void SetDefaultFieldValues(Type tt)
         {
 

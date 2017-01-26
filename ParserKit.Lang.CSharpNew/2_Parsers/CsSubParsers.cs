@@ -10,7 +10,7 @@ namespace Parser.MyCs
 {
 
 
-    public class TypeParser : CsSubParser2<TypeParser.Walker, TypeParser>
+    public class TypeParser : CsSubParser<TypeParser.Walker, TypeParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -60,7 +60,7 @@ namespace Parser.MyCs
 
 
 
-    public class ArrayTypeParser : CsSubParser2<ArrayTypeParser.Walker, ArrayTypeParser>
+    public class ArrayTypeParser : CsSubParser<ArrayTypeParser.Walker, ArrayTypeParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -88,7 +88,7 @@ namespace Parser.MyCs
     }
 
     public class TypeParameterConstraintsClausesParser :
-        CsSubParser2<TypeParameterConstraintsClausesParser.Walker, TypeParameterConstraintsClausesParser>
+        CsSubParser<TypeParameterConstraintsClausesParser.Walker, TypeParameterConstraintsClausesParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -125,7 +125,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class TypeArgumentListParser : CsSubParser2<TypeArgumentListParser.Walker, TypeArgumentListParser>
+    public class TypeArgumentListParser : CsSubParser<TypeArgumentListParser.Walker, TypeArgumentListParser>
     {
         static UserNTDefinition
           _type_argument_list = _(
@@ -140,7 +140,7 @@ namespace Parser.MyCs
 
 
 
-    public class ExpressionParser : CsSubParser2<ExpressionParser.Walker, ExpressionParser>
+    public class ExpressionParser : CsSubParser<ExpressionParser.Walker, ExpressionParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -592,8 +592,8 @@ namespace Parser.MyCs
 
 
     public class ObjectOrCollectionInitializerParser :
-        CsSubParser2<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
-    {   
+        CsSubParser<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
+    {
         //must call begin first
         //this tricker static base-class call
         //before we go further
@@ -649,7 +649,7 @@ namespace Parser.MyCs
     }
 
 
-    public class ArgumentListParser : CsSubParser2<
+    public class ArgumentListParser : CsSubParser<
         ArgumentListParser.Walker, ArgumentListParser>
     {
         //must call begin first
@@ -681,7 +681,7 @@ namespace Parser.MyCs
 
     }
 
-    public class StatementParser : CsSubParser2<StatementParser.Walker, StatementParser>
+    public class StatementParser : CsSubParser<StatementParser.Walker, StatementParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1045,7 +1045,7 @@ namespace Parser.MyCs
     }
 
 
-    public class AttributesParser : CsSubParser2<AttributesParser.Walker, AttributesParser>
+    public class AttributesParser : CsSubParser<AttributesParser.Walker, AttributesParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1088,7 +1088,7 @@ namespace Parser.MyCs
 
 
 
-    public class ClassDeclParser : CsSubParser2<ClassDeclParser.Walker, ClassDeclParser>
+    public class ClassDeclParser : CsSubParser<ClassDeclParser.Walker, ClassDeclParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1175,7 +1175,7 @@ namespace Parser.MyCs
             _property_declaration,
             _field_declaration;//external define  
 
-        //          sync(_token_class);
+        bool sync1 = sync(_token_class);
 
         public class Walker : AstWalker
         {
@@ -1183,7 +1183,7 @@ namespace Parser.MyCs
         }
     }
 
-    public class PropertyDeclParser : CsSubParser2<PropertyDeclParser.Walker, PropertyDeclParser>
+    public class PropertyDeclParser : CsSubParser<PropertyDeclParser.Walker, PropertyDeclParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1262,13 +1262,17 @@ namespace Parser.MyCs
         //-------------------------------
         //sync(_token_get);
         //sync(_token_set);  
+        bool sync1 = sync(_token_get);
+        bool sync2 = sync(_token_set);
+
+
         public class Walker : AstWalker
         {
         }
     }
 
 
-    public class FieldDeclParser : CsSubParser2<FieldDeclParser.Walker, FieldDeclParser>
+    public class FieldDeclParser : CsSubParser<FieldDeclParser.Walker, FieldDeclParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1310,13 +1314,16 @@ namespace Parser.MyCs
         //TODO: review here
         //sync(_token_semicolon);
         //   sync(_token_assign);
-
+        //-------------------------------------------
+        bool sync1 = sync(_token_semicolon);
+        bool sync2 = sync(_token_assign);
+        //------------------------------------------- 
         public class Walker : AstWalker
         {
         }
     }
 
-    public class FormalParameterListParser : CsSubParser2<FormalParameterListParser.Walker, FormalParameterListParser>
+    public class FormalParameterListParser : CsSubParser<FormalParameterListParser.Walker, FormalParameterListParser>
     {
         //must call begin first
         //this tricker static base-class call
@@ -1372,7 +1379,7 @@ namespace Parser.MyCs
 
         }
     }
-    public class MethodDeclParser : CsSubParser2<MethodDeclParser.Walker, MethodDeclParser>
+    public class MethodDeclParser : CsSubParser<MethodDeclParser.Walker, MethodDeclParser>
     { //must call begin first
         //this tricker static base-class call
         //before we go further
@@ -1435,14 +1442,18 @@ namespace Parser.MyCs
         //sync(_token_openPar);
 
 
+
+        //TODO: review here
+        bool sync1 = sync(_token_openPar);
+
         public class Walker : AstWalker
         {
 
         }
     }
 
-    public class StructDeclParser : CsSubParser2<StructDeclParser.Walker, StructDeclParser>
-    {   
+    public class StructDeclParser : CsSubParser<StructDeclParser.Walker, StructDeclParser>
+    {
         //must call begin first
         //this tricker static base-class call
         //before we go further
@@ -1524,13 +1535,16 @@ namespace Parser.MyCs
            _interface_type = _(o => _type_name),
            _interface_typelist;//external define  
 
-        //reiew  sync(_token_struct); 
+        //----------------------------
+        bool sync1 = sync(_token_struct);
+
         public class Walker : AstWalker
         {
+
         }
     }
 
-    public class NamespaceParser : CsSubParser2<NamespaceParser.Walker, NamespaceParser>
+    public class NamespaceParser : CsSubParser<NamespaceParser.Walker, NamespaceParser>
     {
         //must call begin first
         //this tricker static base-class call

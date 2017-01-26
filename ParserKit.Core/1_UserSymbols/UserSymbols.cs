@@ -1136,6 +1136,8 @@ namespace Parser.ParserKit
                     subAssignSets[i].AssignDataToNt(unt);
                 }
                 unt.IsClosed = true;
+
+
             }
             else
             {
@@ -1145,6 +1147,8 @@ namespace Parser.ParserKit
                 }
 
                 UserSymbolSequence newss = UserNTSubParserExtension.CreateUserSymbolSeq(unt, symbols);
+
+
                 if (symbolShiftDel != null)
                 {
                     ShiftMap shMap = new ShiftMap(symbolShiftDel);
@@ -1160,8 +1164,32 @@ namespace Parser.ParserKit
                 {
                     unt.IsClosed = true;
                 }
+
+                if (this.Precedence > 0)
+                {
+                    int prec = this.Precedence;
+                    for (int i = newss.RightCount - 1; i >= 0; --i)
+                    {
+                        UserExpectedSymbol ues = newss[i];
+                        if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
+                        {
+                            UserNTDefinition unt2 = ues.ResolvedUserNtDef;
+                            if (unt.IsAutoGen)
+                            {
+                                unt.NTPrecedence = prec;
+                            }
+                            else
+                            {
+                                // Console.WriteLine(unt);
+                            }
+                        }
+                    }
+                }
+
             }
         }
+
+
         class ShiftMap
         {
             SubParsers.UserExpectedSymbolShift shiftDel;
@@ -1238,25 +1266,6 @@ namespace Parser.ParserKit
             //TODO: review here again ***
             this.Precedence = value;
 
-
-            //currentSq.Precedence = prec;
-            //for (int i = currentSq.RightCount - 1; i >= 0; --i)
-            //{
-            //    UserExpectedSymbol ues = currentSq[i];
-            //    if (ues.SymbolKind == UserExpectedSymbolKind.Nonterminal)
-            //    {
-            //        UserNTDefinition unt = ues.ResolvedUserNtDef;
-            //        if (unt.IsAutoGen)
-            //        {
-            //            unt.NTPrecedence = prec;
-
-            //        }
-            //        else
-            //        {
-            //            // Console.WriteLine(unt);
-            //        }
-            //    }
-            //}
             return this;
         }
         public int Precedence { get; private set; }
