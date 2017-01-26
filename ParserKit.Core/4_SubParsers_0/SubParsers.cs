@@ -1732,11 +1732,10 @@ namespace Parser.ParserKit
                 for (int i = 0; i < j; ++i)
                 {
                     ss.AppendLast(CreateUserExpectedSymbol(ownerSubParser, expectedSymbols[i]));
-                }
-                ntdef.AddSymbolSequence(ss);
+                } 
                 ss.ClearParserReductionNotifyDel();
             });
-
+            ntdef.AddSymbolSequence(ss);
             return ss;
         }
     }
