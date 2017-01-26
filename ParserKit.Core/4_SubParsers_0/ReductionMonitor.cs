@@ -1,7 +1,5 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-
-using Parser.ParserKit.SubParsers;
-
+ 
 namespace Parser.ParserKit.SubParsers
 {
     public delegate object UserExpectedSymbolShift(ParseNodeHolder r);

@@ -1,9 +1,7 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Text;
+using System; 
 using System.Collections.Generic;
-using System.Reflection;
-using Parser.ParserKit.LR;
+using System.Reflection; 
 using Parser.ParserKit.SubParsers;
 
 namespace Parser.ParserKit

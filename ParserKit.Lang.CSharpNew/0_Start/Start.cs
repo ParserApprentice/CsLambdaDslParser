@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-
 using Parser.ParserKit;
+
 namespace Parser.MyCs
 {
 

@@ -1,12 +1,9 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Text;
+using System; 
 using System.Collections.Generic;
 
 namespace Parser.ParserKit
-{
-
-
+{ 
     public interface ISymbolDefinition
     {
         bool IsNT
@@ -18,8 +15,7 @@ namespace Parser.ParserKit
             get;
         }
     }
-
-
+     
     public enum BasicTokenKind : byte
     {
         Unknown,

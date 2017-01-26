@@ -1,11 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Text;
-using System.Collections.Generic;
-using Parser.CodeDom;
-using Parser.ParserKit;
-using Parser.ParserKit.LR;
-
+ 
+using Parser.ParserKit; 
 namespace Parser.MyCs
 {
 

@@ -13,7 +13,7 @@ namespace Parser.ParserKit.SubParsers
         List<IntermeidateTokenDef> tokenDefs;
         List<IntermediateNt> nts;
 
-        internal List<SubParsers.SwitchDetail> swDetails;
+        internal List<SwitchDetail> swDetails;
         internal List<List<LRItemTodo>> todoListForTks;
         internal List<List<LRItemTodo>> todoListForNts;
 
@@ -227,7 +227,8 @@ namespace Parser.ParserKit.SubParsers
                                     //6.3
                                     writer.Write(usymbol.SymbolString);
                                     writer.Write(0);
-                                } break;
+                                }
+                                break;
                             default:
                                 throw new NotSupportedException();
                         }
@@ -421,8 +422,8 @@ namespace Parser.ParserKit.SubParsers
                                 {
                                     case LRItemTodoKind.Shift:
                                         todo2 = reader.ReadInt32();
-                                        break; 
-                                } 
+                                        break;
+                                }
                                 list.Add(LRItemTodo.InternalCreateLRItem(todo1 >> 8,
                                         (LRItemTodoKind)(todo1 & 0xFF),
                                         todo2 >> 8,
@@ -433,11 +434,11 @@ namespace Parser.ParserKit.SubParsers
                             {
                                 break;
                             }
-                        } 
+                        }
                         if (load_OK)
                         {
                             SuccessLoaded = true;
-                        } 
+                        }
                     }
                     else
                     {
@@ -467,7 +468,7 @@ namespace Parser.ParserKit.SubParsers
                 list.Add(reader.ReadString());
             }
             return list;
-        } 
+        }
 
         class IntermeidateTokenDef
         {
@@ -575,8 +576,8 @@ namespace Parser.ParserKit.SubParsers
             ParserDataBinaryCache.SaveToBinary(parsingTable, filename);
         }
 
-      
-        
+
+
         public static void SaveAsTextFile(LRParsingTable parsingTable, string filename)
         {
 
@@ -707,45 +708,54 @@ namespace Parser.ParserKit.SubParsers
                 case LRItemTodoKind.Accept:
                     {
                         stbuilder.Append("a" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.Err:
                     {
                         stbuilder.Append("e" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.Goto:
                     {
                         stbuilder.Append("g" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.Reduce:
                     {
                         stbuilder.Append("r" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.Shift:
                     {
                         stbuilder.Append("s" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.UnresolvedSwitch:
                     {
                         stbuilder.Append("u_sw" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.ResolveSwitch:
                     {
                         stbuilder.Append("sw" + todo.StateNumber);
-                    } break;
+                    }
+                    break;
                 case LRItemTodoKind.Empty:
                     {
 
-                    } break;
+                    }
+                    break;
                 default:
                     {
                         stbuilder.Append("u" + todo.StateNumber);
                         throw new NotSupportedException();
-                    } break;
+                    }
+                    break;
             }
         }
 
     }
 
 
-    
+
 }

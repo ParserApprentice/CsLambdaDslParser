@@ -3,6 +3,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+
 namespace Parser.ParserKit.LR
 {
 

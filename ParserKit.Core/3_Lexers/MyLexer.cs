@@ -1,9 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using Parser.ParserKit;
+using System.Collections.Generic; 
 
 namespace Parser.ParserKit.Lexers
 {
