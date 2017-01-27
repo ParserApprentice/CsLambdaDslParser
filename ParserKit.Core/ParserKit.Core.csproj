@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{34E2BA19-5043-465C-AF6F-5F2E396C3889}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ParserKit.Core</RootNamespace>
+    <AssemblyName>ParserKit.Core</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="0_Accessories\DevDebugConsole.cs" />
+    <Compile Include="0_Accessories\ParserReporter.cs" />
+    <Compile Include="0_Accessories\System.Runtime.CompilerServices.ExtensionAttribute.cs" />
+    <Compile Include="1_UserSymbols\SymbolDelegates.cs" />
+    <Compile Include="2_System_LR\LRParser.cs" />
+    <Compile Include="2_System_LR\LRParsingTable.cs" />
+    <Compile Include="2_System_LR\LRParsingTable_Switch.cs" />
+    <Compile Include="2_System_LR\RRConflict.cs" />
+    <Compile Include="2_System_Infra\SymbolSequence.cs" />
+    <Compile Include="0_Accessories\TokenStreamReader.cs" />
+    <Compile Include="2_System_Infra\FirstTokenInfoCollectionDic.cs" />
+    <Compile Include="0_Accessories\ColumnBasedTable.cs" />
+    <Compile Include="2_System_LR\LRParsing.cs" />
+    <Compile Include="2_System_Infra\SymbolResolutionInfo.cs" />
+    <Compile Include="1_UserSymbols\TokenInfoCollection.cs" />
+    <Compile Include="2_System_Infra\SymbolDefinitions.cs" />
+    <Compile Include="2_System_Infra\NTDependencyAnalysis.cs" />
+    <Compile Include="0_Accessories\CRC32Calculator.cs" />
+    <Compile Include="1_UserSymbols\UserLangGrammarSheet.cs" />
+    <Compile Include="1_UserSymbols\UserSymbols.cs" />
+    <Compile Include="4_SubParsers_0\ParseNodeHolder.cs" />
+    <Compile Include="4_SubParsers_0\ParserSwitchContext.cs" />
+    <Compile Include="4_SubParsers_0\ReductionMonitor.cs" />
+    <Compile Include="4_SubParsers_0\SubParsers.cs" />
+    <Compile Include="4_SubParsers_1\LRTableCaching.cs" />
+    <Compile Include="4_SubParsers_1\ParserManager.cs" />
+    <Compile Include="4_SubParsers_2\ReflectionSubParser.cs" />
+    <Compile Include="4_SubParsers_1\SubParsers.cs" />
+    <Compile Include="4_SubParsers_1\SwicthDetail.cs" />
+    <Compile Include="4_SubParsers_1\SyncSymbols.cs" />
+    <Compile Include="3_Lexers\MyLexer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="1_UserSymbols\ParseNodes_Token_Nts.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
