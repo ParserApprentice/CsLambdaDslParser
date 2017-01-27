@@ -13,7 +13,7 @@ namespace Parser.ParserKit
         public static TokenInfoCollection s_tkInfoCollection;
         public static GetProperFieldNameDel s_getProperFieldName;
 
-        List<UserNTDefinition> _initUserNts;
+       
 
         protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
 
@@ -59,15 +59,7 @@ namespace Parser.ParserKit
         {
             return new OneOfSymbol(symbols);
         }
-
-
-
-        internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
-        {
-            //TODO: review here
-            //ignor this pair
-            return new SyncSymbol(begin, end, SyncSymbolKind.Ignor);
-        }
+          
 
         static FieldInfo[] GetFields(Type instanceType)
         {
@@ -85,8 +77,9 @@ namespace Parser.ParserKit
         }
 
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
-        {
-            _initUserNts = new List<UserNTDefinition>();
+        {   
+            //TODO: review how to get field and its convetion here
+            var initUserNts = new List<UserNTDefinition>();
             //get all static user nt              
             List<UserNTDefinition> lateNts = null;
             FieldInfo[] fields = GetFields(this.GetType());
@@ -137,7 +130,7 @@ namespace Parser.ParserKit
                         }
                     }
                     unt.OwnerSubParser = this;
-                    _initUserNts.Add(unt);
+                    initUserNts.Add(unt);
 
                     List<UserNTDefinition> lateUserNts = unt.GetLateNts();
                     if (lateUserNts != null)
@@ -183,20 +176,20 @@ namespace Parser.ParserKit
             }
             if (lateNts != null)
             {
-                _initUserNts.AddRange(lateNts);
+                initUserNts.AddRange(lateNts);
             }
-
+            //--------------------------------------------------------------------
             //check if all user nt is define
-            for (int i = _initUserNts.Count - 1; i >= 0; --i)
+            for (int i = initUserNts.Count - 1; i >= 0; --i)
             {
-                UserNTDefinition unt = _initUserNts[i];
+                UserNTDefinition unt = initUserNts[i];
                 if (unt.UserSeqCount == 0)
                 {
                     //this nt is not defined!
                     unt.MarkedAsUnknownNT = true;
                 }
+                //we anala
             }
-
             //---------------------------------------
             if (this._rootNtDef == null)
             {
@@ -207,7 +200,7 @@ namespace Parser.ParserKit
             //---------------------------------------
             _miniGrammarSheet = new MiniGrammarSheet();
             _miniGrammarSheet.LoadTokenInfo(tkInfoCollection);
-            _miniGrammarSheet.LoadUserNts(_initUserNts);
+            _miniGrammarSheet.LoadUserNts(initUserNts);
             //--------------------------------------- 
             _augmentedNTDefinition = _miniGrammarSheet.PrepareUserGrammarForAnyLR(this.RootNt);
             _parsingTable = _miniGrammarSheet.CreateLR1Table(_augmentedNTDefinition);
