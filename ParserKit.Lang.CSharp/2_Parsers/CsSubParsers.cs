@@ -1034,7 +1034,7 @@ namespace Parser.MyCs
     {
 
         //--------------------------
-        static TopUserNTDefinition
+       static UserNTDefinition
             _class_decl = top() * _(             /**/ r => r.NewClassDeclaration,
               o => opt(_attributes),
               o => opt(list(_class_modifier)),
@@ -1046,9 +1046,7 @@ namespace Parser.MyCs
               o => opt(_type_parameter_constraints_clauses),
               o => _class_body,
               o => opt(_token_semicolon)
-            );
-
-        static UserNTDefinition
+            ),       
             //-----------------------
             _attributes,
             _class_modifier = _oneof(
