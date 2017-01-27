@@ -1048,23 +1048,7 @@ namespace Parser.MyCs
 
             _attribute = _(o => _attribute_name),
             _attribute_name = _(o => _token_id)
-            ;
-        //protected override void Define()
-        //{
-        //    //_attributes += _(o => list_c(_attribute_section));
-        //    _attribute_section += _(
-        //        o => _token_openBkt,
-        //        o => list_c(_attribute),
-        //        o => opt(_token_comma),
-        //        o => _token_closeBkt);
-
-        //    _attribute += _(o => _attribute_name);
-        //    _attribute_name += _(o => _token_id);
-
-        //    //----------------
-        //    sync_start(_token_openBkt);
-        //    //---------------- 
-        //}
+            ; 
         public class Walker : AstWalker
         {
         }

@@ -6,9 +6,13 @@ using Parser.ParserKit.SubParsers;
 
 namespace Parser.ParserKit
 {
+    public delegate string GetProperFieldNameDel(string fieldName);
+
     public abstract class ReflectionSubParser : SubParser
     {
         public static TokenInfoCollection s_tkInfoCollection;
+        public static GetProperFieldNameDel s_getProperFieldName;
+
         List<UserNTDefinition> _initUserNts;
 
         protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
@@ -243,7 +247,6 @@ namespace Parser.ParserKit
                 }
                 cur_base = cur_base.BaseType;
             }
-
             //init base first ***
             for (int i = initSteps.Count - 1; i >= 0; --i)
             {
@@ -257,9 +260,22 @@ namespace Parser.ParserKit
                 typeToInit.GetFields(System.Reflection.BindingFlags.Static |
                 System.Reflection.BindingFlags.NonPublic |
                 System.Reflection.BindingFlags.DeclaredOnly);
+                        
+            //------------------------------------------------------------------
+            GetProperFieldNameDel getProperFieldName = s_getProperFieldName;
+            if (getProperFieldName == null)
+            {
+                //default field name convention
+                //this can replace by assign field name conversion func to 
+                //(shared) s_getProperFieldName of this  
+                getProperFieldName = fieldname =>
+                     fieldname.StartsWith("_token_") ?
+                        fieldname.Substring(7) :
+                        fieldname; 
+            }
+            //------------------------------------------------------------------
             int j = allStaticFields.Length;
             TokenInfoCollection tkInfoCollection = s_tkInfoCollection;
-
             for (int i = 0; i < j; ++i)
             {
                 System.Reflection.FieldInfo field = allStaticFields[i];
@@ -270,7 +286,7 @@ namespace Parser.ParserKit
                     if (fieldValue == null)
                     {
                         //no init value 
-                        field.SetValue(null, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name))));
+                        field.SetValue(null, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(getProperFieldName(field.Name))));
                     }
                     else
                     {
@@ -281,7 +297,7 @@ namespace Parser.ParserKit
                 else if (field.FieldType == typeof(UserNTDefinition))
                 {
                     //create dummy user nt def
-                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, GetPresentationName2(field.Name));
+                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, getProperFieldName(field.Name));
                     proxyUserNts[field] = proxyUserNt; //last resolve
                     field.SetValue(null, proxyUserNt);
                 }
@@ -290,22 +306,10 @@ namespace Parser.ParserKit
                     var fieldValue = field.GetValue(null) as TokenDefinition;
                     if (fieldValue == null)
                     {
-                        field.SetValue(null, tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name)));
+                        field.SetValue(null, tkInfoCollection.GetTokenInfo(getProperFieldName(field.Name)));
                     }
                 }
 
-            }
-        }
-        static string GetPresentationName2(string fieldname)
-        {
-            //convention here
-            if (fieldname.StartsWith("_token_"))
-            {
-                return fieldname.Substring(7);
-            }
-            else
-            {
-                return fieldname;
             }
         }
 
@@ -359,18 +363,18 @@ namespace Parser.ParserKit
             _syncSeqs.Add(new SyncSequence(syncCmds));
             return true;
         }
-        protected static bool sync_start(TokenDefinition startSync)
-        {
-            if (_syncSeqs == null)
-            {
-                _syncSeqs = new List<SyncSequence>();
-            }
-            SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
-                 new SeqSyncCmd(SyncCmdName.First, startSync)
-            };
-            _syncSeqs.Add(new SyncSequence(syncCmds));
-            return true;
-        }
+        //protected static bool sync_start(TokenDefinition startSync)
+        //{
+        //    if (_syncSeqs == null)
+        //    {
+        //        _syncSeqs = new List<SyncSequence>();
+        //    }
+        //    SeqSyncCmd[] syncCmds = new SeqSyncCmd[]{
+        //         new SeqSyncCmd(SyncCmdName.First, startSync)
+        //    };
+        //    _syncSeqs.Add(new SyncSequence(syncCmds));
+        //    return true;
+        //}
 
         protected static NtDefAssignSet<T> _(BuilderDel3<T> reductionDel, UserExpectedSymbolDef<T> s1)
         {
