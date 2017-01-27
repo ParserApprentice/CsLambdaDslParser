@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoCecil", "MonoCecil\Mono
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserKit.CSharpCodeModel", "ParserKit.CSharpCodeModel\ParserKit.CSharpCodeModel.csproj", "{F2795CA4-5692-462B-9D42-395CDFCF2E66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserKit.Lang.CSharpNew", "ParserKit.Lang.CSharpNew\ParserKit.Lang.CSharpNew.csproj", "{9CB42ECC-F382-43A7-A742-68EAD377218E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParserKit.Lang.CSharp", "ParserKit.Lang.CSharp\ParserKit.Lang.CSharp.csproj", "{9CB42ECC-F382-43A7-A742-68EAD377218E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
