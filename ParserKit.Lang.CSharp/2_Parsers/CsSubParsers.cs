@@ -7,7 +7,7 @@ namespace Parser.MyCs
 
     public class TypeParser : CsSubParser<TypeParser.Walker, TypeParser>
     {
-        
+
         static UserNTDefinition
             //
             //top ***
@@ -122,7 +122,7 @@ namespace Parser.MyCs
 
 
     public class ExpressionParser : CsSubParser<ExpressionParser.Walker, ExpressionParser>
-    { 
+    {
         //operator precedence
         //     //low
         //Unknown,
@@ -570,7 +570,7 @@ namespace Parser.MyCs
     public class ObjectOrCollectionInitializerParser :
         CsSubParser<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
     {
-        
+
         static UserNTDefinition
          _object_or_collection_initializer = top() * _oneof(
                _(  /*1*/                        r => r.NewObjectInitialization,
@@ -1034,87 +1034,87 @@ namespace Parser.MyCs
     {
 
         //--------------------------
-       static UserNTDefinition
-            _class_decl = top() * _(             /**/ r => r.NewClassDeclaration,
-              o => opt(_attributes),
-              o => opt(list(_class_modifier)),
-              o => opt(_token_partial),
-              o => +_token_class,//add sync symbol+ to sync token
-              o => _token_id,
-              o => opt(_type_parameter_list),
-              o => opt(_class_base),
-              o => opt(_type_parameter_constraints_clauses),
-              o => _class_body,
-              o => opt(_token_semicolon)
-            ),       
+        static UserNTDefinition
+             _class_decl = top() * _(             /**/ r => r.NewClassDeclaration,
+               o => opt(_attributes),
+               o => opt(list(_class_modifier)),
+               o => opt(_token_partial),
+               o => +_token_class,//add sync symbol+ to sync token
+               o => _token_id,
+               o => opt(_type_parameter_list),
+               o => opt(_class_base),
+               o => opt(_type_parameter_constraints_clauses),
+               o => _class_body,
+               o => opt(_token_semicolon)
+             ),
             //-----------------------
-            _attributes,
-            _class_modifier = _oneof(
-                o => _token_public,
-                o => _token_protected,
-                o => _token_internal,
-                o => _token_private,
-                o => _token_abstract,
-                o => _token_sealed,
-                o => _token_new,
-                o => _token_static
-                ),
-            //-----------------------
-            //doc 491
-            _type_parameter_list = _(
-                o => _token_openAng,
-                o => _type_parameters,
-                o => _token_closeAng),
-            //-----------------------
-            _class_base = _(
-                o => _token_colon,
-                o => list_c(_type_name)),
-            //-----------------------
-            _type_parameter_constraints_clauses,
-            //-----------------------
-            _class_body = _(
-               o => _token_openBrc,
-               o => opt(list(_class_member_declaration)),
-               o => _token_closeBrc),
-            //-----------------------
-            _type_name = _(o => _namespace_or_typename),
-            //-----------------------
-            //doc 491
-            _type_parameters = _oneof(
-                 _(o => opt(_attributes),
-                   o => _type_parameter),
-
-                 _(o => _type_parameters,
-                   o => _token_comma,
-                   o => opt(_attributes),
-                   o => _type_parameter)
-            ),
-            //-----------------------
-            _type_parameter = _(o => _token_id),
-            //-----------------------
-            //doc 477
-            _namespace_or_typename = _oneof(
-                 _(o => _token_id,
-                    o => opt(_type_argument_list)),
-                 _(o => _namespace_or_typename,
-                     o => _token_dot,
-                     o => _token_id,
-                     o => opt(_type_argument_list))
+             _attributes,
+             _class_modifier = _oneof(
+                 o => _token_public,
+                 o => _token_protected,
+                 o => _token_internal,
+                 o => _token_private,
+                 o => _token_abstract,
+                 o => _token_sealed,
+                 o => _token_new,
+                 o => _token_static
                  ),
             //-----------------------
-            _type_argument_list,
+            //doc 491
+             _type_parameter_list = _(
+                 o => _token_openAng,
+                 o => _type_parameters,
+                 o => _token_closeAng),
             //-----------------------
-            _class_member_declaration = _oneof(
-                o => _method_declaration,
-                o => _property_declaration,
-                o => _field_declaration
-                ),
+             _class_base = _(
+                 o => _token_colon,
+                 o => list_c(_type_name)),
             //-----------------------
-            _method_declaration,
-            _property_declaration,
-            _field_declaration;//external define  
+             _type_parameter_constraints_clauses,
+            //-----------------------
+             _class_body = _(
+                o => _token_openBrc,
+                o => opt(list(_class_member_declaration)),
+                o => _token_closeBrc),
+            //-----------------------
+             _type_name = _(o => _namespace_or_typename),
+            //-----------------------
+            //doc 491
+             _type_parameters = _oneof(
+                  _(o => opt(_attributes),
+                    o => _type_parameter),
 
-        bool sync1 = sync(_token_class);
+                  _(o => _type_parameters,
+                    o => _token_comma,
+                    o => opt(_attributes),
+                    o => _type_parameter)
+             ),
+            //-----------------------
+             _type_parameter = _(o => _token_id),
+            //-----------------------
+            //doc 477
+             _namespace_or_typename = _oneof(
+                  _(o => _token_id,
+                     o => opt(_type_argument_list)),
+                  _(o => _namespace_or_typename,
+                      o => _token_dot,
+                      o => _token_id,
+                      o => opt(_type_argument_list))
+                  ),
+            //-----------------------
+             _type_argument_list,
+            //-----------------------
+             _class_member_declaration = _oneof(
+                 o => _method_declaration,
+                 o => _property_declaration,
+                 o => _field_declaration
+                 ),
+            //-----------------------
+             _method_declaration,
+             _property_declaration,
+             _field_declaration;//external define  
+
+
 
         public class Walker : AstWalker
         {
@@ -1167,13 +1167,13 @@ namespace Parser.MyCs
             _get_accessor_declaration = _(
                 o => opt(_attributes),
                 o => opt(_accessor_modifier),
-                o => _token_get,
+                o => +_token_get, /* + for hinted sync token*/
                 o => _accessor_body),
             //--------------------------------
             _set_accessor_declaration = _(
                 o => opt(_attributes),
                 o => opt(_accessor_modifier),
-                o => _token_set,
+                o => +_token_set,
                 o => _accessor_body),
             //--------------------------------
             _accessor_modifier = _oneof(
@@ -1195,10 +1195,6 @@ namespace Parser.MyCs
         //TODO: review here
         //what is the 'safe-point' or 'sync-point' if  an error occurs ? 
         //-------------------------------
-        //sync(_token_get);
-        //sync(_token_set);  
-        bool sync1 = sync(_token_get);
-        bool sync2 = sync(_token_set);
 
 
         public class Walker : AstWalker
@@ -1217,7 +1213,7 @@ namespace Parser.MyCs
                o => opt(_field_modifiers),
                o => _type,
                o => list_c(_variable_declarator), //variable_declarators
-               o => _token_semicolon),
+               o => +_token_semicolon),
             //-----------------------------------
 
             _attributes,
@@ -1237,25 +1233,19 @@ namespace Parser.MyCs
             _variable_declarator = _oneof(
                  _(o => _token_id),
                  _(o => _token_id,
-                   o => _token_assign,
+                   o => +_token_assign,
                    o => _expression)
                 ),
             //-----------------------------------
             _expression;
-        //TODO: review here
-        //sync(_token_semicolon);
-        //   sync(_token_assign);
-        //-------------------------------------------
-        bool sync1 = sync(_token_semicolon);
-        bool sync2 = sync(_token_assign);
-        //------------------------------------------- 
+
         public class Walker : AstWalker
         {
         }
     }
 
     public class FormalParameterListParser : CsSubParser<FormalParameterListParser.Walker, FormalParameterListParser>
-    {   
+    {
         static UserNTDefinition /* root, must be top */
             _formal_parameter_list = top() * _oneof(
             /*1*/_(
@@ -1321,7 +1311,7 @@ namespace Parser.MyCs
                 o => _return_type,
                 o => _member_name,
                 o => opt(_type_parameter_list),
-                o => _token_openPar,
+                o => +_token_openPar, /*+ for hinted sync token*/
                 o => opt(_formal_parameter_list),
                 o => _token_closePar
             //opt<type_parameter_constraints_clauses
@@ -1362,12 +1352,6 @@ namespace Parser.MyCs
             _type,
             _statement
             ;
-        //sync(_token_openPar);
-
-
-
-        //TODO: review here
-        bool sync1 = sync(_token_openPar);
 
         public class Walker : AstWalker
         {
@@ -1384,7 +1368,7 @@ namespace Parser.MyCs
                o => opt(_attributes),
                o => opt(_struct_modifiers),
                o => opt(_token_partial),
-               o => _token_struct,
+               o => +_token_struct,/*+ for hinted sync token*/
                o => _token_id,
                o => opt(_type_parameter_list),
                o => opt(_struct_interfaces),
@@ -1453,10 +1437,7 @@ namespace Parser.MyCs
             //----------------------------
            _interface_type = _(o => _type_name),
            _interface_typelist;//external define  
-
-        //----------------------------
-        bool sync1 = sync(_token_struct);
-
+         
         public class Walker : AstWalker
         {
 

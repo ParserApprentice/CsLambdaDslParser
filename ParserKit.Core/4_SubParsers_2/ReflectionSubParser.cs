@@ -59,7 +59,7 @@ namespace Parser.ParserKit
         {
             return new OneOfSymbol(symbols);
         }
-
+        protected abstract void SetSyncTokens(TokenDefinition[] syncTks);
 
         static FieldInfo[] GetFields(Type instanceType)
         {
@@ -192,7 +192,8 @@ namespace Parser.ParserKit
                     //this nt is not defined!
                     unt.MarkedAsUnknownNT = true;
                 }
-                //we anala
+
+
             }
             //---------------------------------------
             if (this._rootNtDef == null)
@@ -208,6 +209,26 @@ namespace Parser.ParserKit
             //--------------------------------------- 
             _augmentedNTDefinition = _miniGrammarSheet.PrepareUserGrammarForAnyLR(this.RootNt);
             _parsingTable = _miniGrammarSheet.CreateLR1Table(_augmentedNTDefinition);
+
+            //--------------------------------------- 
+            //collect sync tokens
+            for (int i = initUserNts.Count - 1; i >= 0; --i)
+            {
+                UserNTDefinition unt = initUserNts[i];
+                //GetAllPossibleSeqIterForward() has data after create LR1 table?
+                foreach (UserSymbolSequence useq in unt.GetAllPossibleSeqIterForward())
+                {
+                    foreach (UserExpectedSymbol u_expectedSymbol in useq.GetRightSideSymbols())
+                    {
+                        if (u_expectedSymbol.IsSync)
+                        {
+                            //found sync token
+                            SetSyncTokens(new[] { u_expectedSymbol.ResolvedTokenDefinition });
+                        }
+                    }
+                }
+            }
+            //--------------------------------------- 
             //can use cache table 
             //---------------------------------------    
             //sync parser table
@@ -342,8 +363,11 @@ namespace Parser.ParserKit
         }
         static List<SyncSequence> _syncSeqs;
         //--------------------------------------------------------
-
-        protected static bool sync(params TokenDefinition[] syncTks)
+        protected override void SetSyncTokens(TokenDefinition[] syncTks)
+        {
+            sync(syncTks);
+        }
+          static bool sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
             {

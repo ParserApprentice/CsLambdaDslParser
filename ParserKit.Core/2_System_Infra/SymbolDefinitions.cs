@@ -921,12 +921,11 @@ namespace Parser.ParserKit
         {
             return u.TkDef;
         }
-        public static UserTokenDefinition operator +(UserTokenDefinition u )
+        public static ParserKit.SubParsers.MarkedTokenSymbol operator +(UserTokenDefinition u)
         {
-            u.IsSync = true;
-            return u;
+            return new ParserKit.SubParsers.MarkedTokenSymbol(u);
         }
-        public bool IsSync { get; private set; }
+
     }
 
 }

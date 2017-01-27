@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using System.Collections.Generic; 
+using System;
+using System.Collections.Generic;
 using Parser.ParserKit.LR;
 using Parser.ParserKit.SubParsers;
 
@@ -12,7 +12,7 @@ namespace Parser.ParserKit
 
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
-        protected TopUserNTDefinition  _rootNtDef;
+        protected TopUserNTDefinition _rootNtDef;
 
         //------------------------------
         protected LRParsingTable _parsingTable;
@@ -241,6 +241,8 @@ namespace Parser.ParserKit
                 shiftDel = symbolReduction.shiftDel;
             }
 
+
+
             OptSymbol optSymbol = expSS as OptSymbol;
             bool isOpt = false;
             if (optSymbol != null)
@@ -270,6 +272,15 @@ namespace Parser.ParserKit
                 }
             }
             //----------------------------------------------------------
+
+            //content is marked symbol
+            MarkedTokenSymbol markedSymbol = expSS as MarkedTokenSymbol;
+            if (markedSymbol != null)
+            {
+                tkdef = markedSymbol.userTokenDef.TkDef;
+                return new UserExpectedSymbol(tkdef, isOpt, shiftDel) { ReductionDel = reductionDel, IsSync = true };
+            }
+
             UserTokenDefinition utkdef = expSS as UserTokenDefinition;
             if (utkdef != null)
             {
