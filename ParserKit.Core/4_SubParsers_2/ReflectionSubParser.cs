@@ -242,13 +242,27 @@ namespace Parser.ParserKit
     }
 
 
-
+    static class CommonWalkerProvider
+    {
+        public static T GetWalkerDel<T>(ParseNodeHolder h)
+        {
+            var userSpecificSubParser = h.CurrentSubParser.userSpecificGetWalkerDel as GetWalkerDel<T>;
+            if (userSpecificSubParser != null)
+            {
+                return userSpecificSubParser(h);
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+    }
 
     public abstract class ReflectionSubParser<T, P> : ReflectionSubParser
     {
         //T: walker
         //P: exact parser type
-
+        static GetWalkerDel<T> getWalkerDel = CommonWalkerProvider.GetWalkerDel<T>;
         static ReflectionSubParser()
         {
             List<Type> initSteps = new List<Type>();
@@ -340,11 +354,18 @@ namespace Parser.ParserKit
                       proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
 
 
-        static GetWalkerDel<T> getWalkerDel;
+
         public GetWalkerDel<T> GetWalker
         {
-            get { return getWalkerDel; }
-            set { getWalkerDel = value; }
+            get
+            {
+                return getWalkerDel;
+            }
+            set
+            {
+                getWalkerDel = value;
+                userSpecificGetWalkerDel = value;
+            }
         }
 
 

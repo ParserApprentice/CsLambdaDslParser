@@ -1181,7 +1181,6 @@ namespace Parser.ParserKit
 
                 UserSymbolSequence newss = UserNTSubParserExtension.CreateUserSymbolSeq(unt, symbols);
 
-
                 if (symbolShiftDel != null)
                 {
                     ShiftMap shMap = new ShiftMap(symbolShiftDel);
@@ -1248,6 +1247,11 @@ namespace Parser.ParserKit
             int cacheHolderId = 0;
             public SeqReductionDelMap(GetWalkerDel<T> getBuilder, BuilderDel3<T> builderDel)
             {
+#if DEBUG
+                if (getBuilder == null)
+                {
+                }
+#endif
                 this.getBuilder = getBuilder;
                 this.builderDel = builderDel;
             }
@@ -1257,7 +1261,7 @@ namespace Parser.ParserKit
                 {
                     return;
                 }
-                if (cacheHolderId != pnHolder.parseNodeHolderId)
+                if (subItemFill == null ||cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
@@ -1282,6 +1286,11 @@ namespace Parser.ParserKit
             T cachedBuilder;
             public SeqShiftDelMap(GetWalkerDel<T> getBuilder, UserExpectedSymbolDef<T> builderDel)
             {
+#if DEBUG
+                if (getBuilder == null)
+                {
+                }
+#endif
                 this.getBuilder = getBuilder;
                 this.builderDel = builderDel;
             }

@@ -19,7 +19,7 @@ namespace Parser.ParserKit
         protected LRParser _actualLRParser;
         //------------------------------
 
-
+        internal object userSpecificGetWalkerDel;
 
         public SubParser()
         {
@@ -110,7 +110,13 @@ namespace Parser.ParserKit
         }
         public void Parse(ParseNodeHolder holder, TokenStreamReader reader)
         {
+            //save prev sub parser
+            var prevSubParser = holder.CurrentSubParser;
+            //set new
+            holder.CurrentSubParser = this;
             _actualLRParser.Parse(holder, reader);
+            //restore back
+            holder.CurrentSubParser = prevSubParser;
         }
 
         public void Parse(ParserSwitchContext sw)
