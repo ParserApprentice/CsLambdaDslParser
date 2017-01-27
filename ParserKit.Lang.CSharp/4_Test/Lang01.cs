@@ -1617,7 +1617,9 @@ namespace Parser.ParserKit.LR
              
             parserMan.Setup(new StructDeclParser());
             parserMan.Setup(new ClassDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).ClassWalker });            
-            parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });             
+            parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
+            parserMan.Setup(new MethodDeclParser());
+
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
             parserMan.Setup(new AttributesParser());
