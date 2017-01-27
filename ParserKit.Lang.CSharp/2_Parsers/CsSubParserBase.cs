@@ -139,69 +139,7 @@ namespace Parser.MyCs
         _token_where,
         _token_get, //contextual
         _token_set  //contextual 
-       ;
-
-
-       
-        static void SetDefaultFieldValues(Type tt)
-        {
-
-            System.Reflection.FieldInfo[] allStaticFields =
-                tt.GetFields(System.Reflection.BindingFlags.Static |
-                System.Reflection.BindingFlags.NonPublic |
-                System.Reflection.BindingFlags.DeclaredOnly);
-            int j = allStaticFields.Length;
-            TokenInfoCollection tkInfoCollection = s_tkInfoCollection;
-
-            for (int i = 0; i < j; ++i)
-            {
-                System.Reflection.FieldInfo field = allStaticFields[i];
-                if (field.FieldType == typeof(UserTokenDefinition))
-                {
-                    var fieldValue = field.GetValue(null) as UserTokenDefinition;
-
-                    if (fieldValue == null)
-                    {
-                        //no init value 
-                        field.SetValue(null, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name))));
-                    }
-                    else
-                    {
-                        //use presentation string 
-                        fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
-                    }
-                }
-                else if (field.FieldType == typeof(UserNTDefinition))
-                {
-                    //create dummy user nt def
-                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, GetPresentationName2(field.Name));
-                    proxyUserNts[field] = proxyUserNt; //last resolve
-                    field.SetValue(null, proxyUserNt);
-                }
-                else if (field.FieldType == typeof(TokenDefinition))
-                {
-                    var fieldValue = field.GetValue(null) as TokenDefinition;
-                    if (fieldValue == null)
-                    {
-                        field.SetValue(null, tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name)));
-                    }
-                }
-
-            }
-        }
-        static string GetPresentationName2(string fieldname)
-        {
-            //convention here
-            if (fieldname.StartsWith("_token_"))
-            {
-                return fieldname.Substring(7);
-            }
-            else
-            {
-                return fieldname;
-            }
-        }
-
+       ; 
       
 
         static UserTokenDefinition mtk(string grammarString)
