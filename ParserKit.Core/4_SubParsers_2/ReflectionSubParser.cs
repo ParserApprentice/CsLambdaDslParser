@@ -13,7 +13,7 @@ namespace Parser.ParserKit
         public static TokenInfoCollection s_tkInfoCollection;
         public static GetProperFieldNameDel s_getProperFieldName;
 
-       
+
 
         protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
 
@@ -59,7 +59,7 @@ namespace Parser.ParserKit
         {
             return new OneOfSymbol(symbols);
         }
-          
+
 
         static FieldInfo[] GetFields(Type instanceType)
         {
@@ -77,8 +77,12 @@ namespace Parser.ParserKit
         }
 
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
-        {   
-            //TODO: review how to get field and its convetion here
+        {
+            //---------------------------------------------------
+            //TODO: review how to get field and its  name convetion here
+            //---------------------------------------------------
+
+
             var initUserNts = new List<UserNTDefinition>();
             //get all static user nt              
             List<UserNTDefinition> lateNts = null;
@@ -253,7 +257,7 @@ namespace Parser.ParserKit
                 typeToInit.GetFields(System.Reflection.BindingFlags.Static |
                 System.Reflection.BindingFlags.NonPublic |
                 System.Reflection.BindingFlags.DeclaredOnly);
-                        
+
             //------------------------------------------------------------------
             GetProperFieldNameDel getProperFieldName = s_getProperFieldName;
             if (getProperFieldName == null)
@@ -264,7 +268,7 @@ namespace Parser.ParserKit
                 getProperFieldName = fieldname =>
                      fieldname.StartsWith("_token_") ?
                         fieldname.Substring(7) :
-                        fieldname; 
+                        fieldname;
             }
             //------------------------------------------------------------------
             int j = allStaticFields.Length;
