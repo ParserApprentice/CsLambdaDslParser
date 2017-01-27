@@ -1,9 +1,9 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
+using System;
 using System.Collections.Generic;
 
 namespace Parser.ParserKit
-{ 
+{
     public interface ISymbolDefinition
     {
         bool IsNT
@@ -15,7 +15,7 @@ namespace Parser.ParserKit
             get;
         }
     }
-     
+
     public enum BasicTokenKind : byte
     {
         Unknown,
@@ -784,7 +784,7 @@ namespace Parser.ParserKit
         /// <returns></returns>
         internal bool CollectFirstTerminalPhase3()
         {
-           
+
             SymbolSequence[] selectedSymbolList = null;
             if (this.allPossibleSqs != null && this.allPossibleSqs.Length > 0)
             {
@@ -921,6 +921,12 @@ namespace Parser.ParserKit
         {
             return u.TkDef;
         }
+        public static UserTokenDefinition operator +(UserTokenDefinition u )
+        {
+            u.IsSync = true;
+            return u;
+        }
+        public bool IsSync { get; private set; }
     }
 
 }
