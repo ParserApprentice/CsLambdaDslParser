@@ -25,38 +25,38 @@ namespace ParserKit.TestParsers
     }
 
 
-    delegate int TestDel();
-    delegate int TestDel2(int x);
-    class A
-    {
-        void Test()
-        {
-            TestDel d1 = delegate
-            {
-                return 0;
-            };
+    //delegate int TestDel();
+    //delegate int TestDel2(int x);
+    //class A
+    //{
+    //    void Test()
+    //    {
+    //        TestDel d1 = delegate
+    //        {
+    //            return 0;
+    //        };
             
-            TestDel d2 = () =>
-            {     // lambda statement
-                return 0;
-            }; 
+    //        TestDel d2 = () =>
+    //        {     // lambda statement
+    //            return 0;
+    //        }; 
             
-            TestDel d3 = () => 0; // lambda expression
+    //        TestDel d3 = () => 0; // lambda expression
 
-            TestDel2 d4 = (x) =>
-            {   // lambda statement
-                return 1;
-            }; 
+    //        TestDel2 d4 = (x) =>
+    //        {   // lambda statement
+    //            return 1;
+    //        }; 
 
-            TestDel2 d5 = x => 1; // lambda expression 
+    //        TestDel2 d5 = x => 1; // lambda expression 
 
-            d1();
-            d2();
-            d3();
-            d4(0);
-            d5(0);
-        }
-    }
+    //        d1();
+    //        d2();
+    //        d3();
+    //        d4(0);
+    //        d5(0);
+    //    }
+    //}
 
 
 

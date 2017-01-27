@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
- 
-using Parser.ParserKit; 
+
+using Parser.ParserKit;
 namespace Parser.MyCs
 {
 
@@ -122,6 +122,7 @@ namespace Parser.MyCs
 
     public class TypeArgumentListParser : CsSubParser<TypeArgumentListParser.Walker, TypeArgumentListParser>
     {
+        static bool init = Begin();
         static UserNTDefinition
           _type_argument_list = _(
                o => _token_gen_oAng,
@@ -1323,10 +1324,10 @@ namespace Parser.MyCs
         //must call begin first
         //this tricker static base-class call
         //before we go further
-        static bool init = Begin();
+        // static bool init = Begin();
         //--------------------------
-        static UserNTDefinition
-            _formal_parameter_list = _oneof(
+        static TopUserNTDefinition
+            _formal_parameter_list = top() + _oneof(
             /*1*/_(
                     o => _fixedParameters),
 
@@ -1336,7 +1337,9 @@ namespace Parser.MyCs
                     o => _parameter_array),
 
                 /*3*/_(
-                    o => _parameter_array)),
+                    o => _parameter_array));
+
+        static UserNTDefinition
             //----------------------------------
             _fixedParameters = _(o => list_c(_fixedParameter)),
             //----------------------------------
@@ -1373,6 +1376,7 @@ namespace Parser.MyCs
         {
 
         }
+
     }
     public class MethodDeclParser : CsSubParser<MethodDeclParser.Walker, MethodDeclParser>
     { //must call begin first
@@ -1541,9 +1545,7 @@ namespace Parser.MyCs
 
     public class NamespaceParser : CsSubParser<NamespaceParser.Walker, NamespaceParser>
     {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
+        //must call begin first 
         static bool init = Begin();
         //--------------------------
         static UserNTDefinition

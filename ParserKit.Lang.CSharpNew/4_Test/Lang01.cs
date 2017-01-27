@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using System.Collections.Generic; 
+using System;
+using System.Collections.Generic;
 using Parser.MyCs;
 
 
@@ -1607,6 +1607,7 @@ namespace Parser.ParserKit.LR
             parserMan.UseCache = true;
 
             parserMan.Setup(new FormalParameterListParser());
+            //parserMan.Setup2<FormalParameterListParser>();
 
             //review get walker here
             NamespaceParser nsParser = parserMan.Setup(new NamespaceParser() { GetWalker = p => ((CsParseNodeHolder)p).NamespaceWalker });

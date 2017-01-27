@@ -64,7 +64,15 @@ namespace Parser.ParserKit
 
     }
 
-
+    public class TopUserNTDefinition : UserNTDefinition
+    {
+        public TopUserNTDefinition() { }
+        public static TopUserNTDefinition operator +(TopUserNTDefinition topNt, NtDefAssignSet ntDefAssignSet)
+        {
+            ntDefAssignSet.AssignDataToNt(topNt);
+            return topNt;
+        }
+    }
     public class UserNTDefinition : USymbol
     {
 

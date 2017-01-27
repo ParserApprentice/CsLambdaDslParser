@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using Parser.ParserKit; 
+using System;
+using Parser.ParserKit;
 namespace Parser.MyCs
 {
     public abstract class CsSubParser<T, P> : ReflectionSubParser<T>
@@ -142,14 +142,8 @@ namespace Parser.MyCs
        ;
 
 
-
         static CsSubParser()
         {
-            //init all default values
-            //1. set at base type
-            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
-            //2. and this type (P)
-            SetDefaultFieldValues(typeof(P));
         }
 
         static void SetDefaultFieldValues(Type tt)
@@ -210,8 +204,23 @@ namespace Parser.MyCs
                 return fieldname;
             }
         }
-        protected static bool Begin()
+
+        public static TopUserNTDefinition top()
         {
+            ////init all default values
+            ////1. set at base type
+            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
+            //2. and this type (P)
+            SetDefaultFieldValues(typeof(P));
+            return new TopUserNTDefinition();
+        }
+        public static bool Begin()
+        {
+            ////init all default values
+            ////1. set at base type
+            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
+            //2. and this type (P)
+            SetDefaultFieldValues(typeof(P));
             return true;
         }
 

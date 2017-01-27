@@ -1,11 +1,11 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using System.Collections.Generic; 
+using System;
+using System.Collections.Generic;
 using Parser.ParserKit.SubParsers;
 
 namespace Parser.ParserKit
 {
-  
+
     public class ParserManager
     {
         Dictionary<string, SubParser> subParsers = new Dictionary<string, SubParser>();
@@ -19,6 +19,7 @@ namespace Parser.ParserKit
             this.tkInfoCollection = tkInfoCollection;
         }
 
+        
         public T Setup<T>(T subParser)
            where T : SubParser
         {
@@ -30,7 +31,7 @@ namespace Parser.ParserKit
 
             return subParser;
         }
-        
+
         public bool UseCache
         {
             get;
@@ -74,7 +75,7 @@ namespace Parser.ParserKit
                         selectedSubParser = swPair.resolvedSubParser;
                     }
                     break;
-            } 
+            }
 #if DEBUG
             if (selectedSubParser == null)
             {
