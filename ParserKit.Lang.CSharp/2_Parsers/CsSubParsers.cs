@@ -7,16 +7,11 @@ namespace Parser.MyCs
 
     public class TypeParser : CsSubParser<TypeParser.Walker, TypeParser>
     {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
-
-        //--------------------------
-
+        
         static UserNTDefinition
             //
             //top ***
-            _type = top() + _oneof(
+            _type = top() * _oneof(
             /*1*/
                 _(
                     o => _token_id,
@@ -57,15 +52,8 @@ namespace Parser.MyCs
 
     public class ArrayTypeParser : CsSubParser<ArrayTypeParser.Walker, ArrayTypeParser>
     {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
-
-        //--------------------------
-
         static UserNTDefinition
-            //
-        _array_type = top() + _(                /**/ r => r.NewArrayType,
+        _array_type = top() * _(                /**/ r => r.NewArrayType,
                 o => _non_array_type,
                 o => list(_rank_specifier)
                 ),
@@ -89,7 +77,7 @@ namespace Parser.MyCs
         //--------------------------
         static UserNTDefinition
             //
-           _type_parameter_constraints_clauses = top() + _(
+           _type_parameter_constraints_clauses = top() * _(
                o => list(_type_parameter_constraints_clause)),
             //----------------------------------------------
             _type_parameter_constraints_clause = _(r => r.NewTypeParameterConstraints,
@@ -121,7 +109,7 @@ namespace Parser.MyCs
     {
 
         static UserNTDefinition
-          _type_argument_list = top() + _(
+          _type_argument_list = top() * _(
                o => _token_gen_oAng,
                o => list_c(_type),
                o => _token_gen_cAng),
@@ -134,12 +122,7 @@ namespace Parser.MyCs
 
 
     public class ExpressionParser : CsSubParser<ExpressionParser.Walker, ExpressionParser>
-    {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
-
-        //--------------------------
+    { 
         //operator precedence
         //     //low
         //Unknown,
@@ -162,7 +145,7 @@ namespace Parser.MyCs
 
         //primary expression
         static UserNTDefinition
-            _expression = top() + _oneof(
+            _expression = top() * _oneof(
                  o => _simple_name_expression,
                  o => _literal,
                  o => _parenthesized_expression,
@@ -587,13 +570,9 @@ namespace Parser.MyCs
     public class ObjectOrCollectionInitializerParser :
         CsSubParser<ObjectOrCollectionInitializerParser.Walker, ObjectOrCollectionInitializerParser>
     {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
-
-        //--------------------------
+        
         static UserNTDefinition
-         _object_or_collection_initializer = top() + _oneof(
+         _object_or_collection_initializer = top() * _oneof(
                _(  /*1*/                        r => r.NewObjectInitialization,
                    o => _token_openBrc,
                    o => opt(list_c(_member_initializer)),
@@ -645,13 +624,9 @@ namespace Parser.MyCs
     public class ArgumentListParser : CsSubParser<
         ArgumentListParser.Walker, ArgumentListParser>
     {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
 
-        //--------------------------
         static UserNTDefinition
-           _argument_list = top() + _(o => list_c(_argument)),
+           _argument_list = top() * _(o => list_c(_argument)),
             //--------------------------------------------
            _argument = _(
                  o => opt(_argument_name),
@@ -679,7 +654,7 @@ namespace Parser.MyCs
 
         static UserNTDefinition
             //
-            _statement = top() + _oneof(
+            _statement = top() * _oneof(
                  o => _expression_statement,
                  o => _empty_statement,
                  o => _block_statement,
@@ -1039,7 +1014,7 @@ namespace Parser.MyCs
 
         //--------------------------
         static UserNTDefinition
-            _attributes = top() + _(o => list_c(_attribute_section)),
+            _attributes = top() * _(o => list_c(_attribute_section)),
             _attribute_section = _(
                 o => _token_openBkt,
                 o => list_c(_attribute),
@@ -1048,7 +1023,7 @@ namespace Parser.MyCs
 
             _attribute = _(o => _attribute_name),
             _attribute_name = _(o => _token_id)
-            ; 
+            ;
         public class Walker : AstWalker
         {
         }
@@ -1060,11 +1035,11 @@ namespace Parser.MyCs
 
         //--------------------------
         static TopUserNTDefinition
-            _class_decl = top() + _(                              /**/ r => r.NewClassDeclaration,
+            _class_decl = top() * _(             /**/ r => r.NewClassDeclaration,
               o => opt(_attributes),
               o => opt(list(_class_modifier)),
               o => opt(_token_partial),
-              o => _token_class,
+              o => +_token_class,//add sync symbol+ to sync token
               o => _token_id,
               o => opt(_type_parameter_list),
               o => opt(_class_base),
@@ -1154,7 +1129,7 @@ namespace Parser.MyCs
 
         static UserNTDefinition
             //--------------------------------
-            _property_declaration = top() + _(
+            _property_declaration = top() * _(
                 o => opt(_attributes),
                 o => opt(list(_property_modifier)),
                 o => _type,
@@ -1239,7 +1214,7 @@ namespace Parser.MyCs
 
         //492
         static UserNTDefinition
-            _field_declaration = top() + _(
+            _field_declaration = top() * _(
                o => opt(_attributes),
                o => opt(_field_modifiers),
                o => _type,
@@ -1282,14 +1257,9 @@ namespace Parser.MyCs
     }
 
     public class FormalParameterListParser : CsSubParser<FormalParameterListParser.Walker, FormalParameterListParser>
-    {
-        //must call begin first
-        //this tricker static base-class call
-        //before we go further
-        // static bool init = Begin();
-        //--------------------------
+    {   
         static UserNTDefinition /* root, must be top */
-            _formal_parameter_list = top() + _oneof(
+            _formal_parameter_list = top() * _oneof(
             /*1*/_(
                     o => _fixedParameters),
 
@@ -1342,7 +1312,7 @@ namespace Parser.MyCs
     {
         static
         UserNTDefinition
-            _method_declaration = top() + _(
+            _method_declaration = top() * _(
                 o => _method_header,
                 o => _method_body),
             //---------------------------------------------------
@@ -1412,7 +1382,7 @@ namespace Parser.MyCs
 
         //497 
         static UserNTDefinition
-            _struct_decl = top() + _(
+            _struct_decl = top() * _(
                o => opt(_attributes),
                o => opt(_struct_modifiers),
                o => opt(_token_partial),
@@ -1499,7 +1469,7 @@ namespace Parser.MyCs
     {
 
         static UserNTDefinition
-            _compilation_unit = top() + _(              /**/ r => r.NewCompilationUnit,
+            _compilation_unit = top() * _(              /**/ r => r.NewCompilationUnit,
                  o => opt(list(_using_directive)),
                  o => opt(_namespace_member_decls)
                  ),

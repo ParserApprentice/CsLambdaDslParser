@@ -72,7 +72,7 @@ namespace Parser.ParserKit
             //use need to create this type by calling top() method of reflection subparser
             //
         }
-        public static TopUserNTDefinition operator +(TopUserNTDefinition topNt, NtDefAssignSet ntDefAssignSet)
+        public static TopUserNTDefinition operator *(TopUserNTDefinition topNt, NtDefAssignSet ntDefAssignSet)
         {
             ntDefAssignSet.AssignDataToNt(topNt);
             return topNt;
