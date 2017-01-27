@@ -9,6 +9,8 @@ namespace Parser.ParserKit
     public class ParserManager
     {
         Dictionary<string, SubParser> subParsers = new Dictionary<string, SubParser>();
+        Dictionary<Type, bool> registeredSubParserTypes = new Dictionary<Type, bool>();
+
         TokenInfoCollection tkInfoCollection;
         bool _useFastParseMode;
         bool _breakOnShift;
@@ -17,12 +19,18 @@ namespace Parser.ParserKit
         public ParserManager(TokenInfoCollection tkInfoCollection)
         {
             this.tkInfoCollection = tkInfoCollection;
-        }
+        } 
 
-        
         public T Setup<T>(T subParser)
            where T : SubParser
         {
+
+            Type subParserType = typeof(T);
+            if (registeredSubParserTypes.ContainsKey(subParserType))
+            {
+                throw new NotSupportedException("duplicated subparser:" + subParserType.Name);
+            }
+            registeredSubParserTypes.Add(subParserType, true);
 
             subParser.TryUseTableDataCache = UseCache;//set use cache or not before call Setup()
             subParser.Setup(tkInfoCollection);
