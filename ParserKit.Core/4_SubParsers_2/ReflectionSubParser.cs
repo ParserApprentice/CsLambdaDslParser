@@ -88,24 +88,50 @@ namespace Parser.ParserKit
             FieldInfo[] fields = GetFields(this.GetType());
             foreach (FieldInfo f in fields)
             {
-                if (f.FieldType == typeof(UserNTDefinition))
+                if (f.FieldType == typeof(TopUserNTDefinition) || f.FieldType == typeof(UserNTDefinition))
                 {
                     UserNTDefinition unt = (UserNTDefinition)f.GetValue(null);
-                    if (this._rootNtDef == null)
-                    {
-                        //TODO: review here again
-                        _rootNtDef = unt;
-                    }
 
                     if (unt.Name == null)
                     {
                         unt.SetName(f.Name);
                     }
 
+                    if (unt is TopUserNTDefinition)
+                    {
+                        if (this._rootNtDef == null)
+                        {
+                            //TODO: review here again
+                            _rootNtDef = (TopUserNTDefinition)unt;
+                        }
+                        else
+                        {
+                            //duplicate root!
+                            throw new NotSupportedException();
+                        }
+                    }
+                    else
+                    {
+
+                    }
+
+
                     UserNTDefinition proxyNtDef = GetRegisteredProxyUserNt(f);
-                    ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
-
-
+                    if (proxyNtDef != null)
+                    {
+                        ((ProxyUserNTDefinition)proxyNtDef).SetActualImplementation(unt);
+                    }
+                    else
+                    {
+                        if (unt is TopUserNTDefinition)
+                        {
+                            //OK
+                        }
+                        else
+                        {
+                            //!!!
+                        }
+                    }
                     unt.OwnerSubParser = this;
                     _initUserNts.Add(unt);
 
@@ -168,6 +194,13 @@ namespace Parser.ParserKit
             }
 
             //---------------------------------------
+            if (this._rootNtDef == null)
+            {
+                //must found root ***
+                throw new NotSupportedException();
+            }
+
+            //---------------------------------------
             _miniGrammarSheet = new MiniGrammarSheet();
             _miniGrammarSheet.LoadTokenInfo(tkInfoCollection);
             _miniGrammarSheet.LoadUserNts(_initUserNts);
@@ -189,8 +222,98 @@ namespace Parser.ParserKit
 
 
 
-    public abstract class ReflectionSubParser<T> : ReflectionSubParser
+    public abstract class ReflectionSubParser<T, P> : ReflectionSubParser
     {
+        //T: walker
+        //P: exact parser type
+
+        static ReflectionSubParser()
+        {
+            List<Type> initSteps = new List<Type>();
+            Type exactParse = typeof(P);
+            Type cur_base = exactParse.BaseType;
+            initSteps.Add(exactParse);
+            while (cur_base != null)
+            {
+                initSteps.Add(cur_base);
+                if (cur_base == typeof(ReflectionSubParser<T, P>))
+                {
+                    //stop 
+                    break;
+                }
+                cur_base = cur_base.BaseType;
+            }
+
+            //init base first ***
+            for (int i = initSteps.Count - 1; i >= 0; --i)
+            {
+                SetDefaultSymbolFieldValues(initSteps[i]);
+            }
+        }
+        static void SetDefaultSymbolFieldValues(Type typeToInit)
+        {
+
+            System.Reflection.FieldInfo[] allStaticFields =
+                typeToInit.GetFields(System.Reflection.BindingFlags.Static |
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.DeclaredOnly);
+            int j = allStaticFields.Length;
+            TokenInfoCollection tkInfoCollection = s_tkInfoCollection;
+
+            for (int i = 0; i < j; ++i)
+            {
+                System.Reflection.FieldInfo field = allStaticFields[i];
+                if (field.FieldType == typeof(UserTokenDefinition))
+                {
+                    var fieldValue = field.GetValue(null) as UserTokenDefinition;
+
+                    if (fieldValue == null)
+                    {
+                        //no init value 
+                        field.SetValue(null, new UserTokenDefinition(tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name))));
+                    }
+                    else
+                    {
+                        //use presentation string 
+                        fieldValue.TkDef = tkInfoCollection.GetTokenInfo(fieldValue.GrammarString);
+                    }
+                }
+                else if (field.FieldType == typeof(UserNTDefinition))
+                {
+                    //create dummy user nt def
+                    UserNTDefinition proxyUserNt = UserNTDefinition.CreateProxyUserNtDefinition(field, GetPresentationName2(field.Name));
+                    proxyUserNts[field] = proxyUserNt; //last resolve
+                    field.SetValue(null, proxyUserNt);
+                }
+                else if (field.FieldType == typeof(TokenDefinition))
+                {
+                    var fieldValue = field.GetValue(null) as TokenDefinition;
+                    if (fieldValue == null)
+                    {
+                        field.SetValue(null, tkInfoCollection.GetTokenInfo(GetPresentationName2(field.Name)));
+                    }
+                }
+
+            }
+        }
+        static string GetPresentationName2(string fieldname)
+        {
+            //convention here
+            if (fieldname.StartsWith("_token_"))
+            {
+                return fieldname.Substring(7);
+            }
+            else
+            {
+                return fieldname;
+            }
+        }
+
+        public static TopUserNTDefinition top()
+        {
+            return new TopUserNTDefinition();
+        }
+
         protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
                       proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
         static GetWalkerDel<T> getWalkerDel;

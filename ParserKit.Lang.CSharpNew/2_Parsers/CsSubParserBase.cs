@@ -3,7 +3,7 @@ using System;
 using Parser.ParserKit;
 namespace Parser.MyCs
 {
-    public abstract class CsSubParser<T, P> : ReflectionSubParser<T>
+    public abstract class CsSubParser<T, P> : ReflectionSubParser<T, P>
         where T : AstWalker, new()
         where P : ReflectionSubParser /*exact class */
     {
@@ -142,10 +142,7 @@ namespace Parser.MyCs
        ;
 
 
-        static CsSubParser()
-        {
-        }
-
+       
         static void SetDefaultFieldValues(Type tt)
         {
 
@@ -205,24 +202,7 @@ namespace Parser.MyCs
             }
         }
 
-        public static TopUserNTDefinition top()
-        {
-            ////init all default values
-            ////1. set at base type
-            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
-            //2. and this type (P)
-            SetDefaultFieldValues(typeof(P));
-            return new TopUserNTDefinition();
-        }
-        public static bool Begin()
-        {
-            ////init all default values
-            ////1. set at base type
-            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
-            //2. and this type (P)
-            SetDefaultFieldValues(typeof(P));
-            return true;
-        }
+      
 
         static UserTokenDefinition mtk(string grammarString)
         {

@@ -12,7 +12,7 @@ namespace Parser.ParserKit
 
         protected MiniGrammarSheet _miniGrammarSheet;
         protected NTDefinition _augmentedNTDefinition;
-        protected UserNTDefinition _rootNtDef;
+        protected TopUserNTDefinition  _rootNtDef;
 
         //------------------------------
         protected LRParsingTable _parsingTable;
