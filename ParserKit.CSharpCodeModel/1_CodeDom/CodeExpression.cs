@@ -1,9 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-
+ 
+using System.Text; 
 
 namespace Parser.CodeDom
 {
@@ -121,7 +118,7 @@ namespace Parser.CodeDom
 #if DEBUG
         protected string ToCodeString()
         {
-            
+
             StringBuilder stBuilder = new StringBuilder();
             Parser.AsmInfrastructures.AsmIndentTextWriter writer =
                 new Parser.AsmInfrastructures.AsmIndentTextWriter(stBuilder);

@@ -1,14 +1,9 @@
 ﻿//MIT, 2015-2017, ParserApprentice
 using System;
-using System.Text;
-using System.Collections.Generic;
-using Parser.CodeDom;
 using Parser.ParserKit;
-using Parser.ParserKit.LR;
-
 namespace Parser.MyCs
 {
-    public abstract class CsSubParser<T, P> : ReflectionSubParser<T>
+    public abstract class CsSubParser<T, P> : ReflectionSubParser<T, P>
         where T : AstWalker, new()
         where P : ReflectionSubParser /*exact class */
     {
@@ -147,16 +142,7 @@ namespace Parser.MyCs
        ;
 
 
-
-        static CsSubParser()
-        {
-            //init all default values
-            //1. set at base type
-            SetDefaultFieldValues(typeof(CsSubParser<T, P>));
-            //2. and this type (P)
-            SetDefaultFieldValues(typeof(P));
-        }
-
+       
         static void SetDefaultFieldValues(Type tt)
         {
 
@@ -215,10 +201,8 @@ namespace Parser.MyCs
                 return fieldname;
             }
         }
-        protected static bool Begin()
-        {
-            return true;
-        }
+
+      
 
         static UserTokenDefinition mtk(string grammarString)
         {

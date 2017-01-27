@@ -1,12 +1,7 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+ 
 namespace Parser.AsmInfrastructures
-{
-
-
+{ 
     public abstract class CodeErrorDescription
     {
         int code = -1;

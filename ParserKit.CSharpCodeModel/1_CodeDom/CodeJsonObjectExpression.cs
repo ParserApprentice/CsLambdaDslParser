@@ -1,8 +1,7 @@
 ﻿//MIT, 2015-2017, ParserApprentice
 using System;
 using System.Collections.Generic;
-using System.Text; 
-using Parser.AsmInfrastructures; 
+ 
 
 namespace Parser.CodeDom
 {
@@ -92,7 +91,7 @@ namespace Parser.CodeDom
                         continue;
                     }
                     else if (mb is CodeBinaryOperatorExpression)
-                    {  
+                    {
 
                         CodeBinaryOperatorExpression binOp = (CodeBinaryOperatorExpression)mb;
                         if (binOp.BinaryOp == CodeBinaryOperatorName.Assign)
@@ -101,12 +100,12 @@ namespace Parser.CodeDom
                             {
                                 mbList.Add(new JsonNamedMemberExpression(
                                  ((CodeIdExpression)binOp.LeftExpression).NameAsString,
-                                 binOp.RightExpression)); 
+                                 binOp.RightExpression));
                                 continue;
                             }
                             else if (binOp.LeftExpression is CodePrimitiveExpression)
                             {
-                                 
+
 
                                 string strValue = ((CodePrimitiveExpression)binOp.LeftExpression).Value;
                                 if (strValue.StartsWith("\""))
@@ -115,7 +114,7 @@ namespace Parser.CodeDom
                                 }
                                 mbList.Add(new JsonNamedMemberExpression(
                                     strValue,
-                                    binOp.RightExpression)); 
+                                    binOp.RightExpression));
                                 continue;
                             }
                         }
@@ -148,7 +147,7 @@ namespace Parser.CodeDom
         {
             exprCollection.AddCodeObject(expr);
         }
-        
+
         public CodeVariableDeclarationStatement ContextVarDeclStatement
         {
             get
@@ -168,5 +167,5 @@ namespace Parser.CodeDom
         {
             get { return 0; }
         }
-    } 
+    }
 }

@@ -1,10 +1,7 @@
 ﻿//MIT, 2015-2017, ParserApprentice
 //#define RETURN_NOW
 
-using System;
-using Parser.CodeDom;
-using Parser.ParserKit;
-using System.Collections.Generic;
+using System; 
 
 namespace Parser.MyCs
 {

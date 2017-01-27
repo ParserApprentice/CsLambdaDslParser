@@ -38,7 +38,6 @@
     <Compile Include="0_Accessories\System.Runtime.CompilerServices.ExtensionAttribute.cs" />
     <Compile Include="1_UserSymbols\SymbolDelegates.cs" />
     <Compile Include="2_System_LR\LRParser.cs" />
-    <Compile Include="2_System_LR\LRParserBackup.cs" />
     <Compile Include="2_System_LR\LRParsingTable.cs" />
     <Compile Include="2_System_LR\LRParsingTable_Switch.cs" />
     <Compile Include="2_System_LR\RRConflict.cs" />
@@ -60,6 +59,7 @@
     <Compile Include="4_SubParsers_0\SubParsers.cs" />
     <Compile Include="4_SubParsers_1\LRTableCaching.cs" />
     <Compile Include="4_SubParsers_1\ParserManager.cs" />
+    <Compile Include="4_SubParsers_2\ReflectionSubParser.cs" />
     <Compile Include="4_SubParsers_1\SubParsers.cs" />
     <Compile Include="4_SubParsers_1\SwicthDetail.cs" />
     <Compile Include="4_SubParsers_1\SyncSymbols.cs" />

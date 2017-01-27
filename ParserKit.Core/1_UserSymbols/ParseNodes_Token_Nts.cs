@@ -7,7 +7,6 @@ namespace Parser.ParserKit
 {
     public enum ParseNodeKind : byte
     {
-
         Tk,
         Nt,
         List,
