@@ -32,9 +32,12 @@ namespace Parser.MyCs
             parserMan.Setup(new TypeArgumentListParser());
             parserMan.Setup(new TypeParser());
             parserMan.Setup(new StatementParser() { GetWalker = p => ((CsParseNodeHolder)p).StatementBuilder });
+
             parserMan.Setup(new StructDeclParser());
             parserMan.Setup(new ClassDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).ClassWalker });
+
             parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
+
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
             parserMan.Setup(new AttributesParser());

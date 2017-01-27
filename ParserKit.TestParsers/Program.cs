@@ -16,7 +16,7 @@ namespace ParserKit.TestParsers
             //-----------
             //inject code 
 #if DEBUG
-            //AsmBreakInjector.InjectBreakPoint("ParserKit.Lang.CSharp.dll");
+           AsmBreakInjector.InjectBreakPoint("ParserKit.Lang.CSharp.dll");
 #endif
             //----------- 
             Application.Run(new FormLR());

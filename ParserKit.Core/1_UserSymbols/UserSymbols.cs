@@ -904,16 +904,16 @@ namespace Parser.ParserKit
             this.SymbolString = tokenInfo.PresentationString;
             this.onStepDel = onShiftDel;
         }
-        public UserExpectedSymbol(UserTokenDefinition userTokenDef, bool isOptional, ParserNotifyDel onShiftDel)
-        {
-            dbugSetupDebugId();
-            this.tokenInfo = userTokenDef; //implicit conv
-            this.SymbolKind = UserExpectedSymbolKind.Terminal;
-            this.IsOptional = isOptional;
-            this.SymbolString = tokenInfo.PresentationString;
-            this.onStepDel = onShiftDel;
+        //public UserExpectedSymbol(UserTokenDefinition userTokenDef, bool isOptional, ParserNotifyDel onShiftDel)
+        //{
+        //    dbugSetupDebugId();
+        //    this.tokenInfo = userTokenDef; //implicit conv
+        //    this.SymbolKind = UserExpectedSymbolKind.Terminal;
+        //    this.IsOptional = isOptional;
+        //    this.SymbolString = tokenInfo.PresentationString;
+        //    this.onStepDel = onShiftDel; 
 
-        }
+        //}
         //------------------------------------------------------------------
         public UserExpectedSymbolKind SymbolKind
         {
@@ -1126,8 +1126,10 @@ namespace Parser.ParserKit
 
                     USymbol usymbol = (USymbol)f_result;
                     var seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
+
                     var symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
                         new SubParsers.UserExpectedSymbolShift(seqShiftDelMap.Invoke));
+
                     firstLevelSymbols.Add(symbolWithStepInfo);
 
                 }
@@ -1178,7 +1180,6 @@ namespace Parser.ParserKit
                 }
 
                 UserSymbolSequence newss = UserNTSubParserExtension.CreateUserSymbolSeq(unt, symbols);
-
 
                 if (symbolShiftDel != null)
                 {
@@ -1246,16 +1247,30 @@ namespace Parser.ParserKit
             int cacheHolderId = 0;
             public SeqReductionDelMap(GetWalkerDel<T> getBuilder, BuilderDel3<T> builderDel)
             {
+#if DEBUG
+                if (getBuilder == null)
+                {
+                }
+#endif
                 this.getBuilder = getBuilder;
                 this.builderDel = builderDel;
             }
             public void Invoke(ParseNodeHolder pnHolder)
             {
-                if (cacheHolderId != pnHolder.parseNodeHolderId)
+                if (getBuilder == null)
+                {
+                    return;
+                }
+                if (subItemFill == null || cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
-                    subItemFill = builderDel(getBuilder(pnHolder));
+                    var get_walker = getBuilder(pnHolder);
+                    if (get_walker == null)
+                    {
+                        return;
+                    }
+                    subItemFill = builderDel(get_walker);
                 }
                 subItemFill();
             }
@@ -1271,17 +1286,27 @@ namespace Parser.ParserKit
             T cachedBuilder;
             public SeqShiftDelMap(GetWalkerDel<T> getBuilder, UserExpectedSymbolDef<T> builderDel)
             {
+#if DEBUG
+                if (getBuilder == null)
+                {
+                }
+#endif
                 this.getBuilder = getBuilder;
                 this.builderDel = builderDel;
             }
             public object Invoke(ParseNodeHolder pnHolder)
             {
+                if (getBuilder == null)
+                {
+                    return null;
+                }
                 if (cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
                     cachedBuilder = getBuilder(pnHolder);
                 }
+                //get parser node holder after invoke
                 return (object)builderDel(cachedBuilder);
             }
         }

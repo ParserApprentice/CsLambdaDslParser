@@ -44,7 +44,7 @@ namespace Parser.ParserKit
             get;
             set;
         }
-
+        internal SubParser CurrentSubParser { get; set; }
 
         internal bool CancelNextParseTree { get; set; }
 

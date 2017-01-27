@@ -8,8 +8,8 @@
     <ProjectGuid>{9CB42ECC-F382-43A7-A742-68EAD377218E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ParserKit.Lang.CSharpNew</RootNamespace>
-    <AssemblyName>ParserKit.Lang.CSharpNew</AssemblyName>
+    <RootNamespace>ParserKit.Lang.CSharp</RootNamespace>
+    <AssemblyName>ParserKit.Lang.CSharp</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

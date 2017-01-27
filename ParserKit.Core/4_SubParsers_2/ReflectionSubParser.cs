@@ -242,13 +242,27 @@ namespace Parser.ParserKit
     }
 
 
-
+    static class CommonWalkerProvider
+    {
+        public static T GetWalkerDel<T>(ParseNodeHolder h)
+        {
+            var userSpecificSubParser = h.CurrentSubParser.userSpecificGetWalkerDel as GetWalkerDel<T>;
+            if (userSpecificSubParser != null)
+            {
+                return userSpecificSubParser(h);
+            }
+            else
+            {
+                return default(T);
+            }
+        }
+    }
 
     public abstract class ReflectionSubParser<T, P> : ReflectionSubParser
     {
         //T: walker
         //P: exact parser type
-
+        static GetWalkerDel<T> getWalkerDel = CommonWalkerProvider.GetWalkerDel<T>;
         static ReflectionSubParser()
         {
             List<Type> initSteps = new List<Type>();
@@ -338,12 +352,23 @@ namespace Parser.ParserKit
 
         protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
                       proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
-        static GetWalkerDel<T> getWalkerDel;
+
+
+
         public GetWalkerDel<T> GetWalker
         {
-            get { return getWalkerDel; }
-            set { getWalkerDel = value; }
+            get
+            {
+                return getWalkerDel;
+            }
+            set
+            {
+                getWalkerDel = value;
+                userSpecificGetWalkerDel = value;
+            }
         }
+
+
         //--------------------------------------------------------
         protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
         {
@@ -367,7 +392,7 @@ namespace Parser.ParserKit
         {
             sync(syncTks);
         }
-          static bool sync(params TokenDefinition[] syncTks)
+        static bool sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
             {
