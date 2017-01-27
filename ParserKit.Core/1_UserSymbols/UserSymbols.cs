@@ -1236,8 +1236,8 @@ namespace Parser.ParserKit
         }
 
         //--------------------------------------------
-        //[System.Diagnostics.DebuggerNonUserCode]
-        //[System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerStepThrough]
         class SeqReductionDelMap
         {
 
@@ -1261,7 +1261,7 @@ namespace Parser.ParserKit
                 {
                     return;
                 }
-                if (subItemFill == null ||cacheHolderId != pnHolder.parseNodeHolderId)
+                if (subItemFill == null || cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
@@ -1275,8 +1275,8 @@ namespace Parser.ParserKit
                 subItemFill();
             }
         }
-        //[System.Diagnostics.DebuggerNonUserCode]
-        //[System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerStepThrough]
         class SeqShiftDelMap
         {
 
