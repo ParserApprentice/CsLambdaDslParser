@@ -13,7 +13,7 @@ namespace Parser.ParserKit
         public static TokenInfoCollection s_tkInfoCollection;
         public static GetProperFieldNameDel s_getProperFieldName;
 
-        List<UserNTDefinition> _initUserNts;
+
 
         protected abstract UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo);
 
@@ -59,15 +59,7 @@ namespace Parser.ParserKit
         {
             return new OneOfSymbol(symbols);
         }
-
-
-
-        internal SyncSymbol skip(TokenDefinition begin, TokenDefinition end)
-        {
-            //TODO: review here
-            //ignor this pair
-            return new SyncSymbol(begin, end, SyncSymbolKind.Ignor);
-        }
+        protected abstract void SetSyncTokens(TokenDefinition[] syncTks);
 
         static FieldInfo[] GetFields(Type instanceType)
         {
@@ -86,7 +78,12 @@ namespace Parser.ParserKit
 
         protected override void InternalSetup(TokenInfoCollection tkInfoCollection)
         {
-            _initUserNts = new List<UserNTDefinition>();
+            //---------------------------------------------------
+            //TODO: review how to get field and its  name convetion here
+            //---------------------------------------------------
+
+
+            var initUserNts = new List<UserNTDefinition>();
             //get all static user nt              
             List<UserNTDefinition> lateNts = null;
             FieldInfo[] fields = GetFields(this.GetType());
@@ -137,7 +134,7 @@ namespace Parser.ParserKit
                         }
                     }
                     unt.OwnerSubParser = this;
-                    _initUserNts.Add(unt);
+                    initUserNts.Add(unt);
 
                     List<UserNTDefinition> lateUserNts = unt.GetLateNts();
                     if (lateUserNts != null)
@@ -183,20 +180,21 @@ namespace Parser.ParserKit
             }
             if (lateNts != null)
             {
-                _initUserNts.AddRange(lateNts);
+                initUserNts.AddRange(lateNts);
             }
-
+            //--------------------------------------------------------------------
             //check if all user nt is define
-            for (int i = _initUserNts.Count - 1; i >= 0; --i)
+            for (int i = initUserNts.Count - 1; i >= 0; --i)
             {
-                UserNTDefinition unt = _initUserNts[i];
+                UserNTDefinition unt = initUserNts[i];
                 if (unt.UserSeqCount == 0)
                 {
                     //this nt is not defined!
                     unt.MarkedAsUnknownNT = true;
                 }
-            }
 
+
+            }
             //---------------------------------------
             if (this._rootNtDef == null)
             {
@@ -207,10 +205,30 @@ namespace Parser.ParserKit
             //---------------------------------------
             _miniGrammarSheet = new MiniGrammarSheet();
             _miniGrammarSheet.LoadTokenInfo(tkInfoCollection);
-            _miniGrammarSheet.LoadUserNts(_initUserNts);
+            _miniGrammarSheet.LoadUserNts(initUserNts);
             //--------------------------------------- 
             _augmentedNTDefinition = _miniGrammarSheet.PrepareUserGrammarForAnyLR(this.RootNt);
             _parsingTable = _miniGrammarSheet.CreateLR1Table(_augmentedNTDefinition);
+
+            //--------------------------------------- 
+            //collect sync tokens
+            for (int i = initUserNts.Count - 1; i >= 0; --i)
+            {
+                UserNTDefinition unt = initUserNts[i];
+                //GetAllPossibleSeqIterForward() has data after create LR1 table?
+                foreach (UserSymbolSequence useq in unt.GetAllPossibleSeqIterForward())
+                {
+                    foreach (UserExpectedSymbol u_expectedSymbol in useq.GetRightSideSymbols())
+                    {
+                        if (u_expectedSymbol.IsSync)
+                        {
+                            //found sync token
+                            SetSyncTokens(new[] { u_expectedSymbol.ResolvedTokenDefinition });
+                        }
+                    }
+                }
+            }
+            //--------------------------------------- 
             //can use cache table 
             //---------------------------------------    
             //sync parser table
@@ -260,7 +278,7 @@ namespace Parser.ParserKit
                 typeToInit.GetFields(System.Reflection.BindingFlags.Static |
                 System.Reflection.BindingFlags.NonPublic |
                 System.Reflection.BindingFlags.DeclaredOnly);
-                        
+
             //------------------------------------------------------------------
             GetProperFieldNameDel getProperFieldName = s_getProperFieldName;
             if (getProperFieldName == null)
@@ -271,7 +289,7 @@ namespace Parser.ParserKit
                 getProperFieldName = fieldname =>
                      fieldname.StartsWith("_token_") ?
                         fieldname.Substring(7) :
-                        fieldname; 
+                        fieldname;
             }
             //------------------------------------------------------------------
             int j = allStaticFields.Length;
@@ -345,8 +363,11 @@ namespace Parser.ParserKit
         }
         static List<SyncSequence> _syncSeqs;
         //--------------------------------------------------------
-
-        protected static bool sync(params TokenDefinition[] syncTks)
+        protected override void SetSyncTokens(TokenDefinition[] syncTks)
+        {
+            sync(syncTks);
+        }
+          static bool sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
             {

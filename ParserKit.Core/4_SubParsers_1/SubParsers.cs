@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using System.Collections.Generic; 
+using System;
+using System.Collections.Generic;
 using Parser.ParserKit.LR;
 
 namespace Parser.ParserKit.SubParsers
@@ -14,7 +14,7 @@ namespace Parser.ParserKit.SubParsers
         public static ShouldBreakOnLambda _shouldBreakOnLambda;
     }
 
-     
+
     public static class SubParserCache
     {
         public static void SaveAsBinaryFile(SubParser subparser, string filename)
@@ -127,7 +127,15 @@ namespace Parser.ParserKit.SubParsers
             this.symbols = symbols;
         }
     }
-
+    public class MarkedTokenSymbol : USymbol
+    {
+        //we can extend marked token here
+        public readonly UserTokenDefinition userTokenDef;
+        public MarkedTokenSymbol(UserTokenDefinition userTokenDef)
+        {
+            this.userTokenDef = userTokenDef;
+        }
+    }
 
     public class MiniGrammarSheet : UserLangGrammarSheet
     {

@@ -1607,8 +1607,6 @@ namespace Parser.ParserKit.LR
             parserMan.UseCache = true;
 
             parserMan.Setup(new FormalParameterListParser());
-            //parserMan.Setup2<FormalParameterListParser>();
-
             //review get walker here
             NamespaceParser nsParser = parserMan.Setup(new NamespaceParser() { GetWalker = p => ((CsParseNodeHolder)p).NamespaceWalker });
             //NamespaceParser nsParser = parserMan.Setup(new NamespaceParser());

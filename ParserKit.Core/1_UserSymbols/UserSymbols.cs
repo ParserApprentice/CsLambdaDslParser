@@ -72,7 +72,7 @@ namespace Parser.ParserKit
             //use need to create this type by calling top() method of reflection subparser
             //
         }
-        public static TopUserNTDefinition operator +(TopUserNTDefinition topNt, NtDefAssignSet ntDefAssignSet)
+        public static TopUserNTDefinition operator *(TopUserNTDefinition topNt, NtDefAssignSet ntDefAssignSet)
         {
             ntDefAssignSet.AssignDataToNt(topNt);
             return topNt;
@@ -904,6 +904,16 @@ namespace Parser.ParserKit
             this.SymbolString = tokenInfo.PresentationString;
             this.onStepDel = onShiftDel;
         }
+        public UserExpectedSymbol(UserTokenDefinition userTokenDef, bool isOptional, ParserNotifyDel onShiftDel)
+        {
+            dbugSetupDebugId();
+            this.tokenInfo = userTokenDef; //implicit conv
+            this.SymbolKind = UserExpectedSymbolKind.Terminal;
+            this.IsOptional = isOptional;
+            this.SymbolString = tokenInfo.PresentationString;
+            this.onStepDel = onShiftDel;
+
+        }
         //------------------------------------------------------------------
         public UserExpectedSymbolKind SymbolKind
         {
@@ -935,7 +945,15 @@ namespace Parser.ParserKit
         public bool IsOptional
         {
             get;
-            set;
+            internal set;
+        }
+        /// <summary>
+        /// hint, sync token
+        /// </summary>
+        public bool IsSync
+        {
+            get;
+            internal set;
         }
         string _symbolString;
         public string SymbolString
