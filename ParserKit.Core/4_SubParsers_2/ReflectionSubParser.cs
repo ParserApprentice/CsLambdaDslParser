@@ -338,12 +338,16 @@ namespace Parser.ParserKit
 
         protected static Dictionary<System.Reflection.FieldInfo, UserNTDefinition>
                       proxyUserNts = new Dictionary<System.Reflection.FieldInfo, UserNTDefinition>();
+
+
         static GetWalkerDel<T> getWalkerDel;
         public GetWalkerDel<T> GetWalker
         {
             get { return getWalkerDel; }
             set { getWalkerDel = value; }
         }
+
+
         //--------------------------------------------------------
         protected override UserNTDefinition GetRegisteredProxyUserNt(System.Reflection.FieldInfo fieldInfo)
         {
@@ -367,7 +371,7 @@ namespace Parser.ParserKit
         {
             sync(syncTks);
         }
-          static bool sync(params TokenDefinition[] syncTks)
+        static bool sync(params TokenDefinition[] syncTks)
         {
             if (_syncSeqs == null)
             {

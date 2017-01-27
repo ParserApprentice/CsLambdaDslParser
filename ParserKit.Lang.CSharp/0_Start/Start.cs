@@ -27,14 +27,19 @@ namespace Parser.MyCs
 
             //3. setup sub-parsers
             parserMan.Setup(new FormalParameterListParser());
-            NamespaceParser nsParser = parserMan.Setup(new NamespaceParser() { GetWalker = p => ((CsParseNodeHolder)p).NamespaceWalker });
-            parserMan.Setup(new ExpressionParser() { GetWalker = p => ((CsParseNodeHolder)p).ExpressionWalker });
+            //NamespaceParser nsParser = parserMan.Setup(new NamespaceParser() { GetWalker = p => ((CsParseNodeHolder)p).NamespaceWalker });
+            NamespaceParser nsParser = parserMan.Setup(new NamespaceParser());
+            //parserMan.Setup(new ExpressionParser() { GetWalker = p => ((CsParseNodeHolder)p).ExpressionWalker });
+            parserMan.Setup(new ExpressionParser());
             parserMan.Setup(new TypeArgumentListParser());
             parserMan.Setup(new TypeParser());
-            parserMan.Setup(new StatementParser() { GetWalker = p => ((CsParseNodeHolder)p).StatementBuilder });
+            //parserMan.Setup(new StatementParser() { GetWalker = p => ((CsParseNodeHolder)p).StatementBuilder });
+            parserMan.Setup(new StatementParser());
             parserMan.Setup(new StructDeclParser());
-            parserMan.Setup(new ClassDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).ClassWalker });
-            parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
+            //parserMan.Setup(new ClassDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).ClassWalker });
+            parserMan.Setup(new ClassDeclParser());
+            //parserMan.Setup(new MethodDeclParser() { GetWalker = p => ((CsParseNodeHolder)p).MethodWalker });
+            parserMan.Setup(new MethodDeclParser());
             parserMan.Setup(new PropertyDeclParser());
             parserMan.Setup(new FieldDeclParser());
             parserMan.Setup(new AttributesParser());

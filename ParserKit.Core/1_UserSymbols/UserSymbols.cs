@@ -904,16 +904,16 @@ namespace Parser.ParserKit
             this.SymbolString = tokenInfo.PresentationString;
             this.onStepDel = onShiftDel;
         }
-        public UserExpectedSymbol(UserTokenDefinition userTokenDef, bool isOptional, ParserNotifyDel onShiftDel)
-        {
-            dbugSetupDebugId();
-            this.tokenInfo = userTokenDef; //implicit conv
-            this.SymbolKind = UserExpectedSymbolKind.Terminal;
-            this.IsOptional = isOptional;
-            this.SymbolString = tokenInfo.PresentationString;
-            this.onStepDel = onShiftDel;
+        //public UserExpectedSymbol(UserTokenDefinition userTokenDef, bool isOptional, ParserNotifyDel onShiftDel)
+        //{
+        //    dbugSetupDebugId();
+        //    this.tokenInfo = userTokenDef; //implicit conv
+        //    this.SymbolKind = UserExpectedSymbolKind.Terminal;
+        //    this.IsOptional = isOptional;
+        //    this.SymbolString = tokenInfo.PresentationString;
+        //    this.onStepDel = onShiftDel; 
 
-        }
+        //}
         //------------------------------------------------------------------
         public UserExpectedSymbolKind SymbolKind
         {
@@ -1126,8 +1126,10 @@ namespace Parser.ParserKit
 
                     USymbol usymbol = (USymbol)f_result;
                     var seqShiftDelMap = new SeqShiftDelMap(getBuilder, symDel);
+
                     var symbolWithStepInfo = new SubParsers.SymbolWithStepInfo(usymbol,
                         new SubParsers.UserExpectedSymbolShift(seqShiftDelMap.Invoke));
+
                     firstLevelSymbols.Add(symbolWithStepInfo);
 
                 }
@@ -1235,8 +1237,8 @@ namespace Parser.ParserKit
         }
 
         //--------------------------------------------
-        [System.Diagnostics.DebuggerNonUserCode]
-        [System.Diagnostics.DebuggerStepThrough]
+        //[System.Diagnostics.DebuggerNonUserCode]
+        //[System.Diagnostics.DebuggerStepThrough]
         class SeqReductionDelMap
         {
 
@@ -1251,17 +1253,26 @@ namespace Parser.ParserKit
             }
             public void Invoke(ParseNodeHolder pnHolder)
             {
+                if (getBuilder == null)
+                {
+                    return;
+                }
                 if (cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
-                    subItemFill = builderDel(getBuilder(pnHolder));
+                    var get_walker = getBuilder(pnHolder);
+                    if (get_walker == null)
+                    {
+                        return;
+                    }
+                    subItemFill = builderDel(get_walker);
                 }
                 subItemFill();
             }
         }
-        [System.Diagnostics.DebuggerNonUserCode]
-        [System.Diagnostics.DebuggerStepThrough]
+        //[System.Diagnostics.DebuggerNonUserCode]
+        //[System.Diagnostics.DebuggerStepThrough]
         class SeqShiftDelMap
         {
 
@@ -1276,12 +1287,17 @@ namespace Parser.ParserKit
             }
             public object Invoke(ParseNodeHolder pnHolder)
             {
+                if (getBuilder == null)
+                {
+                    return null;
+                }
                 if (cacheHolderId != pnHolder.parseNodeHolderId)
                 {
                     //create new
                     cacheHolderId = pnHolder.parseNodeHolderId;
                     cachedBuilder = getBuilder(pnHolder);
                 }
+                //get parser node holder after invoke
                 return (object)builderDel(cachedBuilder);
             }
         }

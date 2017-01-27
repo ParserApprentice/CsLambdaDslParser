@@ -37,23 +37,7 @@ namespace Parser.ParserKit.SubParsers
         internal ReductionMonitor reductionDel;
         internal ParserNotifyDel shiftDel;
 
-        //public SymbolWithStepInfo(object symbol, ReductionFillSubItem reductionDel)
-        //{
-        //    /*symbol must be one of (UserNTDefinition,TokenDefinition,OptSymbol,ListSymbol,OneOfSymbol)*/
-        //    this.symbol = symbol;
-        //    this.reductionDel = new ReductionMonitor(reductionDel);
-        //}
-        //public SymbolWithStepInfo(object symbol, SeqReductionBreakable reductionDel)
-        //{
-        //    this.symbol = symbol;
-        //    this.reductionDel = new ReductionMonitor(reductionDel);
-        //}
-        //public SymbolWithStepInfo(object symbol, ReductionFillSubItemBreakable reductionDel)
-        //{
-        //    /*symbol must be one of (UserNTDefinition,TokenDefinition,OptSymbol,ListSymbol,OneOfSymbol)*/
-        //    this.symbol = symbol;
-        //    this.reductionDel = new ReductionMonitor(reductionDel);
-        //}
+
         public SymbolWithStepInfo(object symbol, UserExpectedSymbolShift shiftDel)
         {
             /*symbol must be one of (UserNTDefinition,TokenDefinition,OptSymbol,ListSymbol,OneOfSymbol)*/
@@ -73,6 +57,7 @@ namespace Parser.ParserKit.SubParsers
             }
             public void Invoke(ParseNodeHolder report)
             {
+
                 uSymbolShiftDel(report);
             }
         }

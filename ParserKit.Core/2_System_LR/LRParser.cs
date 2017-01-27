@@ -579,10 +579,7 @@ namespace Parser.ParserKit.LR
                             if (breakOnShift)
                             {
                                 SymbolSequence toSq = myLRParsingTable.GetSequence(todo.OriginalSeqNumberForShift);
-                                if (toSq.dbugId == 33)
-                                {
-
-                                }
+                                 
                                 UserExpectedSymbol exp = toSq.GetOriginalUserExpectedSymbol(todo.SampleUserExpectedSymbolPos);
 
                                 if (exp.onStepDel != null)
