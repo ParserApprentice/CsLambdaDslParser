@@ -1304,7 +1304,7 @@ namespace Parser.MyCs
         //before we go further
         // static bool init = Begin();
         //--------------------------
-        static TopUserNTDefinition /* root, must be top */
+        static UserNTDefinition /* root, must be top */
             _formal_parameter_list = top() + _oneof(
             /*1*/_(
                     o => _fixedParameters),
@@ -1315,9 +1315,7 @@ namespace Parser.MyCs
                     o => _parameter_array),
 
                 /*3*/_(
-                    o => _parameter_array));
-
-        static UserNTDefinition
+                    o => _parameter_array)),
             //----------------------------------
             _fixedParameters = _(o => list_c(_fixedParameter)),
             //----------------------------------
