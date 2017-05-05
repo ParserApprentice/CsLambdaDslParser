@@ -153,8 +153,8 @@ namespace ParserKit.TestParsers
                 lang1.TestLR0_3_5();
             }
             {
-                Lang01 lang1 = new Lang01();
-                lang1.TestLR0_3_5x();
+                //Lang01 lang1 = new Lang01();
+                //lang1.TestLR0_3_5x();
             }
         }
 
@@ -396,12 +396,20 @@ namespace ParserKit.TestParsers
         }
         private void button3_Click(object sender, EventArgs e)
         {
+            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
+            char[] codeBuffer = teststr.ToCharArray();
+            //-------------------------------------------             
 
+            Parser.ParserKit.SubParsers.BreakMode._shouldBreakOnLambda = ShouldStopOnLambda;
+            //------------------------------------------- 
+
+            CsParserHelper csParserHelper = new CsParserHelper();
+            ParseNode finalNode = csParserHelper.Parse(codeBuffer);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_02_200.cs");
+            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
             char[] codeBuffer = teststr.ToCharArray();
             //-------------------------------------------             
 

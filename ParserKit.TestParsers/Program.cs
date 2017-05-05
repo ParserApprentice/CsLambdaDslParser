@@ -1,6 +1,6 @@
 ﻿//MIT, 2015-2017, ParserApprentice
-using System; 
-using System.Windows.Forms; 
+using System;
+using System.Windows.Forms;
 namespace ParserKit.TestParsers
 {
     static class Program
@@ -16,7 +16,7 @@ namespace ParserKit.TestParsers
             //-----------
             //inject code 
 #if DEBUG
-           AsmBreakInjector.InjectBreakPoint("ParserKit.Lang.CSharp.dll");
+            //AsmBreakInjector.InjectBreakPoint("ParserKit.Lang.CSharp.dll");
 #endif
             //----------- 
             Application.Run(new FormLR());
@@ -35,12 +35,12 @@ namespace ParserKit.TestParsers
     //        {
     //            return 0;
     //        };
-            
+
     //        TestDel d2 = () =>
     //        {     // lambda statement
     //            return 0;
     //        }; 
-            
+
     //        TestDel d3 = () => 0; // lambda expression
 
     //        TestDel2 d4 = (x) =>
