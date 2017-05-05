@@ -20,6 +20,7 @@ namespace Parser.MyCs
             //1. build token info collection 
             CsTokenInfoCollection csTkInfo = new CsTokenInfoCollection();
             tkInfoCollection = csTkInfo.GetSnapedTokenInfoCollection();
+            ReflectionSubParser.s_tkInfoCollection = tkInfoCollection;
 
             //2. parser manager
             parserMan = new ParserManager(tkInfoCollection);
