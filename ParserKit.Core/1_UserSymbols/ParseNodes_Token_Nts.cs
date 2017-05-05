@@ -377,13 +377,13 @@ namespace Parser.ParserKit
         [System.Runtime.InteropServices.FieldOffset(0)]
         public int startAt;
 
-        [System.Runtime.InteropServices.FieldOffset(4)]
+        [System.Runtime.InteropServices.FieldOffset(8)]
         public ParseNode ntNode;
 
-        [System.Runtime.InteropServices.FieldOffset(4)]
+        [System.Runtime.InteropServices.FieldOffset(8)]
         public TokenDefinition tkDef;
 
-        [System.Runtime.InteropServices.FieldOffset(4)]
+        [System.Runtime.InteropServices.FieldOffset(8)]
         public object otherInfo;
 
         public PNode(ParseNode ntNode)
@@ -494,7 +494,11 @@ namespace Parser.ParserKit
         }
         public override LocationCodeArea GetLocation(ParseNodeLocator locator)
         {
-            throw new NotSupportedException();
+            return new LocationCodeArea();
+        }
+        public override string ToString()
+        {
+            return n1.ToString();
         }
     }
 

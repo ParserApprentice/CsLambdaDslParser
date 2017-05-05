@@ -1,5 +1,5 @@
 ﻿//MIT, 2015-2017, ParserApprentice 
-using System; 
+using System;
 using System.Collections.Generic;
 
 namespace Parser.ParserKit.LR
@@ -13,7 +13,7 @@ namespace Parser.ParserKit.LR
         {
             this.table = table;
 #if DEBUG
-            this.dbugWriteParseLog = false;
+            this.dbugWriteParseLog = true;
 #endif
         }
         public void SetSwitchHandler(LRParserSwitchHandler swHandler)
@@ -478,6 +478,8 @@ namespace Parser.ParserKit.LR
                             if (this.dbugWriteParseLog)
                             {
                                 var dbugWriter = reader.dbugLogWriter;
+                                dbugWriter.NotifyErrorEvent();
+                                //
                                 dbugWriter.Write('(');
                                 dbugWriter.Write(symbolParseNodes.Count.ToString());
                                 dbugWriter.Write(')');
@@ -566,6 +568,7 @@ namespace Parser.ParserKit.LR
                             if (this.dbugWriteParseLog)
                             {
                                 var dbugWriter = reader.dbugLogWriter;
+                                dbugWriter.NotifyShiftEvent();
                                 dbugWriter.Write('(');
                                 dbugWriter.Write(symbolParseNodes.Count.ToString());
                                 dbugWriter.Write(')');
@@ -579,7 +582,7 @@ namespace Parser.ParserKit.LR
                             if (breakOnShift)
                             {
                                 SymbolSequence toSq = myLRParsingTable.GetSequence(todo.OriginalSeqNumberForShift);
-                                 
+
                                 UserExpectedSymbol exp = toSq.GetOriginalUserExpectedSymbol(todo.SampleUserExpectedSymbolPos);
 
                                 if (exp.onStepDel != null)
@@ -607,6 +610,8 @@ namespace Parser.ParserKit.LR
                             if (this.dbugWriteParseLog)
                             {
                                 var dbugWriter = reader.dbugLogWriter;
+                                dbugWriter.NotifyConflictRR();
+                                //
                                 dbugWriter.Write('(');
                                 dbugWriter.Write(symbolParseNodes.Count.ToString());
                                 dbugWriter.Write(')');
@@ -693,6 +698,8 @@ namespace Parser.ParserKit.LR
                             if (this.dbugWriteParseLog)
                             {
                                 var dbugWriter = reader.dbugLogWriter;
+                                dbugWriter.NotifyReduceEvent();
+                                //
                                 dbugWriter.Write('(');
                                 dbugWriter.Write(symbolParseNodes.Count.ToString());
                                 dbugWriter.Write(')');
@@ -1235,6 +1242,8 @@ namespace Parser.ParserKit.LR
                             if (this.dbugWriteParseLog)
                             {
                                 var dbugWriter = reader.dbugLogWriter;
+                                dbugWriter.NotifyErrorEvent();
+                                //
                                 dbugWriter.Write('(');
                                 dbugWriter.Write(symbolParseNodes.Count.ToString());
                                 dbugWriter.Write(')');

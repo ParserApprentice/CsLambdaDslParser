@@ -15,7 +15,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -81,11 +81,11 @@
       <Name>MonoCecil</Name>
     </ProjectReference>
     <ProjectReference Include="..\ParserKit.Core\ParserKit.Core.csproj">
-      <Project>{34E2BA19-5043-465C-AF6F-5F2E396C3889}</Project>
+      <Project>{34e2ba19-5043-465c-af6f-5f2e396c3889}</Project>
       <Name>ParserKit.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\ParserKit.Lang.CSharp\ParserKit.Lang.CSharp.csproj">
-      <Project>{9CB42ECC-F382-43A7-A742-68EAD377218E}</Project>
+      <Project>{9cb42ecc-f382-43a7-a742-68ead377218e}</Project>
       <Name>ParserKit.Lang.CSharp</Name>
     </ProjectReference>
   </ItemGroup>

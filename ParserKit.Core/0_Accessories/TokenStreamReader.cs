@@ -64,28 +64,69 @@ namespace Parser.ParserKit
         }
 
 #if DEBUG
-        string dbugLogFileName;
-        System.IO.FileStream dbugFs;
-        System.IO.StreamWriter dbugWriter;
+        DevDebugLogger dbugLogger;
         public void dbugInitLogs(string filename)
         {
-            if (dbugLogFileName != null)
+            if (dbugLogger != null)
             {
                 return;
             }
 
-            this.dbugLogFileName = filename;
-            dbugFs = new System.IO.FileStream(filename, System.IO.FileMode.Create);
-            dbugWriter = new System.IO.StreamWriter(dbugFs);
-            dbugWriter.AutoFlush = true;
+            this.dbugLogger = new DevDebugLogger(filename);
+
         }
-        public System.IO.StreamWriter dbugLogWriter
+        public DevDebugLogger dbugLogWriter
         {
-            get { return this.dbugWriter; }
+            get { return this.dbugLogger; }
         }
 #endif
     }
 
+#if DEBUG
+    public class DevDebugLogger
+    {
+        string dbugLogFileName;
+        System.IO.FileStream dbugFs;
+        System.IO.StreamWriter dbugWriter;
 
+        int lineNo;
+        public DevDebugLogger(string outputFilename)
+        {
+            this.dbugLogFileName = outputFilename;
+            dbugFs = new System.IO.FileStream(outputFilename, System.IO.FileMode.Create);
+            dbugWriter = new System.IO.StreamWriter(dbugFs);
+            dbugWriter.AutoFlush = true;
+        }
+        public void Write(string data)
+        {
+            dbugWriter.Write(data);
+        }
+        public void Write(char data)
+        {
+            dbugWriter.Write(data);
+        }
+        public void WriteLine(string data)
+        {
+            dbugWriter.WriteLine(data);
+            lineNo++;
+        }
+        public void Flush()
+        {
+            dbugWriter.Flush();
+        }
+        public void NotifyShiftEvent()
+        {
+        }
+        public void NotifyReduceEvent()
+        {
+        }
+        public void NotifyErrorEvent()
+        {
+        }
+        public void NotifyConflictRR()
+        {
+        }
+    }
+#endif
 
 }

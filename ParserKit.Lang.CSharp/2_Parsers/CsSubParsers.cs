@@ -764,7 +764,10 @@ namespace Parser.MyCs
                 o => _statement /*embeded statement*/
                 ),
             //------------------------------
-            _for_initializer,
+            _for_initializer = _oneof(
+               o => _local_variable_declaration,
+               o => list_c(_expression)
+            ),
             //------------------------------
             _foreach_statement = _(
                 o => _token_foreach,
@@ -1437,7 +1440,7 @@ namespace Parser.MyCs
             //----------------------------
            _interface_type = _(o => _type_name),
            _interface_typelist;//external define  
-         
+
         public class Walker : AstWalker
         {
 

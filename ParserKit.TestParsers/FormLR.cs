@@ -396,7 +396,8 @@ namespace ParserKit.TestParsers
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
+            //string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
+            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_02_200.cs");
             char[] codeBuffer = teststr.ToCharArray();
             //-------------------------------------------             
 
@@ -409,7 +410,7 @@ namespace ParserKit.TestParsers
 
         private void button4_Click(object sender, EventArgs e)
         {
-            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_01.cs");
+            string teststr = System.IO.File.ReadAllText(@"D:\projects\px02\cs_inputtest\cs_02_200.cs");
             char[] codeBuffer = teststr.ToCharArray();
             //-------------------------------------------             
 

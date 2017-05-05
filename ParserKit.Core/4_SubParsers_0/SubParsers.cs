@@ -178,7 +178,7 @@ namespace Parser.ParserKit
 #if DEBUG
                     if (swpair.resolvedSubParser == null)
                     {
-                        DebugConsole.WriteLine("unresolved parser name " + swpair.symbolName);
+                        DebugConsole.WriteLine("unresolved parser name    " + swpair.symbolName);
                     }
 #endif
                 }
