@@ -708,7 +708,7 @@ namespace Parser.ParserKit.LR
                                 dbugWriter.Write(new string(' ', symbolParseNodes.Count * 2));
                                 dbugWriter.Write("r:" + todo.ReduceToSequenceNumber);
                                 dbugWriter.Write(' ');
-                                dbugWriter.Write(reduceToSq.ToString());
+                                dbugWriter.WriteLine(reduceToSq.ToString());
                             }
 
 #endif

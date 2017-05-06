@@ -1350,10 +1350,17 @@ namespace Parser.MyCs
             //---------------------------------------------------
             _member_name = _(o => _token_id),
 
-            _type_parameter_list,
+             //doc 491
+            _type_parameter_list = _(
+                 o => _token_openAng,
+            //o => _type_parameters, //temp remove
+                 o => _token_closeAng
+                ),
+
             _formal_parameter_list,
             _type,
             _statement
+
             ;
 
         public class Walker : AstWalker
